@@ -22,55 +22,58 @@ from whimsy import util
 
 _window_props = {
     # client
-    "WM_STATE":                  [ "CARDINAL"              ],
-    "WM_NAME":                   [ "UTF8_STRING"           ],
-    "WM_CLASS":                  [ "UTF8_STRING", "array"  ], # NONE OF THESE NEEDED..?
-    "WM_ICON_NAME":              [ "UTF8_STRING"           ],
-    "WM_PROTOCOLS":              [ "ATOM",        "array"  ],
+    "WM_STATE":                  [ "CARDINAL"                 ],
+    "WM_NAME":                   [ "UTF8_STRING"              ],
+    "WM_CLASS":                  [ "UTF8_STRING", "array"     ], # NONE OF THESE NEEDED..?
+    "WM_ICON_NAME":              [ "UTF8_STRING"              ],
+    "WM_PROTOCOLS":              [ "ATOM",        "array"     ],
 
-    "_NET_WM_NAME":              [ "UTF8_STRING"           ],
-    "_NET_WM_VISIBLE_NAME":      [ "UTF8_STRING"           ],
-    "_NET_WM_ICON_NAME":         [ "UTF8_STRING"           ],
-    "_NET_WM_VISIBLE_ICON_NAME": [ "UTF8_STRING"           ],
+    "_NET_WM_NAME":              [ "UTF8_STRING"              ],
+    "_NET_WM_VISIBLE_NAME":      [ "UTF8_STRING"              ],
+    "_NET_WM_ICON_NAME":         [ "UTF8_STRING"              ],
+    "_NET_WM_VISIBLE_ICON_NAME": [ "UTF8_STRING"              ],
 
-    "_NET_WM_WINDOW_TYPE":       [ "ATOM",     "array"     ],
-    "_NET_WM_STATE":             [ "ATOM",     "array"     ],
-    "_NET_WM_ALLOWED_ACTIONS":   [ "ATOM",     "array"     ],
+    "_NET_WM_WINDOW_TYPE":       [ "ATOM",        "array"     ],
+    "_NET_WM_STATE":             [ "ATOM",        "array"     ],
+    "_NET_WM_ALLOWED_ACTIONS":   [ "ATOM",        "array"     ],
 
-    "_NET_WM_DESKTOP":           [ "CARDINAL"              ],
-    "_NET_WM_PID":               [ "CARDINAL"              ],
-    "_NET_WM_USER_TIME":         [ "CARDINAL"              ],
+    "_NET_WM_DESKTOP":           [ "CARDINAL"                 ],
+    "_NET_WM_PID":               [ "CARDINAL"                 ],
+    "_NET_WM_USER_TIME":         [ "CARDINAL"                 ],
 
-    "_NET_DESKTOP_GEOMETRY":     [ "CARDINAL", "array",  2 ],
-    "_NET_WM_ICON_GEOMETRY":     [ "CARDINAL", "array",  4 ],
-    "_NET_FRAME_EXTENTS":        [ "CARDINAL", "array",  4 ],
-    "_NET_WM_STRUT":             [ "CARDINAL", "array",  4 ],
-    "_NET_WM_STRUT_PARTIAL":     [ "CARDINAL", "array", 12 ],
+    "_NET_DESKTOP_GEOMETRY":     [ "CARDINAL",    "array",  2 ],
+    "_NET_WM_ICON_GEOMETRY":     [ "CARDINAL",    "array",  4 ],
+    "_NET_FRAME_EXTENTS":        [ "CARDINAL",    "array",  4 ],
+    "_NET_WM_STRUT":             [ "CARDINAL",    "array",  4 ],
+    "_NET_WM_STRUT_PARTIAL":     [ "CARDINAL",    "array", 12 ],
 
     # client and root
-    "_NET_SUPPORTING_WM_CHECK":  [ "WINDOW"                ],
+    "_NET_SUPPORTING_WM_CHECK":  [ "WINDOW"                   ],
 
     # root
-    "_NET_NUMBER_OF_DESKTOPS":   [ "CARDINAL"              ],
-    "_NET_SHOWING_DESKTOP":      [ "CARDINAL"              ],
-    "_NET_CURRENT_DESKTOP":      [ "CARDINAL"              ],
+    "_NET_NUMBER_OF_DESKTOPS":   [ "CARDINAL"                 ],
+    "_NET_SHOWING_DESKTOP":      [ "CARDINAL"                 ],
+    "_NET_CURRENT_DESKTOP":      [ "CARDINAL"                 ],
 
-    "_NET_ACTIVE_WINDOW":        [ "WINDOW"                ],
+    "_NET_ACTIVE_WINDOW":        [ "WINDOW"                   ],
 
-    "_NET_DESKTOP_NAMES":        [ "UTF8_STRING", "array"  ],
+    "_NET_DESKTOP_NAMES":        [ "UTF8_STRING", "array"     ],
 
-    "_NET_SUPPORTED":            [ "ATOM",     "array"     ],
+    "_NET_SUPPORTED":            [ "ATOM",        "array"     ],
 
-    "_NET_CLIENT_LIST":          [ "WINDOW",   "array"     ],
-    "_NET_CLIENT_LIST_STACKING": [ "WINDOW",   "array"     ],
-    "_NET_VIRTUAL_ROOTS":        [ "WINDOW",   "array"     ],
+    "_NET_CLIENT_LIST":          [ "WINDOW",      "array"     ],
+    "_NET_CLIENT_LIST_STACKING": [ "WINDOW",      "array"     ],
+    "_NET_VIRTUAL_ROOTS":        [ "WINDOW",      "array"     ],
 
-    "_NET_DESKTOP_VIEWPORT":     [ "CARDINAL", "array",  2 ],
-    "_NET_WORKAREA":             [ "CARDINAL", "array",  4 ],
+    "_NET_DESKTOP_VIEWPORT":     [ "CARDINAL",    "array",  2 ],
+    "_NET_WORKAREA":             [ "CARDINAL",    "array",  4 ],
 
-    "_NET_DESKTOP_LAYOUT":       [ "CARDINAL", "array",  4 ],
+    "_NET_DESKTOP_LAYOUT":       [ "CARDINAL",    "array",  4 ],
 
-    "_WHIMSY_CLIENT_LIST_FOCUS": [ "WINDOW",   "array",    ],
+    "_WHIMSY_CLIENT_LIST_FOCUS": [ "WINDOW",      "array",    ],
+
+    "_WHIMSY_LAST_BUTTON_PRESS": [ "CARDINAL",    "array",  6 ],
+    "_WHIMSY_MULTICLICK_COUNT":  [ "CARDINAL",                ],
 }
 
 def supported_props():

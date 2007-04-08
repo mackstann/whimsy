@@ -80,13 +80,17 @@ wm.register('event', client_method('focus'),                      [ if_(X.EnterN
 
 wm.register('event', remove_client(),                             [ if_(X.DestroyNotify, 'client') ])
 
-focus = focus_tracker()
-wm.register('event', focus.record_focus_event,                    [ if_(X.FocusIn, 'client') ])
-wm.register('event', focus.focus_last_focused,                    [ if_(X.DestroyNotify) ])
+wm.register('event', update_client_list_focus,                    [ if_(X.FocusIn, 'client') ])
+
+# perhaps somehow split actions up into <how to get the window> and <what to do
+# to it> (only applies to some situations like this one)
+wm.register('event', focus_last_focused,                          [ if_(X.DestroyNotify) ])
 
 wm.register('event', install_colormap(),                          [ if_(X.ColormapNotify)   ])
 wm.register('event', configure_request_handler(),                 [ if_(X.ConfigureRequest) ])
 wm.register('event', update_client_property_on_property_notify(), [ if_(X.PropertyNotify, 'client') ])
+
+wm.register('event', update_last_button_press,                    [ if_(X.ButtonPress) ])
 
 wm.register('event', viewport_absolute_move(  0,   0),            [ if_key_press("u",      Control+Alt) ])
 wm.register('event', viewport_absolute_move(  W,   0),            [ if_key_press("i",      Control+Alt) ])
@@ -105,17 +109,17 @@ wm.register('event', viewport_relative_move( 0, +H),              [ if_key_press
 
 wm.register('event', execute("aterm"),                            [ if_key_press("x", Control+Alt) ])
 
-wm.register('event', execute("aterm"),                            [ if_root, if_button_press(1, Any, count=2) ])
+wm.register('event', execute("aterm"),                            [ if_root, if_button_press(1, Any), if_multiclick(2) ])
 
 wm.register('event', client_method("focus"),                      [ if_client, if_button_press(1, Any, passthru=True) ])
 
-wm.register('event', client_method('stack_bottom'),               [ if_button_press(4, Alt ), if_client ])
-wm.register('event', client_method('stack_top'),                  [ if_button_press(5, Alt ), if_client ])
+wm.register('event', client_method('stack_bottom'),               [ if_button_press(4, Alt), if_client ])
+wm.register('event', client_method('stack_top'),                  [ if_button_press(5, Alt), if_client ])
 
 wm.register('event', delete_client(),                             [ if_client, if_key_press('w', Control+Alt) ])
 
-wm.register('event', start_move(),                                [ if_button_press(1, Alt ), if_client ])
-wm.register('event', start_resize(),                              [ if_button_press(3, Alt ), if_client ])
+wm.register('event', start_move(),                                [ if_button_press(1, Alt), if_client ])
+wm.register('event', start_resize(),                              [ if_button_press(3, Alt), if_client ])
 
 wm.register('event_done', event.smart_replay())
 

@@ -5,7 +5,7 @@
 
 from Xlib import X
 
-from whimsy import util
+from whimsy import util, props
 
 class if_event_type:
     def __init__(self, evtype):
@@ -35,3 +35,11 @@ class if_:
         if self.wintype is None:
             return True
         return util.window_type(signal.wm, signal.ev.window) == self.wintype
+
+class if_multiclick:
+    def __init__(self, count):
+        self.count = count
+    def __call__(self, signal):
+        return self.count == \
+            props.get_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_MULTICLICK_COUNT')
+

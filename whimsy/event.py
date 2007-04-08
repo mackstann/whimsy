@@ -8,36 +8,6 @@ from Xlib.protocol import rq
 
 from whimsy.log import *
 
-class click_memory(object):
-    """     
-    remembers details about the last click to determine double clicks, triple
-    clicks, etc.  pass it every button press, and then query the .count member
-    to determine how many clicks have occurred in quick succession.
-    """
-
-    multiclick_pixel_distance = 15
-    multiclick_timeout_ms = 400
-
-    ev = None
-
-    @classmethod
-    def is_repeated_click(cls, prev, ev):
-        return (
-            prev != None and
-            ev.window == prev.window and
-            ev.detail == prev.detail and
-            (ev.time - prev.time) <= cls.multiclick_timeout_ms and
-            abs(ev.root_x - prev.root_x) <= cls.multiclick_pixel_distance and
-            abs(ev.root_y - prev.root_y) <= cls.multiclick_pixel_distance
-        )
-
-    def remember(self, ev):
-        if ev.__class__.__name__ == "ButtonPress":
-            if not self.is_repeated_click(self.ev, ev):
-                self.count = 0
-            self.count += 1
-            self.ev = ev
-
 def replay_or_swallow(dpy, ev, replay):
     if ev.type not in (X.ButtonPress, X.ButtonRelease, X.KeyPress, X.KeyRelease):
         return

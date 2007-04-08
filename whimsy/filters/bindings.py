@@ -13,7 +13,9 @@ from whimsy.log import *
 # register it to the event's done_processing signal (...?)
 
 class binding_base:
-    def __init__(self, **options):
+    def __init__(self, detail, mods, **options):
+        self.detail = detail
+        self.mods = mods
         self.options = options
 
     def __call__(self, signal):
@@ -38,13 +40,11 @@ class if_key_press(binding_base):
     swallow_event_types = [X.KeyPress, X.KeyRelease]
 
     def __init__(self, keyname, mods, **options):
-        binding_base.__init__(self, **options)
         self.keyname = keyname
-        self.detail = 'notakeycode'
-        self.mods = mods
+        binding_base.__init__(self, None, mods, **options)
 
     def __call__(self, signal):
-        if self.detail == 'notakeycode':
+        if self.detail == None:
             self.detail = signal.wm.dpy.keysym_to_keycode(
                 XK.string_to_keysym(self.keyname)
             )
@@ -53,21 +53,6 @@ class if_key_press(binding_base):
 class if_button_press(binding_base):
     execute_event_types = [X.ButtonPress]
     swallow_event_types = [X.ButtonPress, X.ButtonRelease]
-
-    def __init__(self, button, mods, **options):
-        binding_base.__init__(self, **options)
-        self.detail = button
-        self.mods = mods
-        self.memory = event.click_memory()
-
-    def _should_at_least_be_swallowed(self, ev):
-        if ev.__class__.__name__ == "ButtonPress":
-            debug('remember')
-            self.memory.remember(ev)
-        return (
-            binding_base._should_at_least_be_swallowed(self, ev) and
-            self.options.get('count', 0) in (0, self.memory.count)
-        )
 
 class if_button_release(if_button_press):
     execute_event_types = [X.ButtonRelease]

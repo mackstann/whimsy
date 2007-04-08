@@ -20,28 +20,63 @@ class delete_client:
         c.delete()
         signal.wm.clients.remove(c)
 
-# implement _WHIMSY_CLIENT_LIST_FOCUS -> lists managed windows that have been
+# _WHIMSY_CLIENT_LIST_FOCUS: lists managed windows that have been
 # focused, most recent first
 
-class focus_tracker:
-    def record_focus_event(self, signal):
-        wins = props.get_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_CLIENT_LIST_FOCUS')
-        debug('record')
-        if signal.ev.window.id in wins:
-            wins.remove(signal.ev.window.id)
-        wins.insert(0, signal.ev.window.id)
-        props.change_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_CLIENT_LIST_FOCUS', wins)
+def update_client_list_focus(signal):
+    wins = props.get_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_CLIENT_LIST_FOCUS')
+    debug('record')
+    if signal.ev.window.id in wins:
+        wins.remove(signal.ev.window.id)
+    wins.insert(0, signal.ev.window.id)
+    props.change_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_CLIENT_LIST_FOCUS', wins)
 
-    def focus_last_focused(self, signal):
-        wins = props.get_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_CLIENT_LIST_FOCUS')
-        debug('focus old')
-        while wins:
-            c = signal.wm.window_id_to_client(wins[0])
-            if c:
-                c.focus()
-                break
-            wins.pop(0)
-        props.change_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_CLIENT_LIST_FOCUS', wins)
+def focus_last_focused(signal):
+    wins = props.get_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_CLIENT_LIST_FOCUS')
+    debug('focus old')
+    while wins:
+        c = signal.wm.window_id_to_client(wins[0])
+        if c:
+            c.focus()
+            break
+        wins.pop(0)
+    props.change_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_CLIENT_LIST_FOCUS', wins)
+
+pixel_distance = 15
+timeout_ms = 400
+
+# XXX there should be an exclusive selection for this/ese prop(s) to avoid race conditions
+def update_last_button_press(signal):
+    try:
+        window_id, detail, state, time, root_x, root_y = props.get_prop(
+            signal.wm.dpy, signal.wm.root, '_WHIMSY_LAST_BUTTON_PRESS'
+        )
+    except IndexError:
+        return False
+
+    qualifies = (
+        signal.ev.window.id == window_id and
+        signal.ev.detail == detail and
+        signal.ev.state == state and
+        (signal.ev.time - time) <= timeout_ms and
+        abs(signal.ev.root_x - root_x) <= pixel_distance and
+        abs(signal.ev.root_y - root_y) <= pixel_distance
+    )
+    if qualifies:
+        props.change_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_MULTICLICK_COUNT',
+            1 + props.get_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_MULTICLICK_COUNT'),
+        )
+    else:
+        props.change_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_MULTICLICK_COUNT', 1)
+
+    props.change_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_LAST_BUTTON_PRESS', [
+        signal.ev.window.id,
+        signal.ev.detail,
+        signal.ev.state,
+        signal.ev.time,
+        signal.ev.root_x,
+        signal.ev.root_y
+    ])
 
 class start_move:
     def __call__(self, signal):
