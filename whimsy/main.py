@@ -18,8 +18,7 @@ from whimsy.actions.event_handling import *
 from whimsy.client import managed_client
 from whimsy import window_manager
 
-import whimsy.ewmh.plugins
-from whimsy import ewmh
+from whimsy.actions import ewmh
 
 import whimsy.infrastructure as main
 from whimsy.infrastructure.modifiers import *
@@ -49,19 +48,19 @@ H = rootgeom.height
 wm.register({
         'wm_manage_after': 'startup',
         'wm_shutdown_before': 'shutdown',
-    }, ewmh.plugins.net_supported()
+    }, ewmh.net_supported()
 )
 wm.register({
         'wm_manage_after': 'startup',
         'wm_shutdown_before': 'shutdown',
-    }, ewmh.plugins.net_supporting_wm_check()
+    }, ewmh.net_supporting_wm_check()
 )
 wm.register({
         'wm_manage_after': 'startup',
         'wm_shutdown_before': 'shutdown',
-    }, ewmh.plugins.net_desktop_geometry(width=W*3, height=H*3)
+    }, ewmh.net_desktop_geometry(width=W*3, height=H*3)
 )
-wm.register('wm_manage_after', ewmh.plugins.initialize_net_desktop_viewport())
+wm.register('wm_manage_after', ewmh.initialize_net_desktop_viewport())
 
 #IDEA!!
 # have the wm have 'states' or 'scenes' (in game terms)
