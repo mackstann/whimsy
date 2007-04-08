@@ -3,17 +3,12 @@
 # This software is in the public domain
 # and is provided AS IS, with NO WARRANTY.
 
-import os, sys, signal, traceback, time
+import os, signal, traceback
 
 from Xlib.display import Display
-from Xlib import X, XK
 import select
 
 from whimsy.log import *
-from whimsy import event, modifiers
-from whimsy.event_handling.builtins import *
-from whimsy.actions.builtins import *
-from whimsy.client import managed_client
 from whimsy.window_manager import window_manager
 
 def get_display_name():

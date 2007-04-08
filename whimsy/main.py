@@ -13,8 +13,8 @@ import select
 
 from whimsy.log import *
 from whimsy import event, modifiers, props, util
-from whimsy.event_handling.builtins import *
 from whimsy.actions.builtins import *
+from whimsy.actions.event_handling import *
 from whimsy.client import managed_client
 from whimsy import window_manager
 
@@ -78,8 +78,6 @@ wm.register('event', client_method('focus'),                      [ if_(X.MapReq
 
 #use infrastructure.modifiers.ButtonMask.matches()
 wm.register('event', client_method('focus'),                      [ if_(X.EnterNotify, 'client'), if_state(~ButtonMask) ])
-
-# event_handlers -> actions
 
 wm.register('event', remove_client(),                             [ if_(X.DestroyNotify, 'client') ])
 
