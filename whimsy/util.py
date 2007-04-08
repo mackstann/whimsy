@@ -113,19 +113,6 @@ class size_hints(object):
         w = int(round(h * aspect))
         return w, h
 
-    def __str__(self):
-        ret = []
-        for attr in self.__class__.__dict__.keys():
-            if attr.startswith("_"):
-                continue
-            try:
-                getattr(self.hints, attr)
-            except:
-                continue
-            else:
-                ret.append('%s=%s' % (attr, getattr(self, attr)))
-        return "<%s at 0x%x: %s>" % (self.__class__.__name__,
-                                     id(self), ', '.join(ret))
 
 def configure_request_changes(ev):
     changes = {}
@@ -171,8 +158,4 @@ def dict_to_object(d):
 def limited_dict_update(a, b, keys):
     for key in set(keys) & set(b.keys()):
         a[key] = b[key]
-
-class init_with_options:
-    def __init__(self, **options):
-        self.options = options
 

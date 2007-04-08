@@ -13,7 +13,7 @@ def warning(msg): logging.warning(msg)
 def info(msg): logging.info(msg)
 def debug(msg): logging.debug(msg)
 
-# end public stuff ######################################
+#######################################
 
 _logging_options = dict(
     level=logging.DEBUG,
@@ -45,8 +45,7 @@ except OSError, e:
         pass
     elif 'permission denied' in _strerror:
         _set_to_stream(sys.stderr)
-        _initial_warning = ("could not create ``%s''. logging to stderr." %
-                _whimsy_dir)
+        _initial_warning = ("could not create ``%s''. logging to stderr." % _whimsy_dir)
 
 #_set_to_filename(os.path.join(_whimsy_dir, 'log'))
 _set_to_stream(sys.stderr)

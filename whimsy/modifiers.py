@@ -16,31 +16,17 @@ class modifier_core(object):
         self.setup_funnylocks()
 
     def setup_funnylocks(self):
-        ks_to_kc = self.dpy.keysym_to_keycode
-        nlock_key = ks_to_kc(XK.string_to_keysym("Num_Lock"))
-        slock_key = ks_to_kc(XK.string_to_keysym("Scroll_Lock"))
+        nlock_key = self.dpy.keysym_to_keycode(XK.string_to_keysym("Num_Lock"))
+        slock_key = self.dpy.keysym_to_keycode(XK.string_to_keysym("Scroll_Lock"))
         mapping = self.dpy.get_modifier_mapping()
         mod_names = "Shift Lock Control Mod1 Mod2 Mod3 Mod4 Mod5".split()
-        if nlock_key and slock_key: # and?
-            for modname in mod_names:
-                index = getattr(X, "%sMapIndex" % modname)
-                mask = getattr(X, "%sMask" % modname)
-                if nlock_key and nlock_key in mapping[index]:
-                    self.nlock = mask
-                if slock_key and slock_key in mapping[index]:
-                    self.slock = mask
-
-    def get_all_modmasks(self, modmask):
-        if modmask & X.AnyModifier:
-            return (modmask,)
-        return (modmask,
-                modmask | self.nlock,
-                modmask | self.slock,
-                modmask | self.nlock | self.slock,
-                modmask | X.LockMask,
-                modmask | X.LockMask | self.nlock,
-                modmask | X.LockMask | self.slock,
-                modmask | X.LockMask | self.nlock | self.slock)
+        for modname in mod_names:
+            index = getattr(X, "%sMapIndex" % modname)
+            mask = getattr(X, "%sMask" % modname)
+            if nlock_key and nlock_key in mapping[index]:
+                self.nlock = mask
+            if slock_key and slock_key in mapping[index]:
+                self.slock = mask
 
     def modmask_eq(self, lhs, rhs):
         if lhs & X.AnyModifier or rhs & X.AnyModifier:
@@ -77,5 +63,5 @@ class modifier_mask(object):
 
     def matches(self, modmask):
         return (self.modcore.modmask_and(modmask, self.match) == self.match and
-                not self.modcore.modmask_and(modmask, self.negate))
+                 self.modcore.modmask_and(modmask, self.negate) == 0)
 
