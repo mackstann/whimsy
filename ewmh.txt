@@ -1,0 +1,116 @@
+## FOR EACH PROPERTY
+## (some properties are repeated because
+## they are used in more than one context)
+operation: set property, send clientmessage
+window: root, client
+to/from: wm, client, pager, everyone else
+in arguments:
+    for each: type, possible restricted set of values
+processed args: ...
+set when: ...
+notes: ...
+
+_NET_SUPPORTED
+operation: set
+window: root
+from: wm
+to: everyone else
+in arguments:
+    atoms:
+        type: list of atoms
+        desc: hints supported by wm
+
+
+_NET_CLIENT_LIST
+operation: set
+window: root
+from: wm
+to: everyone else
+in arguments:
+    windows:
+        type: list of windows
+        desc: in order of initial mapping, oldest first
+
+_NET_CLIENT_LIST_STACKING
+operation: set
+window: root
+from: wm
+to: everyone else
+in arguments:
+    windows:
+        type: list of windows
+        desc: in order of stacking, bottom first
+
+_NET_NUMBER_OF_DESKTOPS
+operation: set
+window: root
+from: wm
+to: everyone else
+in arguments:
+    ndesks:
+        type: int
+        desc: number of virtual desktops
+
+_NET_NUMBER_OF_DESKTOPS
+operation: send
+window: root
+from: pager
+to: wm
+in arguments:
+    [0]ndesks:
+        type: int
+        desc: request change in number of virtual desktops
+
+_NET_DESKTOP_GEOMETRY
+operation: set
+window: root
+from: wm
+to: everyone else
+in arguments:
+    width:
+        type: int
+        desc: width of desktop size or virtual desktop size
+    height:
+        type: int
+        desc: height of desktop size or virtual desktop size
+processed args:
+    dimensions_array:
+        type: list(width, height)
+
+_NET_DESKTOP_GEOMETRY
+operation: send
+window: root
+from: pager
+to: wm
+in arguments:
+    [0]width:
+        type: int
+        desc: request for new width of desktop size or virtual desktop size
+    [1]height:
+        type: int
+        desc: request for new height of desktop size or virtual desktop size
+
+_NET_DESKTOP_VIEWPORT
+operation: set
+window: root
+from: wm
+to: everyone else
+in arguments:
+    windows:
+        type: list of (x, y) pairs
+        desc: topleft corner of each desktop's viewport
+
+_NET_DESKTOP_VIEWPORT
+operation: send
+window: root
+from: pager
+to: wm
+in arguments:
+    [0]x:
+        type: int
+        desc: request for new topleft corner of current desktop's viewport
+    [1]y:
+        type: int
+        desc: request for new topleft corner of current desktop's viewport
+
+        desc: request for new height of desktop size or virtual desktop size

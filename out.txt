@@ -1,0 +1,293 @@
+2007-04-07 19:54:24,853 DEBUG    took 0.62 ms to handle PropertyNotify
+2007-04-07 19:54:24,854 DEBUG    took 0.50 ms to handle CreateNotify
+2007-04-07 19:54:24,855 DEBUG    took 0.56 ms to handle PropertyNotify
+2007-04-07 19:54:24,856 DEBUG    took 0.49 ms to handle PropertyNotify
+2007-04-07 19:54:25,411 DEBUG    took 0.52 ms to handle EnterNotify
+2007-04-07 19:54:25,449 DEBUG    took 0.47 ms to handle LeaveNotify
+2007-04-07 19:54:25,450 DEBUG    took 0.94 ms to handle EnterNotify
+2007-04-07 19:54:25,657 DEBUG    took 0.50 ms to handle EnterNotify
+2007-04-07 19:54:25,668 DEBUG    took 0.48 ms to handle LeaveNotify
+2007-04-07 19:54:25,668 DEBUG    took 0.59 ms to handle EnterNotify
+2007-04-07 19:54:25,684 DEBUG    took 0.53 ms to handle FocusOut
+2007-04-07 19:54:25,699 DEBUG    record
+2007-04-07 19:54:25,700 DEBUG    took 15.97 ms to handle FocusIn
+2007-04-07 19:54:25,747 DEBUG    took 0.51 ms to handle PropertyNotify
+2007-04-07 19:54:26,444 DEBUG    took 0.83 ms to handle KeyPress
+2007-04-07 19:54:26,531 DEBUG    took 0.63 ms to handle KeyRelease
+2007-04-07 19:54:28,389 DEBUG    took 0.64 ms to handle KeyPress
+2007-04-07 19:54:28,492 DEBUG    took 0.64 ms to handle KeyPress
+2007-04-07 19:54:28,558 DEBUG    took 0.63 ms to handle KeyPress
+2007-04-07 19:54:28,592 DEBUG    took 0.65 ms to handle KeyRelease
+2007-04-07 19:54:28,614 DEBUG    took 0.65 ms to handle KeyRelease
+2007-04-07 19:54:28,631 DEBUG    took 0.65 ms to handle KeyRelease
+2007-04-07 19:54:28,722 DEBUG    took 0.64 ms to handle KeyPress
+2007-04-07 19:54:28,816 DEBUG    took 0.62 ms to handle KeyPress
+2007-04-07 19:54:28,850 DEBUG    took 0.70 ms to handle KeyRelease
+2007-04-07 19:54:28,896 DEBUG    took 0.63 ms to handle KeyRelease
+2007-04-07 19:54:28,967 DEBUG    took 0.64 ms to handle KeyPress
+2007-04-07 19:54:29,110 DEBUG    took 0.63 ms to handle KeyRelease
+2007-04-07 19:54:30,225 DEBUG    took 0.65 ms to handle KeyPress
+2007-04-07 19:54:30,375 DEBUG    took 0.88 ms to handle KeyRelease
+2007-04-07 19:54:31,705 DEBUG    took 0.64 ms to handle KeyPress
+2007-04-07 19:54:31,773 DEBUG    took 0.63 ms to handle KeyRelease
+2007-04-07 19:54:32,528 DEBUG    took 0.53 ms to handle EnterNotify
+2007-04-07 19:54:32,529 DEBUG    remember
+2007-04-07 19:54:32,529 DEBUG    remember
+2007-04-07 19:54:32,529 DEBUG    remember
+2007-04-07 19:54:32,530 DEBUG    remember
+2007-04-07 19:54:32,530 DEBUG    remember
+2007-04-07 19:54:32,530 DEBUG    took 1.46 ms to handle ButtonPress
+2007-04-07 19:54:35,608 DEBUG    took 0.51 ms to handle EnterNotify
+2007-04-07 19:54:35,608 DEBUG    remember
+2007-04-07 19:54:35,609 DEBUG    remember
+2007-04-07 19:54:35,609 DEBUG    remember
+2007-04-07 19:54:35,609 DEBUG    remember
+2007-04-07 19:54:35,610 DEBUG    remember
+2007-04-07 19:54:35,610 DEBUG    took 1.88 ms to handle ButtonPress
+2007-04-07 19:54:36,904 DEBUG    took 0.51 ms to handle EnterNotify
+2007-04-07 19:54:36,904 DEBUG    remember
+2007-04-07 19:54:36,905 DEBUG    remember
+2007-04-07 19:54:36,905 DEBUG    remember
+2007-04-07 19:54:36,905 DEBUG    remember
+2007-04-07 19:54:36,905 DEBUG    remember
+2007-04-07 19:54:36,906 DEBUG    took 1.78 ms to handle ButtonPress
+2007-04-07 19:54:37,745 DEBUG    took 0.49 ms to handle ConfigureNotify
+2007-04-07 19:54:37,747 DEBUG    took 0.51 ms to handle ConfigureNotify
+2007-04-07 19:54:37,748 DEBUG    took 0.47 ms to handle MapNotify
+2007-04-07 19:54:38,216 DEBUG    took 0.52 ms to handle EnterNotify
+2007-04-07 19:54:38,216 DEBUG    remember
+2007-04-07 19:54:38,216 DEBUG    remember
+2007-04-07 19:54:38,217 DEBUG    remember
+2007-04-07 19:54:38,217 DEBUG    remember
+2007-04-07 19:54:38,217 DEBUG    remember
+2007-04-07 19:54:38,218 DEBUG    took 1.79 ms to handle ButtonPress
+2007-04-07 19:54:38,228 DEBUG    took 0.49 ms to handle UnmapNotify
+2007-04-07 19:54:38,229 DEBUG    took 0.50 ms to handle UnmapNotify
+2007-04-07 19:54:39,207 DEBUG    focus old
+2007-04-07 19:54:39,208 DEBUG    took 1.32 ms to handle DestroyNotify
+2007-04-07 19:54:39,221 DEBUG    took 0.49 ms to handle PropertyNotify
+2007-04-07 19:54:39,888 DEBUG    took 0.57 ms to handle EnterNotify
+2007-04-07 19:54:40,160 DEBUG    took 0.53 ms to handle LeaveNotify
+2007-04-07 19:54:40,160 DEBUG    took 0.55 ms to handle EnterNotify
+2007-04-07 19:54:40,527 DEBUG    took 0.55 ms to handle EnterNotify
+2007-04-07 19:54:40,528 DEBUG    remember
+2007-04-07 19:54:40,528 DEBUG    remember
+2007-04-07 19:54:40,528 DEBUG    remember
+2007-04-07 19:54:40,529 DEBUG    remember
+2007-04-07 19:54:40,529 DEBUG    remember
+2007-04-07 19:54:40,529 DEBUG    took 1.87 ms to handle ButtonPress
+2007-04-07 19:54:42,255 DEBUG    took 0.50 ms to handle EnterNotify
+2007-04-07 19:54:42,256 DEBUG    remember
+2007-04-07 19:54:42,256 DEBUG    remember
+2007-04-07 19:54:42,256 DEBUG    remember
+2007-04-07 19:54:42,256 DEBUG    remember
+2007-04-07 19:54:42,257 DEBUG    remember
+2007-04-07 19:54:42,257 DEBUG    took 2.01 ms to handle ButtonPress
+2007-04-07 19:54:43,383 DEBUG    took 0.50 ms to handle EnterNotify
+2007-04-07 19:54:43,735 DEBUG    took 0.47 ms to handle LeaveNotify
+2007-04-07 19:54:43,736 DEBUG    took 0.56 ms to handle EnterNotify
+2007-04-07 19:54:44,459 DEBUG    took 0.50 ms to handle ConfigureNotify
+2007-04-07 19:54:44,462 DEBUG    took 0.49 ms to handle ConfigureNotify
+2007-04-07 19:54:44,463 DEBUG    took 0.47 ms to handle MapNotify
+2007-04-07 19:54:45,182 DEBUG    took 0.50 ms to handle EnterNotify
+2007-04-07 19:54:45,183 DEBUG    remember
+2007-04-07 19:54:45,183 DEBUG    remember
+2007-04-07 19:54:45,183 DEBUG    remember
+2007-04-07 19:54:45,184 DEBUG    remember
+2007-04-07 19:54:45,184 DEBUG    remember
+2007-04-07 19:54:45,184 DEBUG    took 1.84 ms to handle ButtonPress
+2007-04-07 19:54:45,191 DEBUG    took 0.49 ms to handle UnmapNotify
+2007-04-07 19:54:45,192 DEBUG    took 0.46 ms to handle UnmapNotify
+2007-04-07 19:54:45,982 DEBUG    took 0.50 ms to handle EnterNotify
+2007-04-07 19:54:45,983 DEBUG    remember
+2007-04-07 19:54:45,983 DEBUG    remember
+2007-04-07 19:54:45,983 DEBUG    remember
+2007-04-07 19:54:45,984 DEBUG    remember
+2007-04-07 19:54:45,984 DEBUG    remember
+2007-04-07 19:54:45,984 DEBUG    took 1.89 ms to handle ButtonPress
+2007-04-07 19:54:47,878 DEBUG    took 0.51 ms to handle EnterNotify
+2007-04-07 19:54:47,879 DEBUG    remember
+2007-04-07 19:54:47,879 DEBUG    remember
+2007-04-07 19:54:47,879 DEBUG    remember
+2007-04-07 19:54:47,879 DEBUG    remember
+2007-04-07 19:54:47,880 DEBUG    remember
+2007-04-07 19:54:47,880 DEBUG    took 1.84 ms to handle ButtonPress
+2007-04-07 19:54:50,925 DEBUG    took 0.50 ms to handle EnterNotify
+2007-04-07 19:54:50,926 DEBUG    remember
+2007-04-07 19:54:50,926 DEBUG    remember
+2007-04-07 19:54:50,927 DEBUG    remember
+2007-04-07 19:54:50,927 DEBUG    remember
+2007-04-07 19:54:50,927 DEBUG    remember
+2007-04-07 19:54:50,928 DEBUG    took 1.79 ms to handle ButtonPress
+2007-04-07 19:54:51,246 DEBUG    took 0.51 ms to handle EnterNotify
+2007-04-07 19:54:51,247 DEBUG    remember
+2007-04-07 19:54:51,247 DEBUG    remember
+2007-04-07 19:54:51,247 DEBUG    remember
+2007-04-07 19:54:51,248 DEBUG    remember
+2007-04-07 19:54:51,248 DEBUG    remember
+2007-04-07 19:54:51,248 DEBUG    took 1.88 ms to handle ButtonPress
+2007-04-07 19:54:51,421 DEBUG    took 0.50 ms to handle EnterNotify
+2007-04-07 19:54:51,422 DEBUG    remember
+2007-04-07 19:54:51,422 DEBUG    remember
+2007-04-07 19:54:51,423 DEBUG    remember
+2007-04-07 19:54:51,423 DEBUG    remember
+2007-04-07 19:54:51,423 DEBUG    remember
+2007-04-07 19:54:51,423 DEBUG    took 1.84 ms to handle ButtonPress
+2007-04-07 19:54:51,597 DEBUG    took 0.50 ms to handle EnterNotify
+2007-04-07 19:54:51,598 DEBUG    remember
+2007-04-07 19:54:51,598 DEBUG    remember
+2007-04-07 19:54:51,599 DEBUG    remember
+2007-04-07 19:54:51,599 DEBUG    remember
+2007-04-07 19:54:51,599 DEBUG    remember
+2007-04-07 19:54:51,599 DEBUG    took 1.84 ms to handle ButtonPress
+2007-04-07 19:55:02,900 DEBUG    took 0.50 ms to handle EnterNotify
+2007-04-07 19:55:02,900 DEBUG    remember
+2007-04-07 19:55:02,900 DEBUG    remember
+2007-04-07 19:55:02,901 DEBUG    remember
+2007-04-07 19:55:02,901 DEBUG    remember
+2007-04-07 19:55:02,901 DEBUG    remember
+2007-04-07 19:55:02,902 DEBUG    took 1.81 ms to handle ButtonPress
+2007-04-07 19:55:07,108 DEBUG    took 0.50 ms to handle ConfigureNotify
+2007-04-07 19:55:07,111 DEBUG    took 0.50 ms to handle ConfigureNotify
+2007-04-07 19:55:07,111 DEBUG    took 0.47 ms to handle MapNotify
+2007-04-07 19:55:07,979 DEBUG    took 0.50 ms to handle EnterNotify
+2007-04-07 19:55:07,979 DEBUG    remember
+2007-04-07 19:55:07,979 DEBUG    remember
+2007-04-07 19:55:07,980 DEBUG    remember
+2007-04-07 19:55:07,980 DEBUG    remember
+2007-04-07 19:55:07,980 DEBUG    remember
+2007-04-07 19:55:07,981 DEBUG    took 1.79 ms to handle ButtonPress
+2007-04-07 19:55:07,986 DEBUG    took 0.49 ms to handle UnmapNotify
+2007-04-07 19:55:07,987 DEBUG    took 0.47 ms to handle UnmapNotify
+2007-04-07 19:55:09,484 DEBUG    took 0.51 ms to handle EnterNotify
+2007-04-07 19:55:09,484 DEBUG    remember
+2007-04-07 19:55:09,485 DEBUG    remember
+2007-04-07 19:55:09,485 DEBUG    remember
+2007-04-07 19:55:09,485 DEBUG    remember
+2007-04-07 19:55:09,485 DEBUG    remember
+2007-04-07 19:55:09,486 DEBUG    took 1.79 ms to handle ButtonPress
+2007-04-07 19:55:09,561 DEBUG    took 0.50 ms to handle ConfigureNotify
+2007-04-07 19:55:09,566 DEBUG    took 0.50 ms to handle MapNotify
+2007-04-07 19:55:09,590 DEBUG    took 0.49 ms to handle UnmapNotify
+2007-04-07 19:55:09,591 DEBUG    took 0.47 ms to handle UnmapNotify
+2007-04-07 19:55:10,515 DEBUG    took 0.53 ms to handle EnterNotify
+2007-04-07 19:55:10,851 DEBUG    took 0.48 ms to handle LeaveNotify
+2007-04-07 19:55:10,852 DEBUG    took 0.54 ms to handle EnterNotify
+2007-04-07 19:55:11,890 DEBUG    took 0.51 ms to handle EnterNotify
+2007-04-07 19:55:11,891 DEBUG    remember
+2007-04-07 19:55:11,891 DEBUG    remember
+2007-04-07 19:55:11,891 DEBUG    remember
+2007-04-07 19:55:11,892 DEBUG    remember
+2007-04-07 19:55:11,892 DEBUG    remember
+2007-04-07 19:55:11,892 DEBUG    took 1.87 ms to handle ButtonPress
+2007-04-07 19:55:13,282 DEBUG    took 0.51 ms to handle EnterNotify
+2007-04-07 19:55:13,282 DEBUG    remember
+2007-04-07 19:55:13,283 DEBUG    remember
+2007-04-07 19:55:13,283 DEBUG    remember
+2007-04-07 19:55:13,283 DEBUG    remember
+2007-04-07 19:55:13,284 DEBUG    remember
+2007-04-07 19:55:13,284 DEBUG    took 1.79 ms to handle ButtonPress
+2007-04-07 19:55:13,506 DEBUG    took 0.52 ms to handle EnterNotify
+2007-04-07 19:55:13,506 DEBUG    remember
+2007-04-07 19:55:13,507 DEBUG    remember
+2007-04-07 19:55:13,507 DEBUG    remember
+2007-04-07 19:55:13,507 DEBUG    remember
+2007-04-07 19:55:13,507 DEBUG    remember
+2007-04-07 19:55:13,508 DEBUG    took 1.85 ms to handle ButtonPress
+2007-04-07 19:55:13,714 DEBUG    took 0.51 ms to handle EnterNotify
+2007-04-07 19:55:13,714 DEBUG    remember
+2007-04-07 19:55:13,715 DEBUG    remember
+2007-04-07 19:55:13,715 DEBUG    remember
+2007-04-07 19:55:13,715 DEBUG    remember
+2007-04-07 19:55:13,716 DEBUG    remember
+2007-04-07 19:55:13,716 DEBUG    took 1.90 ms to handle ButtonPress
+2007-04-07 19:55:16,457 DEBUG    took 0.50 ms to handle EnterNotify
+2007-04-07 19:55:16,458 DEBUG    remember
+2007-04-07 19:55:16,458 DEBUG    remember
+2007-04-07 19:55:16,458 DEBUG    remember
+2007-04-07 19:55:16,459 DEBUG    remember
+2007-04-07 19:55:16,459 DEBUG    remember
+2007-04-07 19:55:16,459 DEBUG    took 1.80 ms to handle ButtonPress
+2007-04-07 19:55:16,753 DEBUG    took 0.50 ms to handle EnterNotify
+2007-04-07 19:55:16,754 DEBUG    remember
+2007-04-07 19:55:16,754 DEBUG    remember
+2007-04-07 19:55:16,754 DEBUG    remember
+2007-04-07 19:55:16,755 DEBUG    remember
+2007-04-07 19:55:16,755 DEBUG    remember
+2007-04-07 19:55:16,755 DEBUG    took 1.92 ms to handle ButtonPress
+2007-04-07 19:55:18,473 DEBUG    took 0.49 ms to handle ConfigureNotify
+2007-04-07 19:55:18,475 DEBUG    took 0.49 ms to handle ConfigureNotify
+2007-04-07 19:55:18,476 DEBUG    took 0.46 ms to handle MapNotify
+2007-04-07 19:55:21,096 DEBUG    took 0.51 ms to handle EnterNotify
+2007-04-07 19:55:21,097 DEBUG    remember
+2007-04-07 19:55:21,097 DEBUG    remember
+2007-04-07 19:55:21,098 DEBUG    remember
+2007-04-07 19:55:21,098 DEBUG    remember
+2007-04-07 19:55:21,098 DEBUG    remember
+2007-04-07 19:55:21,099 DEBUG    took 1.86 ms to handle ButtonPress
+2007-04-07 19:55:21,104 DEBUG    took 0.50 ms to handle UnmapNotify
+2007-04-07 19:55:21,105 DEBUG    took 0.49 ms to handle UnmapNotify
+2007-04-07 19:55:22,376 DEBUG    took 0.50 ms to handle EnterNotify
+2007-04-07 19:55:22,377 DEBUG    remember
+2007-04-07 19:55:22,377 DEBUG    remember
+2007-04-07 19:55:22,378 DEBUG    remember
+2007-04-07 19:55:22,378 DEBUG    remember
+2007-04-07 19:55:22,378 DEBUG    remember
+2007-04-07 19:55:22,378 DEBUG    took 1.81 ms to handle ButtonPress
+2007-04-07 19:55:22,560 DEBUG    took 0.51 ms to handle EnterNotify
+2007-04-07 19:55:22,561 DEBUG    remember
+2007-04-07 19:55:22,561 DEBUG    remember
+2007-04-07 19:55:22,561 DEBUG    remember
+2007-04-07 19:55:22,562 DEBUG    remember
+2007-04-07 19:55:22,562 DEBUG    remember
+2007-04-07 19:55:22,562 DEBUG    took 1.89 ms to handle ButtonPress
+2007-04-07 19:55:22,728 DEBUG    took 0.51 ms to handle EnterNotify
+2007-04-07 19:55:22,729 DEBUG    remember
+2007-04-07 19:55:22,729 DEBUG    remember
+2007-04-07 19:55:22,729 DEBUG    remember
+2007-04-07 19:55:22,730 DEBUG    remember
+2007-04-07 19:55:22,730 DEBUG    remember
+2007-04-07 19:55:22,730 DEBUG    took 1.85 ms to handle ButtonPress
+2007-04-07 19:55:27,681 DEBUG    took 0.51 ms to handle EnterNotify
+2007-04-07 19:55:27,681 DEBUG    remember
+2007-04-07 19:55:27,681 DEBUG    remember
+2007-04-07 19:55:27,682 DEBUG    remember
+2007-04-07 19:55:27,682 DEBUG    remember
+2007-04-07 19:55:27,682 DEBUG    remember
+2007-04-07 19:55:27,683 DEBUG    took 1.83 ms to handle ButtonPress
+2007-04-07 19:55:28,263 DEBUG    took 0.50 ms to handle EnterNotify
+2007-04-07 19:55:28,264 DEBUG    remember
+2007-04-07 19:55:28,264 DEBUG    remember
+2007-04-07 19:55:28,265 DEBUG    remember
+2007-04-07 19:55:28,265 DEBUG    remember
+2007-04-07 19:55:28,265 DEBUG    remember
+2007-04-07 19:55:28,265 DEBUG    took 1.78 ms to handle ButtonPress
+2007-04-07 19:55:28,471 DEBUG    took 0.50 ms to handle EnterNotify
+2007-04-07 19:55:28,472 DEBUG    remember
+2007-04-07 19:55:28,472 DEBUG    remember
+2007-04-07 19:55:28,473 DEBUG    remember
+2007-04-07 19:55:28,473 DEBUG    remember
+2007-04-07 19:55:28,473 DEBUG    remember
+2007-04-07 19:55:28,474 DEBUG    took 1.91 ms to handle ButtonPress
+2007-04-07 19:55:29,359 DEBUG    took 0.54 ms to handle EnterNotify
+2007-04-07 19:55:29,360 DEBUG    remember
+2007-04-07 19:55:29,360 DEBUG    remember
+2007-04-07 19:55:29,360 DEBUG    remember
+2007-04-07 19:55:29,361 DEBUG    remember
+2007-04-07 19:55:29,361 DEBUG    remember
+2007-04-07 19:55:29,361 DEBUG    took 1.82 ms to handle ButtonPress
+2007-04-07 19:55:29,559 DEBUG    took 0.50 ms to handle EnterNotify
+2007-04-07 19:55:29,560 DEBUG    remember
+2007-04-07 19:55:29,560 DEBUG    remember
+2007-04-07 19:55:29,560 DEBUG    remember
+2007-04-07 19:55:29,561 DEBUG    remember
+2007-04-07 19:55:29,561 DEBUG    remember
+2007-04-07 19:55:29,561 DEBUG    took 1.83 ms to handle ButtonPress
+2007-04-07 19:55:30,847 DEBUG    took 0.50 ms to handle EnterNotify
+2007-04-07 19:55:30,863 DEBUG    took 0.49 ms to handle LeaveNotify
+2007-04-07 19:55:30,864 DEBUG    took 0.61 ms to handle EnterNotify
+2007-04-07 19:55:30,876 DEBUG    took 0.57 ms to handle FocusOut
+2007-04-07 19:55:30,879 DEBUG    record
+2007-04-07 19:55:30,880 DEBUG    took 3.97 ms to handle FocusIn
+2007-04-07 19:55:30,892 DEBUG    took 0.50 ms to handle PropertyNotify
+2007-04-07 19:55:32,751 DEBUG    took 0.66 ms to handle KeyPress

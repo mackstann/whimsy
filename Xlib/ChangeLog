@@ -1,0 +1,67 @@
+2002-03-30  Peter Liljenberg  <peter.liljenberg@esdgkonsult.com>
+
+	* support/unix_connect.py: Handle fcntl/FCNTL changes in Python
+	2.2. 
+
+2002-03-11  Peter Liljenberg  <peter.liljenberg@esdgkonsult.com>
+
+	* xobject/drawable.py (Drawable.fill_arc): This should be a
+	PolyFillArc. 
+
+Fri Jan 19 17:49:45 2001  Peter Liljenberg  <petli@cendio.se>
+
+	* XK.py: Moved all keysyms into separate modules, based on their
+	category.  By default only the miscellany and latin1 keysyms are
+	loaded, and other have to be loaded by importing the
+	Xlib.keysymdef.<category> module, or calling
+	load_keysym_group('category'). 
+
+	* display.py (Display.lookup_string): 
+	(Display.rebind_string):
+
+	Functions to translate keysyms to strings, and binding keysyms to
+	new strings.
+	
+
+2001-01-16    <petli@cendio.se>
+
+	* xobject/drawable.py (Window.send_event): 
+	* display.py (Display.send_event): Changed the order of the
+	event_mask and propagate arguments.
+
+2001-01-10    <petli@cendio.se>
+
+	* display.py (Display._update_keymap): The first half of the
+	update algorithm operated on an earlier type of code->sym map than
+	the second half.  Stupid, stupid.  It would have been nice with a
+	type-checker now.
+
+Tue Jan  9 13:03:19 2001  Peter Liljenberg  <petli@cendio.se>
+
+	* display.py (Display._update_keymap): Fixed call to append with
+ 	1.5.2 semantics, broke in newer Pythons.
+	
+2000-12-22    <petli@cendio.se>
+
+	* display.py (Display.keycode_to_keysym): 
+	(Display.keysym_to_keycode): 
+	(Display.keysym_to_keycodes): 
+	(Display.refresh_keyboard_mapping): 
+	(Display._update_keymap):
+	Added keymap cache implementation.
+
+2000-12-21    <petli@cendio.se>
+
+	* xobject/colormap.py (Colormap.alloc_named_color): Extended to
+	handle #000000 style color specifications.
+
+	* xobject/drawable.py (Window.reparent): Renamed from
+	reparent_window. 
+
+	* display.py (Display.set_error_handler): Added.
+
+2000-12-20    <petli@cendio.se>
+
+	* display.py (_BaseDisplay):
+	Implement a cache of atom names.
+

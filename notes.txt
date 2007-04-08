@@ -1,0 +1,22 @@
+on key/button grabbing & selecting for events:
+
+    - having to pre-grab keys at startup makes things more cumbersome and makes
+      dynamic bindings more troublesome
+
+    - you can grab for all key/button combos and then selectively replay them:
+
+        - you must correctly replay or "swallow" all of the key/button events
+          with XAllowEvents.  i believe there is only one way to do that and it
+          was a pain in the ass to figure out, but it works
+
+        - select {Key,Button}{Press,Release}Mask on root but not on client
+          windows
+
+        - use XGrab{Key,Button} on client windows with Any{Key,Button} and
+          AnyModifier
+
+    - since we grab all button presses/releases, we get EnterNotify events
+      every time one happens.  if you only want to check for "normal"
+      EnterNotifys (not ones caused by clicks), then check that
+      (not ev.state & (X.Button1Mask|X.Button2Mask|...|X.Button5Mask))
+
