@@ -8,39 +8,6 @@ from Xlib.protocol import rq
 
 from whimsy.log import *
 
-class event_core(object):
-
-    def __init__(self):
-        self.__lastevent = X.LASTEvent
-        self.event_types = {}
-        self.__setup_event_types()
-
-    def __setup_event_types(self):
-        # find all classes in Xlib/protocol/event.py that have a _code member
-        # which is set to an actual event type code
-        from Xlib.protocol import event as _event
-        for name in dir(_event):
-            obj = getattr(_event, name)
-            if hasattr(obj, "_code"):
-                code = getattr(obj, "_code")
-                try:
-                    int(code)
-                except TypeError:
-                    # some are unusable base classes and have _code = None,
-                    # ignore these
-                    continue
-
-                if 2 <= code <= 127:
-                    self.add_event_type(name, code)
-
-    def add_event_type(self, name, code=None):
-        if code == None:
-            self.__lastevent += 1
-            code = self.__lastevent
-
-        self.event_types[code] = name
-        self.event_types[name] = code
-
 class click_memory(object):
     """     
     remembers details about the last click to determine double clicks, triple

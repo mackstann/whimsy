@@ -46,7 +46,6 @@ class window_manager(x_event_manager, signals.publisher):
 
         self.signal("wm_init_before")
 
-        self.ecore = event.event_core()
         self.modcore = modifiers.modifier_core(dpy)
 
         self.signal("wm_init_after")
