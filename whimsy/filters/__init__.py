@@ -19,9 +19,11 @@ def if_client(signal):
 def if_root(signal):
     return util.window_type(signal.wm, signal.ev.window) == 'root'
 
-def if_no_button_mask(signal):
-    mask = X.Button1Mask|X.Button2Mask|X.Button3Mask|X.Button4Mask|X.Button5Mask
-    return hasattr(signal.ev, 'state') and not signal.ev.state & mask
+class if_state:
+    def __init__(self, mods):
+        self.mods = mods
+    def __call__(self, signal):
+        return self.mods.matches(signal.ev.state)
 
 class if_:
     def __init__(self, evtype, wintype=None):

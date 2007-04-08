@@ -72,6 +72,9 @@ class modifier_mask(object):
         return modifier_mask(self.modcore,
                 self.match | ~rhs.match, self.negate | rhs.match)
 
+    def __invert__(self):
+        return modifier_mask(self.modcore, self.negate, self.match)
+
     def matches(self, modmask):
         return (self.modcore.modmask_and(modmask, self.match) == self.match and
                 not self.modcore.modmask_and(modmask, self.negate))

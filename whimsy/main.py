@@ -75,7 +75,11 @@ wm.register('event', client_method('map_normal'),                 [ if_(X.MapReq
 
 # how to focus root now?
 wm.register('event', client_method('focus'),                      [ if_(X.MapRequest, 'client') ])
-wm.register('event', client_method('focus'),                      [ if_no_button_mask, if_(X.EnterNotify, 'client') ])
+
+#use infrastructure.modifiers.ButtonMask.matches()
+wm.register('event', client_method('focus'),                      [ if_(X.EnterNotify, 'client'), if_state(~ButtonMask) ])
+
+# event_handlers -> actions
 
 wm.register('event', remove_client(),                             [ if_(X.DestroyNotify, 'client') ])
 
