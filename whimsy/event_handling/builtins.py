@@ -7,7 +7,6 @@ from Xlib import X
 
 from whimsy import util, client, signals, props
 from whimsy.log import *
-from whimsy.event_handling import basic
 
 class manage_new_window_on_map_request:
     def __call__(self, signal):

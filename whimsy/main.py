@@ -16,7 +16,6 @@ from whimsy import event, modifiers, props, util
 from whimsy.event_handling.builtins import *
 from whimsy.actions.builtins import *
 from whimsy.client import managed_client
-from whimsy import plugin
 from whimsy import window_manager
 
 import whimsy.ewmh.plugins
