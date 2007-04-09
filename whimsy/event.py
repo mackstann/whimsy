@@ -22,10 +22,16 @@ def replay_or_swallow(dpy, ev, replay):
         dpy.flush()
 
 class smart_replay:
+    def __init__(self):
+        self.replayed = []
     def __call__(self, signal):
-        if not hasattr(signal.ev, 'already_replayed'):
+        key = (signal.ev.time, signal.ev.sequence_number)
+        if key not in self.replayed:
             replay_or_swallow(signal.wm.dpy, signal.ev, not hasattr(signal.ev, 'swallow'))
-            signal.ev.already_replayed = True
+
+            self.replayed.append(key)
+            if len(self.replayed) > 100:
+                self.replayed.pop(0)
 
 def check_typed_window_event(dpy, start_event, type=None, window=None):
     last_good = start_event
@@ -34,6 +40,5 @@ def check_typed_window_event(dpy, start_event, type=None, window=None):
         if not e:
             return last_good
         last_good = e
-    last_good.wm = start_event.wm
     return last_good
 
