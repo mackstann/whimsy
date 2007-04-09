@@ -9,9 +9,6 @@ from whimsy import event
 
 from whimsy.log import *
 
-# instead of registering the replayer to the main event signal, we should
-# register it to the event's done_processing signal (...?)
-
 class binding_base:
     def __init__(self, detail, mods, **options):
         self.detail = detail
