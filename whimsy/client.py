@@ -21,8 +21,6 @@ class managed_client:
         self.wm = wm
         self.win = win
 
-        #wm.dpy.sync()
-
         self.wm.signal("client_init_before", client=self)
 
         self.win.change_attributes(event_mask=self.mask)
@@ -99,9 +97,6 @@ class managed_client:
 
     def focus(self):
         self.wm.set_focus(self.win)
-
-    def border_size(self, size):
-        self.win.configure(border_width=size)
 
     def stack_top(self):
         self.win.configure(stack_mode=X.Above)

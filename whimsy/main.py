@@ -69,7 +69,16 @@ wm.register('wm_manage_after', ewmh.initialize_net_desktop_viewport())
 
 # make a convenience filter that combines ev type / win type
 
-wm.register('event', manage_new_window_on_map_request(),          [ if_(X.MapRequest)  ])
+# perhaps somehow split actions up into <how to get the window(s)> and <what to do
+# to it/them> (only applies to some situations like this one)
+
+# new filter:
+# - is manageable
+
+# this will fix the border thing, allowing it to become before manage.
+
+wm.register('event', manage_new_window_on_map_request(),          [ if_(X.MapRequest) ])
+wm.register('event', client_method('configure', border_width=0),  [ if_(X.MapRequest, 'client') ])
 wm.register('event', client_method('map_normal'),                 [ if_(X.MapRequest, 'client') ])
 
 # how to focus root now?
@@ -82,8 +91,6 @@ wm.register('event', remove_client(),                             [ if_(X.Destro
 
 wm.register('event', update_client_list_focus,                    [ if_(X.FocusIn, 'client') ])
 
-# perhaps somehow split actions up into <how to get the window> and <what to do
-# to it> (only applies to some situations like this one)
 wm.register('event', focus_last_focused,                          [ if_(X.DestroyNotify) ])
 
 wm.register('event', install_colormap(),                          [ if_(X.ColormapNotify)   ])
@@ -123,12 +130,6 @@ wm.register('event', start_resize(),                              [ if_button_pr
 
 wm.register('event_done', event.smart_replay(),
                           [ if_event_type(X.KeyPress, X.KeyRelease, X.ButtonPress, X.ButtonRelease) ])
-
-#window.configure(stack_mode=X.Above)
-
-def remove_client_border(signal):
-    signal.client.border_size(0)
-wm.register('client_init_before', remove_client_border)
 
 main.run(wm, resolution=10)
 
