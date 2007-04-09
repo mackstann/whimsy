@@ -21,20 +21,16 @@ class publisher:
         sigdict['name'] = name
         signal = util.dict_to_object(sigdict)
         for func, filters in self.signals.get(name, []):
-            skip = False
             for filt in filters:
                 if not filt(signal):
-                    skip = True
                     break
-            if skip:
-                continue
-
-            ret = func(signal)
-            if ret is not None:
-                if ret & return_code.DELETE_HANDLER:
-                    self.signals[name].remove([func, filters])
-                if ret & return_code.SIGNAL_FINISHED:
-                    return
+            else:
+                ret = func(signal)
+                if ret is not None:
+                    if ret & return_code.DELETE_HANDLER:
+                        self.signals[name].remove([func, filters])
+                    if ret & return_code.SIGNAL_FINISHED:
+                        return
 
 
     def register(self, name, callable, filters=[]):
@@ -45,8 +41,5 @@ class publisher:
             self._register(name, callable, filters)
 
     def _register(self, name, func, filters=[]):
-        existing_list = self.signals.get(name, [])
-        entry = [func, filters]
-        if entry not in existing_list:
-            self.signals[name] = existing_list + [entry]
+        self.signals[name] = self.signals.get(name, []) + [[func, filters]]
 
