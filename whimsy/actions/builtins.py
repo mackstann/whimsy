@@ -103,10 +103,11 @@ class client_method:
         self.kw = kw
 
     def __call__(self, signal):
-        getattr(
-            signal.wm.window_to_client(signal.ev.window),
-            self.methodname
-        )(*self.a, **self.kw)
+        if hasattr(signal, 'client'):
+            c = signal.client
+        else:
+            c = signal.wm.window_to_client(signal.ev.window)
+        getattr(c, self.methodname)(*self.a, **self.kw)
 
 class execute:
     def __init__(self, cmd):
