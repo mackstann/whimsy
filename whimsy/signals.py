@@ -10,13 +10,12 @@ class return_code:
     FINISHED_AND_DELETE = DELETE_HANDLER | SIGNAL_FINISHED
 
 class publisher:
-    def __init__(self, **default_signal_attrs):
+    def __init__(self, **defaults):
         self.signals = {}
-        self.filters = {}
-        self.default_signal_attrs = default_signal_attrs
+        self.defaults = defaults
 
     def signal(self, name, **kw):
-        sigdict = self.default_signal_attrs
+        sigdict = self.defaults
         sigdict.update(kw)
         sigdict['name'] = name
         signal = util.dict_to_object(sigdict)
@@ -33,13 +32,10 @@ class publisher:
                         return
 
 
-    def register(self, name, callable, filters=[]):
-        if isinstance(name, types.DictType):
-            for signame, methodname in name.items():
-                self._register(signame, getattr(callable, methodname), filters)
-        else:
-            self._register(name, callable, filters)
+    def register_methods(self, mapping, callobj, filters=[]):
+        for signame, methodname in mapping.items():
+            self.register(signame, getattr(callobj, methodname), filters)
 
-    def _register(self, name, func, filters=[]):
+    def register(self, name, func, filters=[]):
         self.signals[name] = self.signals.get(name, []) + [[func, filters]]
 

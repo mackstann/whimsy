@@ -8,10 +8,10 @@ from Xlib import X
 from whimsy import util, props
 
 class if_event_type:
-    def __init__(self, evtype):
-        self.evtype = evtype
+    def __init__(self, *evtypes):
+        self.evtypes = evtypes
     def __call__(self, signal):
-        return signal.ev.type == self.evtype
+        return signal.ev.type in self.evtypes
 
 def if_client(signal):
     return util.window_type(signal.wm, signal.ev.window) == 'client'

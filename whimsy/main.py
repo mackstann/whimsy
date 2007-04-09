@@ -45,17 +45,17 @@ H = rootgeom.height
 
 # new concept: signal filters
 
-wm.register({
+wm.register_methods({
         'wm_manage_after': 'startup',
         'wm_shutdown_before': 'shutdown',
     }, ewmh.net_supported()
 )
-wm.register({
+wm.register_methods({
         'wm_manage_after': 'startup',
         'wm_shutdown_before': 'shutdown',
     }, ewmh.net_supporting_wm_check()
 )
-wm.register({
+wm.register_methods({
         'wm_manage_after': 'startup',
         'wm_shutdown_before': 'shutdown',
     }, ewmh.net_desktop_geometry(width=W*3, height=H*3)
@@ -121,7 +121,8 @@ wm.register('event', delete_client(),                             [ if_client, i
 wm.register('event', start_move(),                                [ if_button_press(1, Alt), if_client ])
 wm.register('event', start_resize(),                              [ if_button_press(3, Alt), if_client ])
 
-wm.register('event_done', event.smart_replay())
+wm.register('event_done', event.smart_replay(),
+                          [ if_event_type(X.KeyPress, X.KeyRelease, X.ButtonPress, X.ButtonRelease) ])
 
 #window.configure(stack_mode=X.Above)
 
