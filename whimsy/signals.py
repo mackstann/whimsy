@@ -15,7 +15,7 @@ class publisher:
         self.defaults = defaults
 
     def signal(self, name, **kw):
-        sigdict = self.defaults
+        sigdict = self.defaults.copy()
         sigdict.update(kw)
         sigdict['name'] = name
         signal = util.dict_to_object(sigdict)
