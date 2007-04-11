@@ -3,7 +3,7 @@
 # This software is in the public domain
 # and is provided AS IS, with NO WARRANTY.
 
-from Xlib import X
+from Xlib import X, Xutil
 
 from whimsy import util, props
 
@@ -42,4 +42,16 @@ class if_multiclick:
     def __call__(self, signal):
         return self.count == \
             props.get_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_MULTICLICK_COUNT')
+
+def if_should_manage_existing_window(signal):
+    attr = signal.win.get_attributes()
+    return (
+        not attr.override_redirect
+        and attr.map_state == X.IsViewable
+        and getattr(signal.win.get_wm_hints(), 'initial_state', not Xutil.NormalState)
+        == Xutil.NormalState
+    )
+
+def if_should_manage_new_window(signal):
+    return not signal.ev.window.get_attributes().override_redirect
 
