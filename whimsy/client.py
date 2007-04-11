@@ -32,9 +32,6 @@ class managed_client:
 
         self.props = {}
 
-        self.map_normal()
-        self.wm.dpy.sync()
-
         self.grab_all()
 
         self.update_prop('WM_NAME')
