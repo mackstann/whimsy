@@ -159,3 +159,11 @@ def limited_dict_update(a, b, keys):
     for key in set(keys) & set(b.keys()):
         a[key] = b[key]
 
+def signal_window(signal):
+    if hasattr(signal, 'win'):
+        return signal.win
+    if hasattr(signal, 'client'):
+        return signal.client.win
+    if hasattr(signal, 'ev'):
+        return signal.ev.window
+
