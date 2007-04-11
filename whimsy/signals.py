@@ -19,7 +19,7 @@ class publisher:
         sigdict.update(kw)
         sigdict['name'] = name
         signal = util.dict_to_object(sigdict)
-        for func, filters in self.signals.get(name, []):
+        for func, filters in self.signals.get(name, [])[:]:
             for filt in filters:
                 if not filt(signal):
                     break
