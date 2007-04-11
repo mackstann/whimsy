@@ -171,5 +171,4 @@ def discover_existing_windows(signal):
 def manage_window(signal):
     c = client.managed_client(signal.wm, util.signal_window(signal))
     signal.wm.clients.append(c)
-    signal.wm.signal('window_managed', client=c)
 

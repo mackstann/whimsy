@@ -80,8 +80,8 @@ wm.register('existing_window_discovered', manage_window, [ if_should_manage_exis
 
 wm.register('event',                      manage_window, [ if_(X.MapRequest), if_should_manage_new_window ])
 
-wm.register('window_managed', client_method('configure', border_width=0))
-wm.register('window_managed', client_method('map_normal'))
+wm.register('client_init_after', client_method('configure', border_width=0))
+wm.register('client_init_after', client_method('map_normal'))
 
 # how to focus root now?
 wm.register('event', client_method('focus'),                      [ if_(X.MapRequest, 'client') ])
