@@ -8,13 +8,6 @@ from Xlib import X
 from whimsy import util, client, signals, props
 from whimsy.log import *
 
-class manage_new_window_on_map_request:
-    def __call__(self, signal):
-        if signal.wm.should_manage_new_window(signal.ev.window):
-            signal.wm.clients.append(
-                client.managed_client(signal.wm, signal.ev.window)
-            )
-
 class update_client_property_on_property_notify:
     def __call__(self, signal):
         propname = signal.wm.dpy.get_atom_name(signal.ev.atom)

@@ -39,14 +39,12 @@ class window_manager(x_event_manager, signals.publisher):
         x_event_manager.__init__(self, dpy, wm=self)
         signals.publisher.__init__(self, wm=self)
 
-        self.root = dpy.screen().root
-        self.focus = X.NONE
-
-        self.clients = []
-
         self.signal("wm_init_before")
 
-        self.modcore = modifiers.modifier_core(dpy)
+        self.root = dpy.screen().root
+        self.focus = X.NONE # XXX!!!!!!!!
+
+        self.clients = []
 
         self.signal("wm_init_after")
 
@@ -66,7 +64,6 @@ class window_manager(x_event_manager, signals.publisher):
     def manage(self):
         self.signal("wm_manage_before")
         self.get_wm_selection()
-        self.manage_all()
         self.running = True
         self.signal("wm_manage_after")
 
@@ -80,32 +77,16 @@ class window_manager(x_event_manager, signals.publisher):
 
         # TODO: ewmh selection
 
-    def manage_all(self):
-        self.clients = [
-            managed_client(self, win)
-            for win in self.root.query_tree().children
-            if self.should_manage_existing_window(win)
-        ]
-
+    # move to action
     def shutdown_all(self):
         while self.clients:
             self.clients.pop().shutdown()
 
-    def should_manage_existing_window(self, win):
-        attr = win.get_attributes()
-        return (
-            not attr.override_redirect
-            and attr.map_state == X.IsViewable
-            and getattr(win.get_wm_hints(), 'initial_state', 'nope')
-                == Xutil.NormalState
-        )
-
-    def should_manage_new_window(self, win):
-        return not win.get_attributes().override_redirect
-
+    # move to util?
     def window_to_client(self, win):
         return self.window_id_to_client(win.id)
 
+    # move to util?
     def window_id_to_client(self, wid):
         for client in self.clients:
             if wid == client.win.id:

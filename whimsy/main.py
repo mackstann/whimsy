@@ -43,8 +43,6 @@ rootgeom = wm.root.get_geometry()
 W = rootgeom.width
 H = rootgeom.height
 
-# new concept: signal filters
-
 wm.register_methods({
         'wm_manage_after': 'startup',
         'wm_shutdown_before': 'shutdown',
@@ -77,9 +75,13 @@ wm.register('wm_manage_after', ewmh.initialize_net_desktop_viewport())
 
 # this will fix the border thing, allowing it to become before manage.
 
-wm.register('event', manage_new_window_on_map_request(),          [ if_(X.MapRequest) ])
-wm.register('event', client_method('configure', border_width=0),  [ if_(X.MapRequest, 'client') ])
-wm.register('event', client_method('map_normal'),                 [ if_(X.MapRequest, 'client') ])
+wm.register('wm_manage_after', discover_existing_windows)
+wm.register('existing_window_discovered', manage_window, [ if_should_manage_existing_window ])
+
+wm.register('event',                      manage_window, [ if_(X.MapRequest), if_should_manage_new_window ])
+
+wm.register('window_managed', client_method('configure', border_width=0))
+wm.register('window_managed', client_method('map_normal'))
 
 # how to focus root now?
 wm.register('event', client_method('focus'),                      [ if_(X.MapRequest, 'client') ])

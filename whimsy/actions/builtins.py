@@ -7,7 +7,7 @@ import os
 
 from whimsy.log import *
 
-from whimsy import transformers, props, window_manager, util
+from whimsy import transformers, props, window_manager, util, client
 import whimsy.window_manager.util
 
 #####################################################################
@@ -163,4 +163,13 @@ class viewport_relative_move:
             current_x, current_y,
             self.x, self.y,
         )
+
+def discover_existing_windows(signal):
+    for win in signal.wm.root.query_tree().children:
+        signal.wm.signal('existing_window_discovered', win=win)
+
+def manage_window(signal):
+    c = client.managed_client(signal.wm, util.signal_window(signal))
+    signal.wm.clients.append(c)
+    signal.wm.signal('window_managed', client=c)
 
