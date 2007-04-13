@@ -1,4 +1,4 @@
-# Whimsy is written by Nick Welch <mack@incise.org>, 2005-2006.
+# Whimsy is written by Nick Welch <mack@incise.org>, 2005-2007.
 #
 # This software is in the public domain
 # and is provided AS IS, with NO WARRANTY.
