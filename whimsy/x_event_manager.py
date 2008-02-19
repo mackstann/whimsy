@@ -1,3 +1,5 @@
+# Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
+
 class x_event_manager:
     def __init__(self, dpy, **event_attrs):
         self.dpy = dpy

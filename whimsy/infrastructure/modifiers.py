@@ -1,3 +1,5 @@
+# Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
+
 from Xlib import X
 
 from whimsy.modifiers import (

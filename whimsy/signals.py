@@ -1,3 +1,5 @@
+# Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
+
 import types
 
 from whimsy import util

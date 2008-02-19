@@ -1,7 +1,4 @@
-# Whimsy is written by Nick Welch <mack@incise.org>, 2005-2007.
-#
-# This software is in the public domain
-# and is provided AS IS, with NO WARRANTY.
+# Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
 import os, sys, signal, time
 
