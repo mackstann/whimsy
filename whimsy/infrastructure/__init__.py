@@ -37,25 +37,22 @@ def resuming_select(r, w, x, timeout):
 
 def main_loop(wm, **options):
     delay = options.get('resolution', 10) / 1000.0
-    try:
-        while 1:
-            signal.alarm(20)
+    while 1:
+        signal.alarm(20)
 
-            resuming_select([wm.dpy], [], [], delay)
-            wm.pull_all_pending_events()
-            wm.handle_all_pending_events()
+        resuming_select([wm.dpy], [], [], delay)
+        wm.pull_all_pending_events()
+        wm.handle_all_pending_events()
 
-            import datetime as dt
-            n = dt.datetime.now()
-            file('now.txt', 'w').write(
-                ('%04d%02d%02d %02d:%02d\n' % (n.year, n.month, n.day, n.hour, n.minute))+
-                ('%04d%02d%02d %02d:%02d\n' % (n.year, n.month, n.day, n.hour, n.minute-1))+
-                ('%04d%02d%02d %02d:%02d\n' % (n.year, n.month, n.day, n.hour, n.minute+1))
-            )
-            signal.alarm(0)
-            # anything periodic goes here, like timers (not implemented yet)
-    except KeyboardInterrupt:
-        raise SystemExit
+        # temporary super ugly kludge for monitor.sh to be able to kill us if we hang
+        import datetime as dt
+        n = dt.datetime.now()
+        file('now.txt', 'w').write(
+            ('%04d%02d%02d %02d:%02d\n' % (n.year, n.month, n.day, n.hour, n.minute))+
+            ('%04d%02d%02d %02d:%02d\n' % (n.year, n.month, n.day, n.hour, n.minute-1))+
+            ('%04d%02d%02d %02d:%02d\n' % (n.year, n.month, n.day, n.hour, n.minute+1))
+        )
+        signal.alarm(0)
 
 def init(**options):
     set_display_env()
@@ -68,5 +65,9 @@ def run(wm, **options):
     signal.signal(signal.SIGALRM, alrm)
     signal.signal(signal.SIGCHLD, wait_signal_handler)
     wm.manage()
-    main_loop(wm, **options)
+    try:
+        main_loop(wm, **options)
+    except KeyboardInterrupt:
+        wm.shutdown()
+        raise SystemExit
 

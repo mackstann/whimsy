@@ -191,3 +191,6 @@ def get_prop(dpy, win, name, type_name=None):
         return prop.value[0]
     return prop.value
 
+def delete_prop(dpy, win, name):
+    win.delete_property(dpy.get_atom(name))
+

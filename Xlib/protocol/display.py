@@ -755,7 +755,7 @@ class Display:
 
 	# Decrement it by one, so that we don't remove the request
 	# that generated these events, if there is such a one.
-	# Bug reported by Ilpo Nyyssönen
+	# Bug reported by Ilpo NyyssXnen
 	self.get_waiting_request((e.sequence_number - 1) % 65536)
 	
 	# print 'recv Event:', e

@@ -24,6 +24,7 @@ class publisher:
                 if not filt(signal):
                     break
             else:
+                debug('executing %r' % func)
                 ret = func(signal)
                 if ret is not None:
                     if ret & return_code.DELETE_HANDLER:

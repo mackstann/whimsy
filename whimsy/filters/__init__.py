@@ -4,6 +4,7 @@
 # and is provided AS IS, with NO WARRANTY.
 
 from Xlib import X, Xutil
+from Xlib import error as Xerror
 
 from whimsy import util, props
 
@@ -14,10 +15,16 @@ class if_event_type:
         return signal.ev.type in self.evtypes
 
 def if_client(signal):
-    return util.window_type(signal.wm, signal.ev.window) == 'client'
+    return (
+        hasattr(signal.ev, 'window') and
+        util.window_type(signal.wm, signal.ev.window) == 'client'
+    )
 
 def if_root(signal):
-    return util.window_type(signal.wm, signal.ev.window) == 'root'
+    return (
+        hasattr(signal.ev, 'window') and
+        util.window_type(signal.wm, signal.ev.window) == 'root'
+    )
 
 class if_state:
     def __init__(self, mods):
@@ -53,5 +60,7 @@ def if_should_manage_existing_window(signal):
     )
 
 def if_should_manage_new_window(signal):
-    return not signal.ev.window.get_attributes().override_redirect
+    catch = Xerror.CatchError(Xerror.BadWindow)
+    return not signal.ev.window.get_attributes().override_redirect and not catch.get_error()
+
 

@@ -42,7 +42,6 @@ class window_manager(x_event_manager, signals.publisher):
         self.signal("wm_init_before")
 
         self.root = dpy.screen().root
-        self.focus = X.NONE # XXX!!!!!!!!
 
         self.clients = []
 
@@ -57,6 +56,7 @@ class window_manager(x_event_manager, signals.publisher):
     def shutdown(self):
         self.signal("wm_shutdown_before")
         self.root.change_attributes(event_mask=X.NoEventMask)
+        self.dpy.set_input_focus(X.PointerRoot, X.RevertToPointerRoot, X.CurrentTime)
         self.shutdown_all()
         self.running = False
         self.signal("wm_shutdown_after")
@@ -80,6 +80,7 @@ class window_manager(x_event_manager, signals.publisher):
     # move to action
     def shutdown_all(self):
         while self.clients:
+            # make wm method for removing client
             self.clients.pop().shutdown()
 
     # move to util?
@@ -93,8 +94,5 @@ class window_manager(x_event_manager, signals.publisher):
                 return client
 
     def set_focus(self, win):
-        if self.focus != win:
-            self.dpy.set_input_focus(win, X.RevertToPointerRoot, X.CurrentTime)
-            self.focus = win
-
+        self.dpy.set_input_focus(win, X.RevertToPointerRoot, X.CurrentTime)
 

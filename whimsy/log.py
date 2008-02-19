@@ -7,29 +7,30 @@ import os, sys, logging
 
 # public stuff
 
-def critical(msg): logging.critical(msg)
-def error(msg): logging.error(msg)
-def warning(msg): logging.warning(msg)
-def info(msg): logging.info(msg)
-def debug(msg): logging.debug(msg)
+critical = logging.critical
+error = logging.error
+warning = logging.warning
+info = logging.info
+debug = logging.debug
 
 #######################################
 
 _logging_options = dict(
     level=logging.DEBUG,
     format="%(asctime)s %(levelname)-8s %(message)s",
-    filename=os.path.expanduser('~/.whimsy/log'),
-    filemode='w'
 )
 
 def _set_to_filename(fn):
     _logging_options['filename'] = fn
     _logging_options['filemode'] = 'w'
-    del _logging_options['stream']
+    if 'stream' in _logging_options:
+        del _logging_options['stream']
 
 def _set_to_stream(stream):
-    del _logging_options['filename']
-    del _logging_options['filemode']
+    if 'filename' in _logging_options:
+        del _logging_options['filename']
+    if 'filemode' in _logging_options:
+        del _logging_options['filemode']
     _logging_options['stream'] = stream
 
 
