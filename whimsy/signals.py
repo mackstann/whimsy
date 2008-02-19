@@ -35,7 +35,7 @@ class publisher:
                         return
 
 
-    def register_methods(self, mapping, callobj, filters=[]):
+    def register_methods(self, callobj, mapping, filters=[]):
         for signame, methodname in mapping.items():
             self.register(signame, getattr(callobj, methodname), filters)
 

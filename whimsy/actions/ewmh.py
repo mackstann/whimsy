@@ -41,14 +41,14 @@ class net_supporting_wm_check(object):
         self.win.destroy()
 
 class net_desktop_geometry(object):
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
+    def __init__(self, vwidth, vheight):
+        self.vwidth = vwidth
+        self.vheight = vheight
 
     def startup(self, signal):
         props.change_prop(
             signal.wm.dpy, signal.wm.root, '_NET_DESKTOP_GEOMETRY',
-            [self.width, self.height]
+            [self.vwidth, self.vheight]
         )
 
     def shutdown(self, signal):
@@ -61,18 +61,22 @@ class net_client_list(object):
             [ c.win.id for c in signal.wm.clients ]
         )
 
-    def delete(self, signal):
+    def shutdown(self, signal):
         props.delete_prop(signal.wm.dpy, signal.wm.root, '_NET_CLIENT_LIST')
 
-class initialize_net_desktop_viewport(object):
-    def __call__(self, signal):
-        current = props.get_prop(
-            signal.wm.dpy, signal.wm.root, '_NET_DESKTOP_VIEWPORT'
-        )
+class net_desktop_viewport(object):
+    def startup(self, signal):
+        current = props.get_prop(signal.wm.dpy, signal.wm.root, '_NET_DESKTOP_VIEWPORT')
         if not current:
             props.change_prop(
                 signal.wm.dpy, signal.wm.root, '_NET_DESKTOP_VIEWPORT',
+                # not possible to do [[0, 0]]?  pairs are flattened?  is this right?
                 [0, 0]
             )
-        return signals.return_code.DELETE_HANDLER
+
+    def refresh(self, signal):
+        props.change_prop(
+            signal.wm.dpy, signal.wm.root, '_NET_DESKTOP_VIEWPORT',
+            [signal.x, signal.y]
+        )
 

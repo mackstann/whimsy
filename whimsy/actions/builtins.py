@@ -148,11 +148,7 @@ class viewport_relative_move:
         limit_y = total_height - self.root_geom.height
 
         if 0 <= move_to_x <= limit_x and 0 <= move_to_y <= limit_y:
-            window_manager.util.move_viewport_to(
-                signal.wm,
-                current_x, current_y,
-                move_to_x, move_to_y
-            )
+            viewport_absolute_move(move_to_x, move_to_y)(signal)
 
 def discover_existing_windows(signal):
     for win in signal.wm.root.query_tree().children:

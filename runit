@@ -1,2 +1,3 @@
-export PYTHONPATH=/home/death/dev/whimsy
-while true; do python dev/whimsy/whimsy/main.py ; done
+export PYTHONPATH=.
+now=`date '+%Y%m%d-%H:%M:%S'`
+while true; do python whimsy/main.py 2>&1 | tee out.$now; done
