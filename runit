@@ -1,3 +1,2 @@
 export PYTHONPATH=.
-now=`date '+%Y%m%d-%H:%M:%S'`
-while true; do python whimsy/main.py 2>&1 | tee out.$now; done
+while true; do python whimsy/main.py; done

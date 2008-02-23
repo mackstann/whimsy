@@ -3,8 +3,6 @@
 from Xlib import X, Xutil
 import sys
 
-from whimsy.log import *
-
 class size_hints(object):
     def __init__(self, **kw):
         if 'hints' in kw and 'win' not in kw:

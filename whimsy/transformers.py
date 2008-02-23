@@ -2,8 +2,7 @@
 
 from Xlib import X
 
-from whimsy.log import *
-from whimsy import event, util, signals
+from whimsy import event, signals
 
 class interactive_pointer_transform:
     def __init__(self, client, begin_event):
@@ -18,12 +17,8 @@ class interactive_pointer_transform:
             X.CurrentTime
         )
 
-    def __del__(self):
-        debug('transformer deleted')
-
     def __call__(self, signal):
         ev = signal.ev
-        assert not hasattr(self, 'deleted')
 
         if ev.__class__.__name__ == "MotionNotify":
             ev = event.check_typed_window_event(signal.wm.dpy, ev, type=X.MotionNotify, window=self.client.win)
@@ -34,9 +29,7 @@ class interactive_pointer_transform:
 
         elif ev.__class__.__name__ == "ButtonRelease":
             self.client.wm.dpy.ungrab_pointer(X.CurrentTime)
-            self.deleted = True
             return signals.return_code.DELETE_HANDLER
-
         elif ev.__class__.__name__ == "EnterNotify":
             return signals.return_code.SIGNAL_FINISHED
         elif ev.__class__.__name__ == "LeaveNotify":

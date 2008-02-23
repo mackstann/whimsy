@@ -1,19 +1,12 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
-from Xlib import X, Xutil
+from Xlib import X
 from Xlib import error as Xerror
 
 from itertools import *
 
-from whimsy import event, util, modifiers, props
-
-from whimsy.log import *
-from whimsy.client import managed_client
-
 from whimsy.x_event_manager import x_event_manager
 from whimsy import signals
-
-from whimsy.window_manager import util
 
 # maybe don't use inheritance for this?
 class window_manager(x_event_manager, signals.publisher):

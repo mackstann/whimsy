@@ -2,8 +2,6 @@
 
 import os, subprocess
 
-from whimsy.log import *
-
 from whimsy import transformers, props, window_manager, util, client
 import whimsy.window_manager.util
 

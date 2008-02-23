@@ -2,10 +2,6 @@
 
 from Xlib import X, XK
 
-from whimsy import event
-
-from whimsy.log import *
-
 class binding_base:
     def __init__(self, detail, mods, **options):
         self.detail = detail

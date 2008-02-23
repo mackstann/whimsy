@@ -1,9 +1,6 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
 from Xlib import X
-from Xlib.protocol import rq
-
-from whimsy.log import *
 
 def replay_or_swallow(dpy, ev, replay):
     if ev.type not in (X.ButtonPress, X.ButtonRelease, X.KeyPress, X.KeyRelease):

@@ -1,11 +1,9 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
-import os, signal, traceback
+import os, signal, traceback, select
 
 from Xlib.display import Display
-import select
 
-from whimsy.log import *
 from whimsy.window_manager import window_manager
 
 def get_display_name():

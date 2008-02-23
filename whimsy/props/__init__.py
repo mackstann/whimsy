@@ -1,76 +1,62 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
-from Xlib.display import Display
-from Xlib import X, XK, error, Xutil, protocol, Xatom
+from Xlib import X, Xatom
 import types
-
-from whimsy.log import *
-from whimsy import util
-
-# single
-# array
-# arrayN
-
-# cardinal
-# utf8
-# atom
-# window
-# string
 
 _window_props = {
     # client
-    "WM_STATE":                  [ "CARDINAL"                 ],
-    "WM_NAME":                   [ "UTF8_STRING"              ],
-    "WM_CLASS":                  [ "UTF8_STRING", "array"     ], # NONE OF THESE NEEDED..?
-    "WM_ICON_NAME":              [ "UTF8_STRING"              ],
-    "WM_PROTOCOLS":              [ "ATOM",        "array"     ],
+    "WM_STATE":                  [ "CARDINAL",    "single",    1, ],
+    "WM_NAME":                   [ "STRING",      "single",    1, ],
+    "WM_CLASS":                  [ "STRING",      "nullarray", 1, ],
+    "WM_ICON_NAME":              [ "STRING",      "single",    1, ],
+    "WM_PROTOCOLS":              [ "ATOM",        "array",     1, ],
 
-    "_NET_WM_NAME":              [ "UTF8_STRING"              ],
-    "_NET_WM_VISIBLE_NAME":      [ "UTF8_STRING"              ],
-    "_NET_WM_ICON_NAME":         [ "UTF8_STRING"              ],
-    "_NET_WM_VISIBLE_ICON_NAME": [ "UTF8_STRING"              ],
+    "_NET_WM_NAME":              [ "UTF8_STRING", "single",    1, ],
+    "_NET_WM_VISIBLE_NAME":      [ "UTF8_STRING", "single",    1, ],
+    "_NET_WM_ICON_NAME":         [ "UTF8_STRING", "single",    1, ],
+    "_NET_WM_VISIBLE_ICON_NAME": [ "UTF8_STRING", "single",    1, ],
 
-    "_NET_WM_WINDOW_TYPE":       [ "ATOM",        "array"     ],
-    "_NET_WM_STATE":             [ "ATOM",        "array"     ],
-    "_NET_WM_ALLOWED_ACTIONS":   [ "ATOM",        "array"     ],
+    "_NET_WM_WINDOW_TYPE":       [ "ATOM",        "array",     1, ],
+    "_NET_WM_STATE":             [ "ATOM",        "array",     1, ],
+    "_NET_WM_ALLOWED_ACTIONS":   [ "ATOM",        "array",     1, ],
 
-    "_NET_WM_DESKTOP":           [ "CARDINAL"                 ],
-    "_NET_WM_PID":               [ "CARDINAL"                 ],
-    "_NET_WM_USER_TIME":         [ "CARDINAL"                 ],
+    "_NET_WM_DESKTOP":           [ "CARDINAL",    "single",    1, ],
+    "_NET_WM_PID":               [ "CARDINAL",    "single",    1, ],
+    "_NET_WM_USER_TIME":         [ "CARDINAL",    "single",    1, ],
 
-    "_NET_DESKTOP_GEOMETRY":     [ "CARDINAL",    "array",  2 ],
-    "_NET_WM_ICON_GEOMETRY":     [ "CARDINAL",    "array",  4 ],
-    "_NET_FRAME_EXTENTS":        [ "CARDINAL",    "array",  4 ],
-    "_NET_WM_STRUT":             [ "CARDINAL",    "array",  4 ],
-    "_NET_WM_STRUT_PARTIAL":     [ "CARDINAL",    "array", 12 ],
+    "_NET_DESKTOP_GEOMETRY":     [ "CARDINAL",    "array",     2, ],
+    "_NET_WM_ICON_GEOMETRY":     [ "CARDINAL",    "array",     4, ],
+    "_NET_FRAME_EXTENTS":        [ "CARDINAL",    "array",     4, ],
+    "_NET_WM_STRUT":             [ "CARDINAL",    "array",     4, ],
+    "_NET_WM_STRUT_PARTIAL":     [ "CARDINAL",    "array",    12, ],
 
     # client and root
-    "_NET_SUPPORTING_WM_CHECK":  [ "WINDOW"                   ],
+    "_NET_SUPPORTING_WM_CHECK":  [ "WINDOW",      "single",    1, ],
 
     # root
-    "_NET_NUMBER_OF_DESKTOPS":   [ "CARDINAL"                 ],
-    "_NET_SHOWING_DESKTOP":      [ "CARDINAL"                 ],
-    "_NET_CURRENT_DESKTOP":      [ "CARDINAL"                 ],
+    "_NET_NUMBER_OF_DESKTOPS":   [ "CARDINAL",    "single",    1, ],
+    "_NET_SHOWING_DESKTOP":      [ "CARDINAL",    "single",    1, ],
+    "_NET_CURRENT_DESKTOP":      [ "CARDINAL",    "single",    1, ],
 
-    "_NET_ACTIVE_WINDOW":        [ "WINDOW"                   ],
+    "_NET_ACTIVE_WINDOW":        [ "WINDOW",      "single",    1, ],
 
-    "_NET_DESKTOP_NAMES":        [ "UTF8_STRING", "array"     ],
+    "_NET_DESKTOP_NAMES":        [ "UTF8_STRING", "array",     1, ],
 
-    "_NET_SUPPORTED":            [ "ATOM",        "array"     ],
+    "_NET_SUPPORTED":            [ "ATOM",        "array",     1, ],
 
-    "_NET_CLIENT_LIST":          [ "WINDOW",      "array"     ],
-    "_NET_CLIENT_LIST_STACKING": [ "WINDOW",      "array"     ],
-    "_NET_VIRTUAL_ROOTS":        [ "WINDOW",      "array"     ],
+    "_NET_CLIENT_LIST":          [ "WINDOW",      "array",     1, ],
+    "_NET_CLIENT_LIST_STACKING": [ "WINDOW",      "array",     1, ],
+    "_NET_VIRTUAL_ROOTS":        [ "WINDOW",      "array",     1, ],
 
-    "_NET_DESKTOP_VIEWPORT":     [ "CARDINAL",    "array",  2 ],
-    "_NET_WORKAREA":             [ "CARDINAL",    "array",  4 ],
+    "_NET_DESKTOP_VIEWPORT":     [ "CARDINAL",    "array",     2, ],
+    "_NET_WORKAREA":             [ "CARDINAL",    "array",     4, ],
 
-    "_NET_DESKTOP_LAYOUT":       [ "CARDINAL",    "array",  4 ],
+    "_NET_DESKTOP_LAYOUT":       [ "CARDINAL",    "array",     4, ],
 
-    "_WHIMSY_CLIENT_LIST_FOCUS": [ "WINDOW",      "array",    ],
+    "_WHIMSY_CLIENT_LIST_FOCUS": [ "WINDOW",      "array",     1, ],
 
-    "_WHIMSY_LAST_BUTTON_PRESS": [ "CARDINAL",    "array",  6 ],
-    "_WHIMSY_MULTICLICK_COUNT":  [ "CARDINAL",                ],
+    "_WHIMSY_LAST_BUTTON_PRESS": [ "CARDINAL",    "array",     6 ],
+    "_WHIMSY_MULTICLICK_COUNT":  [ "CARDINAL",    "single",    1, ],
 }
 
 def supported_props():
@@ -111,14 +97,11 @@ class property_info:
             assert isinstance(val, types.LongType) or isinstance(val, types.IntType)
 
     def verify(self, agg):
-        if len(self.spec) > 1:
-            aggtype = self.spec[1]
-            if aggtype == 'array':
-                assert isinstance(agg, types.ListType) or isinstance(agg, types.TupleType)
-                if len(self.spec) > 2:
-                    assert len(agg) % self.spec[2] == 0
-                for x in agg:
-                    self.verify_single(x)
+        if self.spec[1] == 'array':
+            assert isinstance(agg, types.ListType) or isinstance(agg, types.TupleType)
+            assert len(agg) % self.spec[2] == 0
+            for x in agg:
+                self.verify_single(x)
         else:
             self.verify_single(agg)
 
@@ -139,19 +122,18 @@ class property_info:
         return val
 
     def convert_for_write(self, val):
-        if len(self.spec) > 1:
-            aggtype = self.spec[1]
-            if aggtype == 'array':
-                return [ self.convert_single(v) for v in val ]
+        if self.spec[1] == 'array':
+            return [ self.convert_single(v) for v in val ]
+        elif self.spec[1] == 'nullarray':
+            return [ self.convert_single(v) + '\0' for v in val ]
         else:
-            if self.datatype_sizes[self.spec[-1]] == 32:
+            if self.datatype_sizes[self.spec[0]] == 32:
                 return [ self.convert_single(val) ]
             return self.convert_single(val)
 
 
     def get_property_info(self, val):
         self.verify(val)
-        from Xlib import Xatom
         atomname = self.spec[0]
         if atomname in vars(Xatom):
             atom = getattr(Xatom, atomname)
@@ -172,15 +154,15 @@ def get_prop(dpy, win, name, type_name=None):
     spec = _window_props[name]
     prop = win.get_full_property(dpy.get_atom(name), dpy.get_atom(spec[0]))
 
-    is_array_type = len(spec) > 1 and spec[1] == 'array'
-
     if prop is None:
-        if is_array_type:
-            return []
-        return None
+        return None if spec[1] == 'single' else []
 
-    if is_array_type:
+    if spec[1] == 'array':
         return list(prop.value)
+
+    if spec[1] == 'nullarray':
+        return prop.value.split('\0')[:-1]
+
     if property_info.datatype_sizes[spec[0]] == 32:
         assert len(prop.value) in (0, 1)
         if not len(prop.value):

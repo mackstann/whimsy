@@ -1,9 +1,6 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
-from Xlib import X
-
-from whimsy import util, client, signals, props
-from whimsy.log import *
+from whimsy import util, props
 
 class update_client_property:
     def __call__(self, signal):

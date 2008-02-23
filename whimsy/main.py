@@ -5,12 +5,18 @@ from Xlib import X
 from whimsy import event, modifiers, props, util, infrastructure, window_manager
 from whimsy.actions import ewmh
 
-from whimsy.log import *
 from whimsy.actions.builtins import *
 from whimsy.actions.event_handling import *
 from whimsy.infrastructure.modifiers import *
 from whimsy.filters import *
 from whimsy.filters.bindings import *
+
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)-8s %(message)s",
+)
 
 wm = infrastructure.init()
 
@@ -26,7 +32,7 @@ class wrap_xevent:
         signal.wm.signal('event',       ev=signal.xev)
         signal.wm.signal('event_done',  ev=signal.xev)
         t2 = time.time()
-        debug('took %0.2f ms to handle %s' % ((t2-t) * 1000, signal.xev.__class__.__name__))
+        logging.debug('took %0.2f ms to handle %s' % ((t2-t) * 1000, signal.xev.__class__.__name__))
 
 # raw x events come in on the 'xevent' signal
 wm.register('xevent', wrap_xevent())

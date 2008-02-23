@@ -1,10 +1,8 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
-from Xlib import X, Xutil, error as Xerror
+from Xlib import X, Xutil
 
 from whimsy import util, props
-
-from whimsy.log import *
 
 class managed_client:
 
@@ -64,7 +62,6 @@ class managed_client:
     def moveresize(self, **kw):
         self.geom.update(kw)
         self.apply_constraints()
-        debug('moveresize: %s' % self.geom)
         self.win.configure(**self.geom)
 
     def moveresize_rel(self, **kw):
@@ -82,7 +79,6 @@ class managed_client:
         self.geom['width'], self.geom['height'] = w, h
 
     def configure(self, **changes):
-        debug('configure: %s' % changes)
         self.win.configure(**changes)
         util.limited_dict_update(
             self.geom, changes,

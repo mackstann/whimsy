@@ -457,7 +457,7 @@ class Window(Drawable):
 	    val = prop.value
 	    if prop.bytes_after:
 		prop = self.get_property(property, type, sizehint,
-					 prop.bytes_after / 4 + 1)
+					 prop.bytes_after)
 		val = val + prop.value
 
 	    prop.value = val
