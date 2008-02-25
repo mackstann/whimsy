@@ -23,6 +23,7 @@ import sys
 import select
 import struct
 import errno
+import socket
 
 # Xlib modules
 from Xlib import error
