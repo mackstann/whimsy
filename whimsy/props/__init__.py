@@ -1,6 +1,6 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
-from Xlib import X, Xatom
+from Xlib import X, Xatom, protocol
 import types
 
 _window_props = {
