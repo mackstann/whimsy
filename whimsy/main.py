@@ -140,5 +140,5 @@ wm.register('event_done', event.smart_replay(),
     [ if_event_type(X.KeyPress, X.KeyRelease, X.ButtonPress, X.ButtonRelease) ]
 )
 
-infrastructure.run(wm, resolution=10)
+infrastructure.run(wm)
 
