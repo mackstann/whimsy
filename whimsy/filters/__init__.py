@@ -47,6 +47,9 @@ class if_multiclick:
         return self.count == \
             props.get_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_MULTICLICK_COUNT')
 
+
+# move these into window_manager, minus the if_; keep if_ versions here as
+# wrapper filters
 def if_should_manage_existing_window(signal):
     attr = signal.win.get_attributes()
     return (

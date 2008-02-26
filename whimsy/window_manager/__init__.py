@@ -39,7 +39,10 @@ class window_manager(x_event_manager, signals.publisher):
 
     # x_event_manager virtual method
     def process_one_event(self):
-        self.signal("xevent", xev=self.next_event())
+        ev=self.next_event()
+        self.signal('event_begin', ev=ev)
+        self.signal('event',       ev=ev)
+        self.signal('event_done',  ev=ev)
 
     # MOVE TO SCREEN CLASS?
 

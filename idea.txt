@@ -1,0 +1,11 @@
+#IDEA!!
+# have the wm have 'states' or 'scenes' (in game terms)
+# this would allow for clean move/resize loops
+# have some handlers that persist in all new scenes (just a boolean called 'persist'?)
+
+# perhaps somehow split actions up into <which window(s)> and <what to do
+# to it/them>
+
+# perhaps clean up variations between functions and callable instances -- the
+# randomness of parentheses is confusing
+

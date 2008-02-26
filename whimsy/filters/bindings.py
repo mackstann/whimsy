@@ -2,6 +2,8 @@
 
 from Xlib import X, XK
 
+# hmmm, is it really necessary to swallow the release events?
+
 class binding_base:
     def __init__(self, detail, mods, **options):
         self.detail = detail
@@ -34,11 +36,16 @@ class if_key_press(binding_base):
         binding_base.__init__(self, None, mods, **options)
 
     def __call__(self, signal):
-        if self.detail == None:
+        if self.detail is None:
+            # maybe we should just do this in __init__
             self.detail = signal.wm.dpy.keysym_to_keycode(
                 XK.string_to_keysym(self.keyname)
             )
         return binding_base.__call__(self, signal)
+
+class if_key_release(if_key_press):
+    execute_event_types = [X.KeyRelease]
+    swallow_event_types = [X.KeyRelease]
 
 class if_button_press(binding_base):
     execute_event_types = [X.ButtonPress]
@@ -47,8 +54,4 @@ class if_button_press(binding_base):
 class if_button_release(if_button_press):
     execute_event_types = [X.ButtonRelease]
     swallow_event_types = [X.ButtonRelease]
-
-class if_key_release(if_key_press):
-    execute_event_types = [X.KeyRelease]
-    swallow_event_types = [X.KeyRelease]
 
