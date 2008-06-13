@@ -43,65 +43,71 @@ wm.register_methods(ewmh.net_desktop_viewport(), {
 
 wm.register('wm_manage_after',            discover_existing_windows)
 wm.register('existing_window_discovered', manage_window, [ if_should_manage_existing_window ])
-wm.register('event',                      manage_window, [ if_(X.MapRequest), if_should_manage_new_window ])
+wm.register('event', manage_window,               [ if_(X.MapRequest), if_should_manage_new_window ])
+wm.register('event', client_method('focus'),      [ if_(X.MapRequest,     wintype='client') ])
+wm.register('event', client_method('focus'),      [ if_(X.EnterNotify,    wintype='client'), if_state(~ButtonMask) ])
+wm.register('event', remove_client(),             [ if_(X.DestroyNotify,  wintype='client') ])
+wm.register('event', remove_client(),             [ if_(X.UnmapNotify,    wintype='client') ])
+wm.register('event', update_client_list_focus,    [ if_(X.FocusIn,        wintype='client') ])
+wm.register('event', update_client_property(),    [ if_(X.PropertyNotify, wintype='client') ])
+wm.register('event', focus_last_focused,          [ if_(X.DestroyNotify)    ])
+wm.register('event', install_colormap(),          [ if_(X.ColormapNotify)   ])
+wm.register('event', configure_request_handler(), [ if_(X.ConfigureRequest) ])
+wm.register('event', update_last_button_press,    [ if_(X.ButtonPress)      ])
 
 wm.register('client_init_after', client_method('configure', border_width=0))
 wm.register('client_init_after', client_method('map_normal'))
 
-# how to focus root now?
-
-act = lambda *args: wm.register("event", *args)
-
-act(client_method('focus'),      [ if_(X.MapRequest,     'client') ])
-act(client_method('focus'),      [ if_(X.EnterNotify,    'client'), if_state(~ButtonMask) ])
-act(remove_client(),             [ if_(X.DestroyNotify,  'client') ])
-act(remove_client(),             [ if_(X.UnmapNotify,    'client') ])
-act(update_client_list_focus,    [ if_(X.FocusIn,        'client') ])
-act(update_client_property(),    [ if_(X.PropertyNotify, 'client') ])
-act(focus_last_focused,          [ if_(X.DestroyNotify)    ])
-act(install_colormap(),          [ if_(X.ColormapNotify)   ])
-act(configure_request_handler(), [ if_(X.ConfigureRequest) ])
-act(update_last_button_press,    [ if_(X.ButtonPress)      ])
-
-act(viewport_absolute_move(  0,   0), [ if_key_press("u",      C+A) ])
-act(viewport_absolute_move(  W,   0), [ if_key_press("i",      C+A) ])
-act(viewport_absolute_move(W*2,   0), [ if_key_press("o",      C+A) ])
-act(viewport_absolute_move(  0,   H), [ if_key_press("j",      C+A) ])
-act(viewport_absolute_move(  W,   H), [ if_key_press("k",      C+A) ])
-act(viewport_absolute_move(W*2,   H), [ if_key_press("l",      C+A) ])
-act(viewport_absolute_move(  0, H*2), [ if_key_press("m",      C+A) ])
-act(viewport_absolute_move(  W, H*2), [ if_key_press("comma",  C+A) ])
-act(viewport_absolute_move(W*2, H*2), [ if_key_press("period", C+A) ])
-
-act(viewport_relative_move(-W,  0),   [ if_key_press("Left",  C) ])
-act(viewport_relative_move(+W,  0),   [ if_key_press("Right", C) ])
-act(viewport_relative_move( 0, -H),   [ if_key_press("Up",    C) ])
-act(viewport_relative_move( 0, +H),   [ if_key_press("Down",  C) ])
-
-act(execute("aterm"), [ if_key_press("x", C+A) ])
-act(execute("aterm"), [ if_root, if_button_press(1, Any), if_multiclick(2) ])
-
-act(execute("sleep 1; xset s activate"), [ if_key_press("s", C+A) ])
-
-def mpd(cmd):
-    socksend('localhost', 6600, "%s\n" % cmd)
-
-act(lambda ev: mpd("previous"), [ if_key_press("z", M4) ])
-act(lambda ev: mpd("stop"),     [ if_key_press("x", M4) ])
-act(lambda ev: mpd("play"),     [ if_key_press("c", M4) ])
-act(lambda ev: mpd("pause"),    [ if_key_press("v", M4) ])
-act(lambda ev: mpd("next"),     [ if_key_press("b", M4) ])
-
-act(client_method("focus"),        [ if_client, if_button_press(1, Any, passthru=True) ])
-act(delete_client(),               [ if_client, if_key_press('w', C+A) ])
-act(start_move(),                  [ if_button_press(1, A), if_client ])
-act(start_resize(),                [ if_button_press(3, A), if_client ])
-act(client_method('stack_bottom'), [ if_button_press(4, A), if_client ])
-act(client_method('stack_top'),    [ if_button_press(5, A), if_client ])
-
 wm.register('event_done', event.smart_replay(),
     [ if_event_type(X.KeyPress, X.KeyRelease, X.ButtonPress, X.ButtonRelease) ]
 )
+
+# how to focus root now?
+
+class mpd:
+    def __init__(self, cmd):
+        self.cmd = cmd
+    def __call__(self, ev):
+        socksend('localhost', 6600, "%s\n" % self.cmd)
+
+actions = [
+    (viewport_absolute_move(  0,   0), [ if_key_press("u",      C+A) ]),
+    (viewport_absolute_move(  W,   0), [ if_key_press("i",      C+A) ]),
+    (viewport_absolute_move(W*2,   0), [ if_key_press("o",      C+A) ]),
+    (viewport_absolute_move(  0,   H), [ if_key_press("j",      C+A) ]),
+    (viewport_absolute_move(  W,   H), [ if_key_press("k",      C+A) ]),
+    (viewport_absolute_move(W*2,   H), [ if_key_press("l",      C+A) ]),
+    (viewport_absolute_move(  0, H*2), [ if_key_press("m",      C+A) ]),
+    (viewport_absolute_move(  W, H*2), [ if_key_press("comma",  C+A) ]),
+    (viewport_absolute_move(W*2, H*2), [ if_key_press("period", C+A) ]),
+
+    (viewport_relative_move(-W,  0),   [ if_key_press("Left",  C) ]),
+    (viewport_relative_move(+W,  0),   [ if_key_press("Right", C) ]),
+    (viewport_relative_move( 0, -H),   [ if_key_press("Up",    C) ]),
+    (viewport_relative_move( 0, +H),   [ if_key_press("Down",  C) ]),
+
+    (execute("aterm"), [ if_key_press("x", C+A) ]),
+    (execute("aterm"), [ if_root, if_button_press(1, Any), if_multiclick(2) ]),
+
+    (execute("sleep 1; xset s activate"), [ if_key_press("s", C+A) ]),
+
+    (mpd("previous"), [ if_key_press("z", M4) ]),
+    (mpd("stop"),     [ if_key_press("x", M4) ]),
+    (mpd("play"),     [ if_key_press("c", M4) ]),
+    (mpd("pause"),    [ if_key_press("v", M4) ]),
+    (mpd("next"),     [ if_key_press("b", M4) ]),
+
+    (client_method('focus'),        [ if_client, if_button_press(1, Any, passthru=True) ]),
+    (delete_client(),               [ if_client, if_key_press('w', C+A) ]),
+    (start_move(),                  [ if_button_press(1, A), if_client ]),
+    (start_resize(),                [ if_button_press(3, A), if_client ]),
+    (client_method('stack_bottom'), [ if_button_press(4, A), if_client ]),
+    (client_method('stack_top'),    [ if_button_press(5, A), if_client ]),
+    (client_method('moveresize', x=0, y=0, width=W, height=H), [ if_key_press("f", C+A) ]),
+]
+
+for action, filters in actions:
+    wm.register("event", action, filters)
 
 infrastructure.run(wm)
 
