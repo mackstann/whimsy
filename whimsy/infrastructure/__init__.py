@@ -3,7 +3,7 @@
 """
 this module is meant to mediate between the window manager and the "real
 world," handling the boring runtime stuff such as signal handlers and shell
-environment and a minimal main loop.  the core window manager code should be
+environment and a main loop.  the core window manager code ideally should be
 totally ignorant about these things.
 
 wm = infrastructure.init()
@@ -29,12 +29,9 @@ def wait_signal_handler(*args):
     except OSError:
         return
 
-def sloppy_select(r, w, x, timeout):
-    """
-    sigchld for example will interrupt select() and cause an unhandled
-    exception.  if we get interrupted, just return.  it happens rarely and
-    high-precision timing is unneeded.
-    """
+def lenient_select(r, w, x, timeout):
+    # sigchld for example will interrupt select() and cause an unhandled
+    # socket.error exception.
     try:
         return select.select(r, w, x, timeout)
     except select.error, e:
@@ -43,11 +40,13 @@ def sloppy_select(r, w, x, timeout):
         raise
 
 def main_loop(wm):
-    while 1:
+    hz100 = 1.0/100
+    while True:
         signal.alarm(20)
-        sloppy_select([wm.dpy], [], [], 1.0 / 100)
-        wm.pull_all_pending_events()
-        wm.handle_all_pending_events()
+        for i in xrange(500): # so we only make alarm() system call every 5s or so
+            lenient_select([wm.dpy], [], [], hz100)
+            wm.pull_all_pending_events()
+            wm.handle_all_pending_events()
         signal.alarm(0)
 
 def init():
