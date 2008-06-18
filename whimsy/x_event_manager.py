@@ -7,7 +7,10 @@ class x_event_manager:
         self.event_attrs = event_attrs
 
     def process_one_event(self):
-        raise NotImplementedError
+        ev = self.next_event()
+        self.signal('event_begin', ev=ev)
+        self.signal('event',       ev=ev)
+        self.signal('event_done',  ev=ev)
     
     def next_event(self):
         ev = self.events.pop(0)

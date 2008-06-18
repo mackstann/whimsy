@@ -37,13 +37,6 @@ class window_manager(x_event_manager, signals.publisher):
 
         self.signal("wm_init_after")
 
-    # x_event_manager virtual method
-    def process_one_event(self):
-        ev=self.next_event()
-        self.signal('event_begin', ev=ev)
-        self.signal('event',       ev=ev)
-        self.signal('event_done',  ev=ev)
-
     # MOVE TO SCREEN CLASS?
 
     def shutdown(self):
