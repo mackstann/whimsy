@@ -40,6 +40,12 @@ def lenient_select(r, w, x, timeout):
         raise
 
 def main_loop(wm):
+    # at this time there is no particular reason to call select() up to 100
+    # times per second -- it could just block on the X event fd.  but if timers
+    # were ever to be implemented in whimsy (i.e. execute some action 5 seconds
+    # after i hit this key), then this approach will let us do it.  you can
+    # currently do a delay with execute("sleep N; ..."), but this is limited to
+    # shell commands, obviously.
     hz100 = 1.0/100
     while True:
         signal.alarm(20)
