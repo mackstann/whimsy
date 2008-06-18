@@ -5,11 +5,10 @@ from Xlib import error as Xerror
 
 from itertools import *
 
-from whimsy.x_event_manager import x_event_manager
 from whimsy import signals
 
 # maybe don't use inheritance for this?
-class window_manager(x_event_manager, signals.publisher):
+class window_manager(signals.publisher):
     """
     represents the window manager, which manages the specified display and
     screen (and only this screen)
@@ -26,16 +25,21 @@ class window_manager(x_event_manager, signals.publisher):
     running = False
 
     def __init__(self, dpy):
-        x_event_manager.__init__(self, dpy, wm=self)
         signals.publisher.__init__(self, wm=self)
 
         self.signal("wm_init_before")
-
+        self.dpy = dpy
         self.root = dpy.screen().root
-
         self.clients = []
-
         self.signal("wm_init_after")
+
+    # XXX temporary hacks
+    def register_methods(self, *a, **kw):
+        signals.publisher.register_methods(self, *a, **kw)
+        self.xec.register_methods(*a, **kw)
+    def register(self, *a, **kw):
+        signals.publisher.register(self, *a, **kw)
+        self.xec.register(*a, **kw)
 
     # MOVE TO SCREEN CLASS?
 
@@ -58,8 +62,7 @@ class window_manager(x_event_manager, signals.publisher):
         self.root.change_attributes(event_mask=self.mask, onerror=catch)
         self.dpy.sync()
         if catch.get_error():
-            raise RuntimeError("can't get WM selection -- another "
-                               "WM seems to be running")
+            raise RuntimeError("can't get WM selection -- another WM seems to be running")
 
         # TODO: ewmh selection
 

@@ -15,6 +15,7 @@ import os, signal, traceback, select, errno, time
 from Xlib.display import Display
 
 from whimsy.window_manager import window_manager
+from whimsy.x_event_controller import x_event_controller
 
 def get_display_name():
     from Xlib.support.connect import get_display
@@ -51,13 +52,15 @@ def main_loop(wm):
         signal.alarm(20)
         for i in xrange(500): # so we only make alarm() system call every 5s or so
             lenient_select([wm.dpy], [], [], hz100)
-            wm.pull_all_pending_events()
-            wm.handle_all_pending_events()
+            wm.xec.emit_all_pending_events()
         signal.alarm(0)
 
 def init():
     set_display_env()
-    return window_manager(Display())
+    wm = window_manager(Display())
+    xec = x_event_controller(wm.dpy, wm=wm)
+    wm.xec = xec # XXX temp hack
+    return wm
 
 def run(wm):
     def alrm(*a):
