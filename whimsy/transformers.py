@@ -10,8 +10,7 @@ class interactive_pointer_transform:
         self.begin_event = begin_event
         self.begin_geom = client.geom.copy()
         self.client.win.grab_pointer(True,
-            X.PointerMotionMask | X.ButtonReleaseMask |
-            X.EnterWindowMask | X.LeaveWindowMask,
+            X.PointerMotionMask | X.ButtonReleaseMask,
             X.GrabModeAsync, X.GrabModeAsync, X.NONE,
             X.NONE, # why doesn't Xcursorfont.left_ptr work for pointer?
             X.CurrentTime
@@ -30,10 +29,6 @@ class interactive_pointer_transform:
         elif ev.__class__.__name__ == "ButtonRelease":
             self.client.wm.dpy.ungrab_pointer(X.CurrentTime)
             return signals.return_code.DELETE_HANDLER
-        elif ev.__class__.__name__ == "EnterNotify":
-            return signals.return_code.SIGNAL_FINISHED
-        elif ev.__class__.__name__ == "LeaveNotify":
-            return signals.return_code.SIGNAL_FINISHED
 
     def _update(self, xdelta, ydelta):
         raise NotImplementedError
