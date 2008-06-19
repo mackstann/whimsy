@@ -1,21 +1,22 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
-from Xlib import X, display
-
-from whimsy import (
-    event, modifiers, props, util, infrastructure, window_manager, signals,
-    tick_controller
-)
-
+from whimsy import infrastructure, signals
 from whimsy.actions.builtins import *
 from whimsy.actions.event_handling import *
-from whimsy.actions import ewmh
-from whimsy.actions.misc import socksend
 from whimsy.filters.bindings import *
 from whimsy.filters import *
 from whimsy.infrastructure.modifiers import *
+
+# there are some distinct sections in this file which have emerged over time
+# and should be split up at some point.  they are enumerated below as comments
+
+### SECTION 1 - initialization
+
+from Xlib import display
+
 from whimsy.window_manager import window_manager
 from whimsy.x_event_controller import x_event_controller
+from whimsy.tick_controller import tick_controller
 
 infrastructure.set_display_env()
 
@@ -24,10 +25,17 @@ hub = signals.publisher()
 
 wm = window_manager(dpy, hub)
 xec = x_event_controller(dpy, hub)
-ticker = tick_controller.tick_controller(hub)
+ticker = tick_controller(hub)
 
 hub.defaults['wm'] = wm
 hub.defaults['hub'] = hub
+
+### SECTION 2 - internal, mostly uninteresting signal/event handling registration
+
+from Xlib import X
+
+from whimsy import event
+from whimsy.actions import ewmh
 
 hub.register('quit', ticker.stop)
 hub.register('tick', xec.select_and_emit_all)
@@ -80,12 +88,15 @@ hub.register('event_done', event.smart_replay(),
     [ if_event_type(X.KeyPress, X.KeyRelease, X.ButtonPress, X.ButtonRelease) ]
 )
 
+### SECTION 3 - the playground
+
 # how to focus root now?
 
 class mpd:
     def __init__(self, cmd):
         self.cmd = cmd
     def __call__(self, ev):
+        from whimsy.actions.misc import socksend
         socksend('localhost', 6600, "%s\n" % self.cmd)
 
 actions = [
@@ -127,6 +138,8 @@ actions = [
 for action, filters in actions:
     hub.register("event", action, filters)
 
+### SECTION 4 - run the damn thing
+
 import signal
 signal.signal(signal.SIGCHLD, infrastructure.wait_signal_handler)
 wm.manage()
@@ -135,5 +148,4 @@ try:
 except KeyboardInterrupt:
     wm.shutdown()
     raise SystemExit
-
 
