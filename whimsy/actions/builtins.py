@@ -75,6 +75,7 @@ class start_move:
     def __call__(self, signal):
         signal.wm.register('event_begin',
             transformers.move_transformer(
+                signal.wm.dpy,
                 signal.wm.window_to_client(signal.ev.window),
                 signal.ev
             )
@@ -84,6 +85,7 @@ class start_resize:
     def __call__(self, signal):
         signal.wm.register('event_begin',
             transformers.resize_transformer(
+                signal.wm.dpy,
                 signal.wm.window_to_client(signal.ev.window),
                 signal.ev
             )

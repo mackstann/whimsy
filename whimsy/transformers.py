@@ -5,7 +5,8 @@ from Xlib import X
 from whimsy import event, signals
 
 class interactive_pointer_transform:
-    def __init__(self, client, begin_event):
+    def __init__(self, dpy, client, begin_event):
+        self.dpy = dpy
         self.client = client
         self.begin_event = begin_event
         self.begin_geom = client.geom.copy()
@@ -27,7 +28,7 @@ class interactive_pointer_transform:
             self._update(xdelta, ydelta)
 
         elif ev.__class__.__name__ == "ButtonRelease":
-            self.client.wm.dpy.ungrab_pointer(X.CurrentTime)
+            self.dpy.ungrab_pointer(X.CurrentTime)
             return signals.return_code.DELETE_HANDLER
 
     def _update(self, xdelta, ydelta):
