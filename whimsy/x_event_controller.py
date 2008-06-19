@@ -15,7 +15,7 @@ class x_event_controller(object):
         # signals.publisher already does this...
         for attr, val in self.event_attrs.items():
             setattr(ev, attr, val)
-        self.hub.signal('event_begin', ev=ev)
-        self.hub.signal('event',       ev=ev)
-        self.hub.signal('event_done',  ev=ev)
+        self.hub.signal('event_begin', ev=ev, win=ev.window)
+        self.hub.signal('event',       ev=ev, win=ev.window)
+        self.hub.signal('event_done',  ev=ev, win=ev.window)
     

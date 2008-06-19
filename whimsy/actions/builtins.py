@@ -6,19 +6,19 @@ from whimsy import transformers, props, window_manager, util, client
 
 class delete_client:
     def __call__(self, signal):
-        c = signal.wm.window_to_client(signal.ev.window)
+        c = signal.wm.window_to_client(signal.win)
         c.delete()
         signal.wm.clients.remove(c)
-        signal.hub.signal('after_delete_client', win=signal.ev.window)
+        signal.hub.signal('after_delete_client', win=signal.win)
 
 # _WHIMSY_CLIENT_LIST_FOCUS: lists managed windows that have been
 # focused, most recent first
 
 def update_client_list_focus(signal):
     wins = props.get_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_CLIENT_LIST_FOCUS')
-    if signal.ev.window.id in wins:
-        wins.remove(signal.ev.window.id)
-    wins.insert(0, signal.ev.window.id)
+    if signal.win.id in wins:
+        wins.remove(signal.win.id)
+    wins.insert(0, signal.win.id)
     props.change_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_CLIENT_LIST_FOCUS', wins)
 
 def focus_last_focused(signal):
@@ -71,7 +71,7 @@ class start_move:
         signal.hub.register('event_begin',
             transformers.move_transformer(
                 signal.wm.dpy,
-                signal.wm.window_to_client(signal.ev.window),
+                signal.wm.window_to_client(signal.win),
                 signal.ev
             )
         )
@@ -81,7 +81,7 @@ class start_resize:
         signal.hub.register('event_begin',
             transformers.resize_transformer(
                 signal.wm.dpy,
-                signal.wm.window_to_client(signal.ev.window),
+                signal.wm.window_to_client(signal.win),
                 signal.ev
             )
         )
@@ -96,7 +96,7 @@ class client_method:
         if hasattr(signal, 'client'):
             c = signal.client
         else:
-            c = signal.wm.window_to_client(signal.ev.window)
+            c = signal.wm.window_to_client(signal.win)
         getattr(c, self.methodname)(*self.a, **self.kw)
 
 class execute:
@@ -157,8 +157,7 @@ def discover_existing_windows(signal):
         signal.hub.signal('existing_window_discovered', win=win)
 
 def manage_window(signal):
-    win = util.signal_window(signal)
-    c = client.managed_client(signal.hub, signal.wm, win)
+    c = client.managed_client(signal.hub, signal.wm, signal.win)
     signal.wm.clients.append(c)
-    signal.hub.signal('after_manage_window', win=win)
+    signal.hub.signal('after_manage_window', win=signal.win)
 

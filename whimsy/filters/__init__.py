@@ -14,13 +14,13 @@ class if_event_type:
 def if_client(signal):
     return (
         hasattr(signal.ev, 'window') and
-        util.window_type(signal.wm, signal.ev.window) == 'client'
+        util.window_type(signal.wm, signal.win) == 'client'
     )
 
 def if_root(signal):
     return (
         hasattr(signal.ev, 'window') and
-        util.window_type(signal.wm, signal.ev.window) == 'root'
+        util.window_type(signal.wm, signal.win) == 'root'
     )
 
 class if_state:
@@ -38,7 +38,7 @@ class if_:
             return False
         if self.wintype is None:
             return True
-        return util.window_type(signal.wm, signal.ev.window) == self.wintype
+        return util.window_type(signal.wm, signal.win) == self.wintype
 
 class if_multiclick:
     def __init__(self, count):
@@ -61,6 +61,6 @@ def if_should_manage_existing_window(signal):
 
 def if_should_manage_new_window(signal):
     catch = Xerror.CatchError(Xerror.BadWindow)
-    return not signal.ev.window.get_attributes().override_redirect and not catch.get_error()
+    return not signal.win.get_attributes().override_redirect and not catch.get_error()
 
 
