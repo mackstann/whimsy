@@ -6,9 +6,6 @@ from whimsy import util
 
 class return_code:
     DELETE_HANDLER = 0x10
-    SIGNAL_FINISHED = 0x20
-
-    FINISHED_AND_DELETE = DELETE_HANDLER | SIGNAL_FINISHED
 
 class publisher:
     def __init__(self, **defaults):
@@ -30,8 +27,6 @@ class publisher:
                 if ret is not None:
                     if ret & return_code.DELETE_HANDLER:
                         self.signals[name].remove([func, filters])
-                    if ret & return_code.SIGNAL_FINISHED:
-                        return
 
 
     def register_methods(self, callobj, mapping, filters=[]):
