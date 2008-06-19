@@ -3,11 +3,6 @@
 import os, subprocess
 
 from whimsy import transformers, props, window_manager, util, client
-import whimsy.window_manager.util
-
-#####################################################################
-############################## public ###############################
-#####################################################################
 
 class delete_client:
     def __call__(self, signal):
