@@ -1,0 +1,15 @@
+# Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
+
+class tick_controller(object):
+    alive = False
+    def __init__(self, hub):
+        self.hub = hub
+
+    def tick_forever(self):
+        self.alive = True
+        while self.alive:
+            self.hub.signal('tick')
+
+    def stop(self, signal):
+        self.alive = False
+    

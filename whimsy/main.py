@@ -1,32 +1,45 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
-from Xlib import X
+from Xlib import X, display
 
 from whimsy import (
-    event, modifiers, props, util, infrastructure, window_manager, signals
+    event, modifiers, props, util, infrastructure, window_manager, signals,
+    tick_controller
 )
 
-from whimsy.actions import ewmh
-from whimsy.actions.misc import socksend
 from whimsy.actions.builtins import *
 from whimsy.actions.event_handling import *
-from whimsy.infrastructure.modifiers import *
-from whimsy.filters import *
+from whimsy.actions import ewmh
+from whimsy.actions.misc import socksend
 from whimsy.filters.bindings import *
+from whimsy.filters import *
+from whimsy.infrastructure.modifiers import *
+from whimsy.window_manager import window_manager
+from whimsy.x_event_controller import x_event_controller
 
+infrastructure.set_display_env()
+
+dpy = display.Display()
 hub = signals.publisher()
-wm = infrastructure.init(hub)
+
+wm = window_manager(dpy, hub)
+xec = x_event_controller(dpy, hub)
+ticker = tick_controller.tick_controller(hub)
+
 hub.defaults['wm'] = wm
 hub.defaults['hub'] = hub
 
-root_geometry = wm.root.get_geometry()
-W = root_geometry.width
-H = root_geometry.height
+hub.register('quit', ticker.stop)
+hub.register('tick', xec.select_and_emit_all)
 
 startup_shutdown_signal_methods = {
     'wm_manage_after': 'startup',
     'wm_shutdown_before': 'shutdown',
 }
+
+root_geometry = wm.root.get_geometry()
+W = root_geometry.width
+H = root_geometry.height
 
 hub.register_methods(ewmh.net_supported(),                startup_shutdown_signal_methods)
 hub.register_methods(ewmh.net_supporting_wm_check(),      startup_shutdown_signal_methods)
@@ -114,5 +127,13 @@ actions = [
 for action, filters in actions:
     hub.register("event", action, filters)
 
-infrastructure.run(wm)
+import signal
+signal.signal(signal.SIGCHLD, infrastructure.wait_signal_handler)
+wm.manage()
+try:
+    ticker.tick_forever()
+except KeyboardInterrupt:
+    wm.shutdown()
+    raise SystemExit
+
 

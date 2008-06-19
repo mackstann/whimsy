@@ -1,10 +1,16 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
+from whimsy.infrastructure import lenient_select
+
 class x_event_controller(object):
     def __init__(self, dpy, hub, **event_attrs):
         self.dpy = dpy
         self.hub = hub
         self.event_attrs = event_attrs
+
+    def select_and_emit_all(self, signal):
+        lenient_select([self.dpy], [], [], 1.0/100)
+        self.emit_all_pending_events()
 
     def emit_all_pending_events(self):
         for i in xrange(self.dpy.pending_events()):
