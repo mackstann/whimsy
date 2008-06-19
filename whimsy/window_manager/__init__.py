@@ -7,8 +7,7 @@ from itertools import *
 
 from whimsy import signals
 
-# maybe don't use inheritance for this?
-class window_manager(signals.publisher):
+class window_manager(object):
     """
     represents the window manager, which manages the specified display and
     screen (and only this screen)
@@ -24,38 +23,29 @@ class window_manager(signals.publisher):
 
     running = False
 
-    def __init__(self, dpy):
-        signals.publisher.__init__(self, wm=self)
-
-        self.signal("wm_init_before")
+    def __init__(self, dpy, hub):
+        hub.signal("wm_init_before")
+        self.hub = hub
         self.dpy = dpy
         self.root = dpy.screen().root
         self.clients = []
-        self.signal("wm_init_after")
-
-    # XXX temporary hacks
-    def register_methods(self, *a, **kw):
-        signals.publisher.register_methods(self, *a, **kw)
-        self.xec.register_methods(*a, **kw)
-    def register(self, *a, **kw):
-        signals.publisher.register(self, *a, **kw)
-        self.xec.register(*a, **kw)
+        hub.signal("wm_init_after")
 
     # MOVE TO SCREEN CLASS?
 
     def shutdown(self):
-        self.signal("wm_shutdown_before")
+        self.hub.signal("wm_shutdown_before")
         self.root.change_attributes(event_mask=X.NoEventMask)
         self.dpy.set_input_focus(X.PointerRoot, X.RevertToPointerRoot, X.CurrentTime)
         self.shutdown_all()
         self.running = False
-        self.signal("wm_shutdown_after")
+        self.hub.signal("wm_shutdown_after")
 
     def manage(self):
-        self.signal("wm_manage_before")
+        self.hub.signal("wm_manage_before")
         self.get_wm_selection()
         self.running = True
-        self.signal("wm_manage_after")
+        self.hub.signal("wm_manage_after")
 
     def get_wm_selection(self):
         catch = Xerror.CatchError(Xerror.BadAccess)

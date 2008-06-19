@@ -55,10 +55,10 @@ def main_loop(wm):
             wm.xec.emit_all_pending_events()
         signal.alarm(0)
 
-def init():
+def init(hub):
     set_display_env()
-    wm = window_manager(Display())
-    xec = x_event_controller(wm.dpy, wm=wm)
+    wm = window_manager(Display(), hub)
+    xec = x_event_controller(wm.dpy, hub)
     wm.xec = xec # XXX temp hack
     return wm
 

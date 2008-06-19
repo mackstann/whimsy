@@ -2,9 +2,11 @@
 
 from Xlib import X
 
-from whimsy import event, modifiers, props, util, infrastructure, window_manager
-from whimsy.actions import ewmh
+from whimsy import (
+    event, modifiers, props, util, infrastructure, window_manager, signals
+)
 
+from whimsy.actions import ewmh
 from whimsy.actions.misc import socksend
 from whimsy.actions.builtins import *
 from whimsy.actions.event_handling import *
@@ -12,7 +14,10 @@ from whimsy.infrastructure.modifiers import *
 from whimsy.filters import *
 from whimsy.filters.bindings import *
 
-wm = infrastructure.init()
+hub = signals.publisher()
+wm = infrastructure.init(hub)
+hub.defaults['wm'] = wm
+hub.defaults['hub'] = hub
 
 root_geometry = wm.root.get_geometry()
 W = root_geometry.width
@@ -23,42 +28,42 @@ startup_shutdown_signal_methods = {
     'wm_shutdown_before': 'shutdown',
 }
 
-wm.register_methods(ewmh.net_supported(),                startup_shutdown_signal_methods)
-wm.register_methods(ewmh.net_supporting_wm_check(),      startup_shutdown_signal_methods)
-wm.register_methods(ewmh.net_number_of_desktops(),       startup_shutdown_signal_methods)
-wm.register_methods(ewmh.net_current_desktop(),          startup_shutdown_signal_methods)
-wm.register_methods(ewmh.net_desktop_geometry(W*3, H*3), startup_shutdown_signal_methods)
+hub.register_methods(ewmh.net_supported(),                startup_shutdown_signal_methods)
+hub.register_methods(ewmh.net_supporting_wm_check(),      startup_shutdown_signal_methods)
+hub.register_methods(ewmh.net_number_of_desktops(),       startup_shutdown_signal_methods)
+hub.register_methods(ewmh.net_current_desktop(),          startup_shutdown_signal_methods)
+hub.register_methods(ewmh.net_desktop_geometry(W*3, H*3), startup_shutdown_signal_methods)
 
-wm.register_methods(ewmh.net_client_list(), {
+hub.register_methods(ewmh.net_client_list(), {
     'after_manage_window': 'refresh',
     'after_remove_client': 'refresh',
     'after_delete_client': 'refresh',
     'wm_shutdown_before': 'shutdown',
 })
 
-wm.register_methods(ewmh.net_desktop_viewport(), {
+hub.register_methods(ewmh.net_desktop_viewport(), {
     'wm_manage_after': 'startup',
     'after_viewport_move': 'refresh',
 })
 
-wm.register('wm_manage_after',            discover_existing_windows)
-wm.register('existing_window_discovered', manage_window, [ if_should_manage_existing_window ])
-wm.register('event', manage_window,               [ if_(X.MapRequest), if_should_manage_new_window ])
-wm.register('event', client_method('focus'),      [ if_(X.MapRequest,     wintype='client') ])
-wm.register('event', client_method('focus'),      [ if_(X.EnterNotify,    wintype='client'), if_state(~ButtonMask) ])
-wm.register('event', remove_client(),             [ if_(X.DestroyNotify,  wintype='client') ])
-wm.register('event', remove_client(),             [ if_(X.UnmapNotify,    wintype='client') ])
-wm.register('event', update_client_list_focus,    [ if_(X.FocusIn,        wintype='client') ])
-wm.register('event', update_client_property(),    [ if_(X.PropertyNotify, wintype='client') ])
-wm.register('event', focus_last_focused,          [ if_(X.DestroyNotify)    ])
-wm.register('event', install_colormap(),          [ if_(X.ColormapNotify)   ])
-wm.register('event', configure_request_handler(), [ if_(X.ConfigureRequest) ])
-wm.register('event', update_last_button_press,    [ if_(X.ButtonPress)      ])
+hub.register('wm_manage_after',            discover_existing_windows)
+hub.register('existing_window_discovered', manage_window, [ if_should_manage_existing_window ])
+hub.register('event', manage_window,               [ if_(X.MapRequest), if_should_manage_new_window ])
+hub.register('event', client_method('focus'),      [ if_(X.MapRequest,     wintype='client') ])
+hub.register('event', client_method('focus'),      [ if_(X.EnterNotify,    wintype='client'), if_state(~ButtonMask) ])
+hub.register('event', remove_client(),             [ if_(X.DestroyNotify,  wintype='client') ])
+hub.register('event', remove_client(),             [ if_(X.UnmapNotify,    wintype='client') ])
+hub.register('event', update_client_list_focus,    [ if_(X.FocusIn,        wintype='client') ])
+hub.register('event', update_client_property(),    [ if_(X.PropertyNotify, wintype='client') ])
+hub.register('event', focus_last_focused,          [ if_(X.DestroyNotify)    ])
+hub.register('event', install_colormap(),          [ if_(X.ColormapNotify)   ])
+hub.register('event', configure_request_handler(), [ if_(X.ConfigureRequest) ])
+hub.register('event', update_last_button_press,    [ if_(X.ButtonPress)      ])
 
-wm.register('client_init_after', client_method('configure', border_width=0))
-wm.register('client_init_after', client_method('map_normal'))
+hub.register('client_init_after', client_method('configure', border_width=0))
+hub.register('client_init_after', client_method('map_normal'))
 
-wm.register('event_done', event.smart_replay(),
+hub.register('event_done', event.smart_replay(),
     [ if_event_type(X.KeyPress, X.KeyRelease, X.ButtonPress, X.ButtonRelease) ]
 )
 
@@ -107,7 +112,7 @@ actions = [
 ]
 
 for action, filters in actions:
-    wm.register("event", action, filters)
+    hub.register("event", action, filters)
 
 infrastructure.run(wm)
 

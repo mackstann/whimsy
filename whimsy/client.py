@@ -12,11 +12,12 @@ class managed_client:
         X.EnterWindowMask | X.FocusChangeMask
     )
 
-    def __init__(self, wm, win):
+    def __init__(self, hub, wm, win):
+        self.hub = hub
         self.wm = wm
         self.win = win
 
-        self.wm.signal("client_init_before", client=self)
+        self.hub.signal("client_init_before", client=self)
 
         self.win.change_attributes(event_mask=self.mask)
 
@@ -35,7 +36,7 @@ class managed_client:
         self.update_prop('WM_STATE')
         self.update_prop('WM_PROTOCOLS')
 
-        self.wm.signal("client_init_after", client=self)
+        self.hub.signal("client_init_after", client=self)
 
     def shutdown(self):
         self.win.change_attributes(event_mask=X.NoEventMask)

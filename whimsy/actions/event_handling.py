@@ -17,7 +17,7 @@ class remove_client:
         signal.wm.clients.remove(
             signal.wm.window_to_client(signal.ev.window)
         )
-        signal.wm.signal('after_remove_client', win=signal.ev.window)
+        signal.hub.signal('after_remove_client', win=signal.ev.window)
 
 #todo: circulate request
 class configure_request_handler:
