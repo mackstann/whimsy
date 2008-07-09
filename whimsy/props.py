@@ -1,6 +1,7 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
 from Xlib import X, Xatom, protocol
+from Xlib.xobject import drawable
 import types
 
 _window_props = {
@@ -78,10 +79,11 @@ def send_window_message(dpy, win, name, data,
         event_mask=event_mask
     )
 
+# should be changed to "property changer" or something
 class property_info:
-    def __init__(self, dpy, prop_spec):
+    def __init__(self, dpy, name):
         self.dpy = dpy
-        self.spec = prop_spec
+        self.spec = _window_props[name]
 
     def get(self, args):
         self.verify(args)
@@ -94,17 +96,21 @@ class property_info:
         elif datatype == 'STRING':
             assert val == str(val)
         elif datatype in ('ATOM', 'CARDINAL', 'WINDOW'):
-            assert isinstance(val, types.LongType) or isinstance(val, types.IntType)
+            assert (
+                isinstance(val, types.LongType) or isinstance(val, types.IntType)
+                or (datatype == 'WINDOW' and isinstance(val, drawable.Window))
+            )
 
     def verify(self, agg):
         if self.spec[1] == 'array':
-            assert isinstance(agg, types.ListType) or isinstance(agg, types.TupleType)
+            iter(agg)
             assert len(agg) % self.spec[2] == 0
             for x in agg:
                 self.verify_single(x)
         else:
             self.verify_single(agg)
 
+    # this belongs outside of here as it's used for both reading and writing
     datatype_sizes = {
         'UTF8_STRING': 8,
         'STRING': 8,
@@ -114,11 +120,11 @@ class property_info:
     }
 
     def convert_single(self, val):
-        if self.spec[0] == 'WINDOW':
-            if val != X.NONE:
-                if hasattr(val, 'id'):
-                    return val.id
-                return val
+        # doing change_prop(..., [ w.id for w in windows ]) gets real old, so
+        # we allow window objects to be passed in and we pick the id off of
+        # them automatically
+        if self.spec[0] == 'WINDOW' and isinstance(val, drawable.Window):
+            return val.id
         return val
 
     def convert_for_write(self, val):
@@ -126,10 +132,9 @@ class property_info:
             return [ self.convert_single(v) for v in val ]
         elif self.spec[1] == 'nullarray':
             return [ self.convert_single(v) + '\0' for v in val ]
-        else:
-            if self.datatype_sizes[self.spec[0]] == 32:
-                return [ self.convert_single(val) ]
-            return self.convert_single(val)
+        elif self.datatype_sizes[self.spec[0]] == 32:
+            return [ self.convert_single(val) ]
+        return self.convert_single(val)
 
 
     def get_property_info(self, val):
@@ -146,11 +151,11 @@ class property_info:
         )
 
 def change_prop(dpy, win, name, value):
-    propinfo = property_info(dpy, _window_props[name])
+    propinfo = property_info(dpy, name)
     type, format, processed_val = propinfo.get(value)
     win.change_property(dpy.get_atom(name), int(type), format, processed_val)
 
-def get_prop(dpy, win, name, type_name=None):
+def get_prop(dpy, win, name):
     spec = _window_props[name]
     prop = win.get_full_property(dpy.get_atom(name), dpy.get_atom(spec[0]))
 

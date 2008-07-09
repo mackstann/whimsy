@@ -29,7 +29,7 @@ class net_current_desktop(object):
 
 class net_supporting_wm_check(object):
     def startup(self, signal):
-        self.win = signal.wm.root.create_window(-2000, -2000, 1, 1, 0, X.CopyFromParent)
+        self.win = signal.wm.root.create_window(-5000, -5000, 1, 1, 0, X.CopyFromParent)
         props.change_prop(signal.wm.dpy, self.win, '_NET_WM_NAME', 'Whimsy')
         props.change_prop(signal.wm.dpy, self.win, '_NET_SUPPORTING_WM_CHECK', self.win.id)
         props.change_prop(signal.wm.dpy, signal.wm.root, '_NET_SUPPORTING_WM_CHECK', self.win.id)
@@ -70,7 +70,6 @@ class net_desktop_viewport(object):
         if not current:
             props.change_prop(
                 signal.wm.dpy, signal.wm.root, '_NET_DESKTOP_VIEWPORT',
-                # not possible to do [[0, 0]]?  pairs are flattened?  is this right?
                 [0, 0]
             )
 
