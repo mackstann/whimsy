@@ -3,9 +3,9 @@
 from whimsy.infrastructure import lenient_select
 
 class x_event_controller(object):
-    def __init__(self, dpy, hub, **event_attrs):
-        self.dpy = dpy
+    def __init__(self, hub, dpy, **event_attrs):
         self.hub = hub
+        self.dpy = dpy
         self.event_attrs = event_attrs
 
     def select_and_emit_all(self, signal):

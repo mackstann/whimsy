@@ -23,7 +23,7 @@ class window_manager(object):
 
     running = False
 
-    def __init__(self, dpy, hub):
+    def __init__(self, hub, dpy):
         hub.signal("wm_init_before")
         self.hub = hub
         self.dpy = dpy
@@ -71,7 +71,4 @@ class window_manager(object):
         for client in self.clients:
             if wid == client.win.id:
                 return client
-
-    def set_focus(self, win):
-        self.dpy.set_input_focus(win, X.RevertToPointerRoot, X.CurrentTime)
 

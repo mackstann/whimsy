@@ -10,6 +10,6 @@ class tick_controller(object):
         while self.alive:
             self.hub.signal('tick')
 
-    def stop(self, signal):
+    def stop(self):
         self.alive = False
     

@@ -11,16 +11,12 @@ class update_client_property:
 
 # todo: click focus handler & sloppy focus handler
 
-# XXX overlap with delete_client
-class remove_client:
-    def __call__(self, signal):
-        signal.wm.clients.remove(signal.wm.window_to_client(signal.win))
-        signal.hub.signal('after_remove_client', win=signal.win)
-
 #todo: circulate request
 class configure_request_handler:
     def __call__(self, signal):
         client_or_win = signal.wm.window_to_client(signal.win) or signal.win
+        if client_or_win is signal.win:
+            print "configuring raw window: %r" % util.configure_request_changes(signal.ev)
         client_or_win.configure(**util.configure_request_changes(signal.ev))
 
 class install_colormap:

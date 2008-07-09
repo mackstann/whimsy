@@ -1,20 +1,20 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
 from Xlib import X, Xutil
+from Xlib import error as Xerror
 
 from whimsy import util, props
 
 class managed_client:
 
     mask = (
-        X.KeyReleaseMask |
-        X.ButtonReleaseMask |
+        X.KeyReleaseMask | X.ButtonReleaseMask |
         X.EnterWindowMask | X.FocusChangeMask
     )
 
-    def __init__(self, hub, wm, win):
+    def __init__(self, hub, dpy, win):
         self.hub = hub
-        self.wm = wm
+        self.dpy = dpy
         self.win = win
 
         self.hub.signal("client_init_before", client=self)
@@ -39,18 +39,25 @@ class managed_client:
         self.hub.signal("client_init_after", client=self)
 
     def shutdown(self):
+        catch = Xerror.CatchError(Xerror.BadWindow, Xerror.BadValue) # not working...
         self.win.change_attributes(event_mask=X.NoEventMask)
         self.ungrab_all()
+        self.dpy.sync()
+        print catch.get_error()
 
     def update_prop(self, propname):
-        self.props[propname] = props.get_prop(self.wm.dpy, self.win, propname)
+        # some properties are specified to only change at certain times (such
+        # as when the window is mapped), so we keep a property cache for them
+        self.props[propname] = self.fetch_prop(propname)
+
+    def fetch_prop(self, propname):
+        return props.get_prop(self.dpy, self.win, propname)
 
     def ungrab_all(self):
         self.win.ungrab_button(X.AnyButton, X.AnyModifier)
         self.win.ungrab_key(X.AnyKey, X.AnyModifier)
 
     def grab_all(self):
-        # should be done externally, called by signal
         self.win.grab_button(X.AnyButton, X.AnyModifier, X.AnyButton,
                 X.NoEventMask, X.GrabModeSync, X.GrabModeSync, X.NONE, X.NONE)
         self.win.grab_key(X.AnyKey, X.AnyModifier, 1, X.GrabModeSync,
@@ -87,7 +94,7 @@ class managed_client:
         )
 
     def focus(self):
-        self.wm.set_focus(self.win)
+        self.dpy.set_input_focus(self.win, X.RevertToPointerRoot, X.CurrentTime)
 
     def stack_top(self):
         self.win.configure(stack_mode=X.Above)
@@ -99,11 +106,14 @@ class managed_client:
         self.win.configure(stack_mode=X.Opposite)
 
     def delete(self):
-        self.update_prop('WM_PROTOCOLS')
-        wm_del = self.wm.dpy.get_atom('WM_DELETE_WINDOW')
+        wm_del = self.dpy.get_atom('WM_DELETE_WINDOW')
+        catch = Xerror.CatchError(Xerror.BadWindow, Xerror.BadValue)
         if wm_del in self.props['WM_PROTOCOLS']:
-            props.send_window_message(self.wm.dpy, self.win, 'WM_PROTOCOLS', [wm_del], self.win, event_mask=0)
+            props.send_window_message(self.dpy, self.win, 'WM_PROTOCOLS', [wm_del], self.win, event_mask=0)
         else:
             self.win.kill_client()
+        self.dpy.sync()
+
+
 
 

@@ -4,67 +4,83 @@ import os, subprocess
 
 from whimsy import transformers, props, window_manager, util, client
 
+def _unmanage(signal, delete=False):
+    c = signal.wm.window_to_client(signal.win)
+    if c:
+        signal.wm.clients.remove(c)
+        c.shutdown()
+        if delete:
+            c.delete()
+    signal.hub.signal('after_unmanage_window', win=signal.win)
+
+class unmanage_window:
+    def __call__(self, signal):
+        _unmanage(signal)
+
 class delete_client:
     def __call__(self, signal):
-        c = signal.wm.window_to_client(signal.win)
-        c.delete()
-        signal.wm.clients.remove(c)
-        signal.hub.signal('after_delete_client', win=signal.win)
+        _unmanage(signal, delete=True)
+
 
 # _WHIMSY_CLIENT_LIST_FOCUS: lists managed windows that have been
 # focused, most recent first
 
-def update_client_list_focus(signal):
-    wins = props.get_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_CLIENT_LIST_FOCUS')
-    if signal.win.id in wins:
-        wins.remove(signal.win.id)
-    wins.insert(0, signal.win.id)
-    props.change_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_CLIENT_LIST_FOCUS', wins)
+class update_client_list_focus:
+    def __call__(self, signal):
+        wins = props.get_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_CLIENT_LIST_FOCUS')
+        try:
+            wins.remove(signal.win.id)
+        except ValueError:
+            pass
+        wins.insert(0, signal.win.id)
+        props.change_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_CLIENT_LIST_FOCUS', wins)
 
-def focus_last_focused(signal):
-    wins = props.get_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_CLIENT_LIST_FOCUS')
-    while wins:
-        c = signal.wm.window_id_to_client(wins[0])
-        if c:
-            c.focus()
-            break
-        wins.pop(0)
-    props.change_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_CLIENT_LIST_FOCUS', wins)
+class focus_last_focused:
+    def __call__(self, signal):
+        wins = props.get_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_CLIENT_LIST_FOCUS')
+        while wins:
+            c = signal.wm.window_id_to_client(wins[0])
+            if c:
+                c.focus()
+                break
+            wins.pop(0)
+        props.change_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_CLIENT_LIST_FOCUS', wins)
 
 pixel_distance = 15
 timeout_ms = 400
 
-def update_last_button_press(signal):
-    try:
-        class prev:
-            window_id, detail, state, time, root_x, root_y = props.get_prop(
-                signal.wm.dpy, signal.wm.root, '_WHIMSY_LAST_BUTTON_PRESS'
+class update_last_button_press:
+    def __call__(self, signal):
+        try:
+            class prev:
+                window_id, detail, state, time, root_x, root_y = props.get_prop(
+                    signal.wm.dpy, signal.wm.root, '_WHIMSY_LAST_BUTTON_PRESS'
+                )
+        except ValueError:
+            is_repeat = False
+        else:
+            is_repeat = (
+                signal.ev.window.id == prev.window_id and
+                signal.ev.detail == prev.detail and
+                signal.ev.state == prev.state and
+                (signal.ev.time - prev.time) <= timeout_ms and
+                abs(signal.ev.root_x - prev.root_x) <= pixel_distance and
+                abs(signal.ev.root_y - prev.root_y) <= pixel_distance
             )
-    except ValueError:
-        is_repeat = False
-    else:
-        is_repeat = (
-            signal.ev.window.id == prev.window_id and
-            signal.ev.detail == prev.detail and
-            signal.ev.state == prev.state and
-            (signal.ev.time - prev.time) <= timeout_ms and
-            abs(signal.ev.root_x - prev.root_x) <= pixel_distance and
-            abs(signal.ev.root_y - prev.root_y) <= pixel_distance
-        )
 
-    count = 1
-    if is_repeat:
-        count += props.get_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_MULTICLICK_COUNT')
+        count = 1
+        if is_repeat:
+            count += props.get_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_MULTICLICK_COUNT')
 
-    props.change_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_MULTICLICK_COUNT', count)
-    props.change_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_LAST_BUTTON_PRESS', [
-        signal.ev.window.id,
-        signal.ev.detail,
-        signal.ev.state,
-        signal.ev.time,
-        signal.ev.root_x,
-        signal.ev.root_y
-    ])
+        props.change_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_MULTICLICK_COUNT', count)
+        props.change_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_LAST_BUTTON_PRESS', [
+            signal.ev.window.id,
+            signal.ev.detail,
+            signal.ev.state,
+            signal.ev.time,
+            signal.ev.root_x,
+            signal.ev.root_y
+        ])
 
 class start_move:
     def __call__(self, signal):
@@ -111,6 +127,7 @@ class execute:
 class viewport_absolute_move:
     def __init__(self, x, y):
         self.x, self.y = x, y
+
     def __call__(self, signal):
         current_x, current_y = props.get_prop(
             signal.wm.dpy, signal.wm.root, '_NET_DESKTOP_VIEWPORT'
@@ -123,7 +140,7 @@ class viewport_absolute_move:
 
             for c in signal.wm.clients:
                 c.moveresize_rel(x=xdelta, y=ydelta)
-                c.wm.dpy.sync() # necessary?  maybe not
+                #c.dpy.sync() # necessary?  maybe not
                 #todo: discard enternotifies
 
         signal.hub.signal('after_viewport_move', x=to_x, y=to_y)
@@ -152,12 +169,14 @@ class viewport_relative_move:
         if 0 <= move_to_x <= limit_x and 0 <= move_to_y <= limit_y:
             viewport_absolute_move(move_to_x, move_to_y)(signal)
 
-def discover_existing_windows(signal):
-    for win in signal.wm.root.query_tree().children:
-        signal.hub.signal('existing_window_discovered', win=win)
+class discover_existing_windows:
+    def __call__(self, signal):
+        for win in signal.wm.root.query_tree().children:
+            signal.hub.signal('existing_window_discovered', win=win)
 
-def manage_window(signal):
-    c = client.managed_client(signal.hub, signal.wm, signal.win)
-    signal.wm.clients.append(c)
-    signal.hub.signal('after_manage_window', win=signal.win)
+class manage_window:
+    def __call__(self, signal):
+        c = client.managed_client(signal.hub, signal.wm.dpy, signal.win)
+        signal.wm.clients.append(c)
+        signal.hub.signal('after_manage_window', win=signal.win)
 
