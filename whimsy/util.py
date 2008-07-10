@@ -154,3 +154,13 @@ def limited_dict_update(a, b, keys):
     for key in set(keys) & set(b.keys()):
         a[key] = b[key]
 
+def socksend(host, port, text):
+    import socket
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((host, port))
+        s.send(text)
+        s.close()
+    except socket.error:
+        pass
+

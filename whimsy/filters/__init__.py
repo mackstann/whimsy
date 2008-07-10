@@ -1,5 +1,7 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
+import logging
+
 from Xlib import X, Xutil
 from Xlib import error as Xerror
 
@@ -63,8 +65,10 @@ class click_counter:
         try:
             prev = self.prev_click
         except:
+            logging.debug("no prev click...")
             is_repeat = False
         else:
+            logging.debug("have prev click...")
             is_repeat = (
                 signal.ev.window.id == prev.window.id and
                 signal.ev.detail == prev.detail and
@@ -75,8 +79,10 @@ class click_counter:
             )
 
         if is_repeat:
+            logging.debug("is repeated click (%dx)" % (self.count+1))
             self.count += 1
         else:
+            logging.debug("not repeated click")
             self.count = 1
 
         self.prev_click = signal.ev
