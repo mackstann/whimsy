@@ -1,6 +1,6 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
-import logging, types
+import logging, types, time
 
 class return_code(object):
     DELETE_HANDLER = 0x10
@@ -15,7 +15,6 @@ class publisher(object):
         self.defaults = defaults
 
     def signal(self, name, **kw):
-        import time
         begin = time.time()
         sig = signal(self.defaults)
         sig.update(kw)
