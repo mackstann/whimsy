@@ -19,7 +19,6 @@ class main:
 
         self.hub.defaults['wm'] = wm
         self.hub.defaults['hub'] = hub
-        self.hub.register('quit', ticker.stop)
 
         # if a tick hasn't happened for 10 seconds we've definitely gotten stuck
         self.hub.register('tick', lambda s: signal.alarm(10))
