@@ -9,7 +9,7 @@ from whimsy.actions.transformers import *
 from whimsy.actions.event_handling import *
 from whimsy.filters.bindings import *
 from whimsy.filters import *
-from whimsy.infrastructure.modifiers import *
+from whimsy.modifiers import modifier_mask, modifier_core
 
 app = main.main()
 dpy = app.dpy
@@ -17,6 +17,30 @@ hub = app.hub
 wm = app.wm
 xec = app.xec
 ticker = app.ticker
+
+modcore = modifier_core(dpy)
+
+makemod = lambda raw_modifier: modifier_mask(modcore, raw_modifier)
+
+Any = makemod(X.AnyModifier)
+
+M1 = Mod1 = makemod(X.Mod1Mask)
+M2 = Mod2 = makemod(X.Mod2Mask)
+M3 = Mod3 = makemod(X.Mod3Mask)
+M4 = Mod4 = makemod(X.Mod4Mask)
+M5 = Mod5 = makemod(X.Mod5Mask)
+
+S  = Shift   = makemod(X.ShiftMask)
+C  = Control = makemod(X.ControlMask)
+
+A = Alt = Mod1
+
+Button1Mask = makemod(X.Button1Mask)
+Button2Mask = makemod(X.Button2Mask)
+Button3Mask = makemod(X.Button3Mask)
+Button4Mask = makemod(X.Button4Mask)
+Button5Mask = makemod(X.Button5Mask)
+ButtonMask = Button1Mask+Button2Mask+Button3Mask+Button4Mask+Button5Mask
 
 root_geometry = app.wm.root.get_geometry()
 W = root_geometry.width

@@ -4,17 +4,15 @@ from Xlib import X, XK, display
 import sys
 
 class modifier_core(object):
-    def __init__(self, dpy=display.Display()):
+    """caps lock, numlock, and scroll lock make comparing modifiers kind of
+    hellish.  it's all contained here."""
+    def __init__(self, dpy):
         self.dpy = dpy
         self.nlock = 0
         self.slock = 0
         self.setup_funnylocks()
 
     def setup_funnylocks(self):
-        # TODO: find out if this is fast.. if it is, we could perhaps just do
-        # it all the time and not require restarting for modifier changes to
-        # apply.
-
         nlock_key = self.dpy.keysym_to_keycode(XK.string_to_keysym("Num_Lock"))
         slock_key = self.dpy.keysym_to_keycode(XK.string_to_keysym("Scroll_Lock"))
         mapping = self.dpy.get_modifier_mapping()
