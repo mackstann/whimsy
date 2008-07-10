@@ -30,7 +30,7 @@ class interactive_pointer_transform(object):
 
         elif ev.__class__.__name__ == "ButtonRelease":
             self.dpy.ungrab_pointer(X.CurrentTime)
-            return signals.return_code.DELETE_HANDLER
+            signal.hub.unregister(self)
 
     def _update(self, xdelta, ydelta):
         raise NotImplementedError

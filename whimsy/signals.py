@@ -2,9 +2,9 @@
 
 import logging, types, time
 
-class return_code(object):
-    DELETE_HANDLER = 0x10
-
+# aha!  the signal should be nothing more than a string.  functions will name
+# the keyword args they require and use **kw to ignore the rest.
+# def func(signal, wm, hub, dpy, **kw)
 class signal(dict):
     def __getattr__(self, attr):
         return self[attr]
@@ -16,18 +16,13 @@ class publisher(object):
 
     def signal(self, name, **kw):
         begin = time.time()
-        sig = signal(self.defaults)
-        sig.update(kw)
-        sig.name = name
+        sig = signal(self.defaults, name=name, **kw)
         for func, filters in self.signals.get(name, [])[:]:
             for filt in filters:
                 if not filt(sig):
                     break
             else:
                 ret = func(sig)
-                if ret is not None:
-                    if ret & return_code.DELETE_HANDLER:
-                        self.signals[name].remove([func, filters])
         logging.debug("took %.3fms to emit %s signal" % ((time.time() - begin) * 1000, name))
 
     def register(self, mapping, callobj, *filters):
@@ -39,4 +34,11 @@ class publisher(object):
         signalname = mapping
         func = callobj
         self.signals[signalname] = self.signals.get(signalname, []) + [[func, filters]]
+
+    def unregister(self, func):
+        for signame in self.signals:
+            sigset = self.signals[signame]
+            for actionset in sigset:
+                if actionset[0] == func:
+                    sigset.remove(actionset)
 
