@@ -36,8 +36,7 @@ class publisher(object):
         self.signals[signalname] = self.signals.get(signalname, []) + [[func, filters]]
 
     def unregister(self, func):
-        for signame in self.signals:
-            sigset = self.signals[signame]
+        for sigset in self.signals.values():
             for actionset in sigset:
                 if actionset[0] == func:
                     sigset.remove(actionset)
