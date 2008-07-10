@@ -1,7 +1,7 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
 from Xlib import X, Xutil
-import sys
+import sys, select, errno, socket
 
 class size_hints(object):
     def __init__(self, **kw):
@@ -127,35 +127,7 @@ def window_type(wm, window):
         return "client"
     return "unmanaged"
 
-from Xlib.protocol import rq
-
-def object_to_dict(o, keys):
-    d = {}
-
-    if isinstance(o, rq.GetAttrData):
-        if keys:
-            limited_dict_update(d, o._data, keys)
-        else:
-            d.update(o._data)
-
-    if keys:
-        limited_dict_update(d, vars(o), keys)
-    else:
-        d.update(dict(
-            (k, v) for k, v in vars(o).items() if not k.startswith('_')
-        ))
-
-    return d
-
-def dict_to_object(d):
-    return rq.DictWrapper(d.copy())
-
-def limited_dict_update(a, b, keys):
-    for key in set(keys) & set(b.keys()):
-        a[key] = b[key]
-
 def socksend(host, port, text):
-    import socket
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((host, port))
@@ -163,4 +135,14 @@ def socksend(host, port, text):
         s.close()
     except socket.error:
         pass
+
+def lenient_select(r, w, x, timeout):
+    # sigchld for example will interrupt select() and cause an unhandled
+    # socket.error exception.
+    try:
+        return select.select(r, w, x, timeout)
+    except select.error, e:
+        if e[0] == errno.EINTR:
+            return [], [], []
+        raise
 

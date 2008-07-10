@@ -1,6 +1,6 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
-from whimsy.infrastructure import lenient_select
+from whimsy.util import lenient_select
 
 class x_event_controller(object):
     def __init__(self, hub, dpy, **event_attrs):

@@ -22,9 +22,14 @@ class managed_client(object):
 
         self.win.change_attributes(event_mask=self.mask)
 
-        self.geom = util.object_to_dict(
-            self.win.get_geometry(), ['x', 'y', 'width', 'height']
+        geom = self.win.get_geometry()
+        self.geom = dict(
+            x = geom.x,
+            y = geom.y,
+            width = geom.width,
+            height = geom.height,
         )
+
         self.sizehints = util.size_hints(win=self.win)
 
         self.props = {}
@@ -88,10 +93,9 @@ class managed_client(object):
 
     def configure(self, **changes):
         self.win.configure(**changes)
-        util.limited_dict_update(
-            self.geom, changes,
-            ['x', 'y', 'width', 'height'],
-        )
+        for k in "x", "y", "width", "height":
+            if k in changes:
+                self.geom[k] = changes[k]
 
     def focus(self):
         self.dpy.set_input_focus(self.win, X.RevertToPointerRoot, X.CurrentTime)

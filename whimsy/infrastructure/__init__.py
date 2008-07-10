@@ -4,7 +4,7 @@
 currently in upheaval
 """
 
-import os, select, errno
+import os, errno
 
 def get_display_name():
     from Xlib.support.connect import get_display
@@ -18,14 +18,4 @@ def wait_signal_handler(*args):
         os.waitpid(-1, os.WNOHANG | os.WUNTRACED)
     except OSError:
         return
-
-def lenient_select(r, w, x, timeout):
-    # sigchld for example will interrupt select() and cause an unhandled
-    # socket.error exception.
-    try:
-        return select.select(r, w, x, timeout)
-    except select.error, e:
-        if e[0] == errno.EINTR:
-            return [], [], []
-        raise
 
