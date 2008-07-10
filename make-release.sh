@@ -21,7 +21,9 @@ git tag -m "$release release" "$release" || die "git tag failed"
 dir=whimsy-"$release"
 
 cp -a . "$dir"
-rm -rf "$dir"/{Xlib,.git{,ignore}}
+rm -rf "$dir"/Xlib
+rm -rf "$dir"/.git
+rm -rf "$dir"/.gitignore
 find "$dir" -name '*.pyc' | while read i; do rm -f "$i"; done
 
 tar zcvf "$dir".tgz "$dir"
