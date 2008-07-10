@@ -4,8 +4,8 @@ import os, signal, logging, logging.handlers
 from Xlib import display
 from whimsy import infrastructure, signals
 from whimsy.window_manager import window_manager
-from whimsy.x_event_controller import x_event_controller
-from whimsy.tick_controller import tick_controller
+from whimsy.controllers.x_event_controller import x_event_controller
+from whimsy.controllers.tick_controller import tick_controller
 
 class main(object):
     def __init__(self):
