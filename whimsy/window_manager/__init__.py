@@ -7,6 +7,10 @@ from itertools import *
 
 from whimsy import signals
 
+class wm_already_running(Exception):
+    def __str__(self):
+        return "Another WM appears to be running already."
+
 class window_manager(object):
     """
     represents the window manager, which manages the specified display and
@@ -52,7 +56,7 @@ class window_manager(object):
         self.root.change_attributes(event_mask=self.mask, onerror=catch)
         self.dpy.sync()
         if catch.get_error():
-            raise RuntimeError("can't get WM selection -- another WM seems to be running")
+            raise wm_already_running()
 
         # TODO: ewmh selection
 
