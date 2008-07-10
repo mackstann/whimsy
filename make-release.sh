@@ -25,4 +25,5 @@ cp -a fetch-python-xlib.sh whimsy tests "$dir"/
 find "$dir" -name '*.pyc' | while read i; do rm -f "$i"; done
 
 tar zcvf "$dir".tgz "$dir"
+rm -rf "$dir"
 
