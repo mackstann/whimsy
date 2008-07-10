@@ -4,70 +4,128 @@ from Xlib import X, Xatom, protocol
 from Xlib.xobject import drawable
 import types
 
-_window_props = {
+datatype_sizes = {
+    'ATOM': 32,
+    'CARDINAL': 32,
+    'STRING': 8,
+    'UTF8_STRING': 8,
+    'WINDOW': 32,
+}
+
+class prop_definition:
+    def __init__(self, type, aggregate_type='single', aggregate_size_multiple=1):
+        self.type = type
+        self.aggregate_type = aggregate_type
+        self.aggregate_size_multiple = aggregate_size_multiple
+
+    @property
+    def format(self):
+        return datatype_sizes[self.type]
+
+    def validate(self, agg):
+        if self.aggregate_type != 'array':
+            self.validate_single_element(agg)
+            return
+        iter(agg)
+        assert len(agg) % self.aggregate_size_multiple == 0
+        for x in agg:
+            self.validate_single_element(x)
+
+    def validate_single_element(self, val):
+        # unicode stuff is still seriously retarded
+        if self.type == 'UTF8_STRING':
+            assert val == unicode(val)
+        elif self.type == 'STRING':
+            assert val == str(val)
+        elif self.type in ('ATOM', 'CARDINAL', 'WINDOW'):
+            assert (
+                isinstance(val, types.LongType) or isinstance(val, types.IntType)
+                or (self.type == 'WINDOW' and isinstance(val, drawable.Window))
+            )
+
+    def convert(self, val):
+        if self.aggregate_type == 'array':
+            return [ self.convert_single_element(v) for v in val ]
+        elif self.aggregate_type == 'nullarray':
+            return [ self.convert_single_element(v) + '\0' for v in val ]
+        elif self.format == 32:
+            return [ self.convert_single_element(val) ]
+        return self.convert_single_element(val)
+
+    def convert_single_element(self, val):
+        # doing change_prop(..., [ w.id for w in windows ]) gets real old, so
+        # whereas python-xlib only takes numerical window ids for a WINDOW
+        # property, we allow window objects to be passed in and we use the id
+        # property of the objects automatically
+        if self.type == 'WINDOW' and isinstance(val, drawable.Window):
+            return val.id
+        return val
+
+
+all_props = {
     # client
-    "WM_STATE":                  [ "CARDINAL",    "single",    1, ],
-    "WM_NAME":                   [ "STRING",      "single",    1, ],
-    "WM_CLASS":                  [ "STRING",      "nullarray", 1, ],
-    "WM_ICON_NAME":              [ "STRING",      "single",    1, ],
-    "WM_PROTOCOLS":              [ "ATOM",        "array",     1, ],
+    "WM_STATE":                  prop_definition("CARDINAL"),
+    "WM_NAME":                   prop_definition("STRING"),
+    "WM_CLASS":                  prop_definition("STRING", "nullarray"),
+    "WM_ICON_NAME":              prop_definition("STRING"),
+    "WM_PROTOCOLS":              prop_definition("ATOM", "array"),
 
-    "_NET_WM_NAME":              [ "UTF8_STRING", "single",    1, ],
-    "_NET_WM_VISIBLE_NAME":      [ "UTF8_STRING", "single",    1, ],
-    "_NET_WM_ICON_NAME":         [ "UTF8_STRING", "single",    1, ],
-    "_NET_WM_VISIBLE_ICON_NAME": [ "UTF8_STRING", "single",    1, ],
+    "_NET_WM_NAME":              prop_definition("UTF8_STRING"),
+    "_NET_WM_VISIBLE_NAME":      prop_definition("UTF8_STRING"),
+    "_NET_WM_ICON_NAME":         prop_definition("UTF8_STRING"),
+    "_NET_WM_VISIBLE_ICON_NAME": prop_definition("UTF8_STRING"),
 
-    "_NET_WM_WINDOW_TYPE":       [ "ATOM",        "array",     1, ],
-    "_NET_WM_STATE":             [ "ATOM",        "array",     1, ],
-    "_NET_WM_ALLOWED_ACTIONS":   [ "ATOM",        "array",     1, ],
+    "_NET_WM_WINDOW_TYPE":       prop_definition("ATOM", "array"),
+    "_NET_WM_STATE":             prop_definition("ATOM", "array"),
+    "_NET_WM_ALLOWED_ACTIONS":   prop_definition("ATOM", "array"),
 
-    "_NET_WM_DESKTOP":           [ "CARDINAL",    "single",    1, ],
-    "_NET_WM_PID":               [ "CARDINAL",    "single",    1, ],
-    "_NET_WM_USER_TIME":         [ "CARDINAL",    "single",    1, ],
+    "_NET_WM_DESKTOP":           prop_definition("CARDINAL"),
+    "_NET_WM_PID":               prop_definition("CARDINAL"),
+    "_NET_WM_USER_TIME":         prop_definition("CARDINAL"),
 
-    "_NET_DESKTOP_GEOMETRY":     [ "CARDINAL",    "array",     2, ],
-    "_NET_WM_ICON_GEOMETRY":     [ "CARDINAL",    "array",     4, ],
-    "_NET_FRAME_EXTENTS":        [ "CARDINAL",    "array",     4, ],
-    "_NET_WM_STRUT":             [ "CARDINAL",    "array",     4, ],
-    "_NET_WM_STRUT_PARTIAL":     [ "CARDINAL",    "array",    12, ],
+    "_NET_DESKTOP_GEOMETRY":     prop_definition("CARDINAL", "array", 2),
+    "_NET_WM_ICON_GEOMETRY":     prop_definition("CARDINAL", "array", 4),
+    "_NET_FRAME_EXTENTS":        prop_definition("CARDINAL", "array", 4),
+    "_NET_WM_STRUT":             prop_definition("CARDINAL", "array", 4),
+    "_NET_WM_STRUT_PARTIAL":     prop_definition("CARDINAL", "array", 12),
 
     # client and root
-    "_NET_SUPPORTING_WM_CHECK":  [ "WINDOW",      "single",    1, ],
+    "_NET_SUPPORTING_WM_CHECK":  prop_definition("WINDOW"),
 
     # root
-    "_NET_NUMBER_OF_DESKTOPS":   [ "CARDINAL",    "single",    1, ],
-    "_NET_SHOWING_DESKTOP":      [ "CARDINAL",    "single",    1, ],
-    "_NET_CURRENT_DESKTOP":      [ "CARDINAL",    "single",    1, ],
+    "_NET_NUMBER_OF_DESKTOPS":   prop_definition("CARDINAL"),
+    "_NET_SHOWING_DESKTOP":      prop_definition("CARDINAL"),
+    "_NET_CURRENT_DESKTOP":      prop_definition("CARDINAL"),
 
-    "_NET_ACTIVE_WINDOW":        [ "WINDOW",      "single",    1, ],
+    "_NET_ACTIVE_WINDOW":        prop_definition("WINDOW"),
 
-    "_NET_DESKTOP_NAMES":        [ "UTF8_STRING", "array",     1, ],
+    "_NET_DESKTOP_NAMES":        prop_definition("UTF8_STRING", "array"),
 
-    "_NET_SUPPORTED":            [ "ATOM",        "array",     1, ],
+    "_NET_SUPPORTED":            prop_definition("ATOM", "array"),
 
-    "_NET_CLIENT_LIST":          [ "WINDOW",      "array",     1, ],
-    "_NET_CLIENT_LIST_STACKING": [ "WINDOW",      "array",     1, ],
-    "_NET_VIRTUAL_ROOTS":        [ "WINDOW",      "array",     1, ],
+    "_NET_CLIENT_LIST":          prop_definition("WINDOW", "array"),
+    "_NET_CLIENT_LIST_STACKING": prop_definition("WINDOW", "array"),
+    "_NET_VIRTUAL_ROOTS":        prop_definition("WINDOW", "array"),
 
-    "_NET_DESKTOP_VIEWPORT":     [ "CARDINAL",    "array",     2, ],
-    "_NET_WORKAREA":             [ "CARDINAL",    "array",     4, ],
+    "_NET_DESKTOP_VIEWPORT":     prop_definition("CARDINAL", "array", 2),
+    "_NET_WORKAREA":             prop_definition("CARDINAL", "array", 4),
 
-    "_NET_DESKTOP_LAYOUT":       [ "CARDINAL",    "array",     4, ],
+    "_NET_DESKTOP_LAYOUT":       prop_definition("CARDINAL", "array", 4),
 
-    "_WHIMSY_CLIENT_LIST_FOCUS": [ "WINDOW",      "array",     1, ],
+    "_WHIMSY_CLIENT_LIST_FOCUS": prop_definition("WINDOW", "array"),
 
-    "_WHIMSY_LAST_BUTTON_PRESS": [ "CARDINAL",    "array",     6 ],
-    "_WHIMSY_MULTICLICK_COUNT":  [ "CARDINAL",    "single",    1, ],
+    "_WHIMSY_LAST_BUTTON_PRESS": prop_definition("CARDINAL", "array", 6),
+    "_WHIMSY_MULTICLICK_COUNT":  prop_definition("CARDINAL"),
 }
 
 def supported_props():
-    return _window_props.keys()
+    return all_props.keys()
 
 def send_window_message(dpy, win, name, data,
         ev_win=X.NONE,
         event_mask=X.SubstructureNotifyMask|X.SubstructureRedirectMask):
 
-    format = property_info.datatype_sizes[_window_props[name][0]]
+    format = all_props[name].format
 
     data += [0] * (160/format - len(data))
     win.send_event(
@@ -79,96 +137,33 @@ def send_window_message(dpy, win, name, data,
         event_mask=event_mask
     )
 
-# should be changed to "property changer" or something
-class property_info:
-    def __init__(self, dpy, name):
-        self.dpy = dpy
-        self.spec = _window_props[name]
-
-    def get(self, args):
-        self.verify(args)
-        return self.get_property_info(args)
-
-    def verify_single(self, val):
-        datatype = self.spec[0]
-        if datatype == 'UTF8_STRING':
-            assert val == unicode(val)
-        elif datatype == 'STRING':
-            assert val == str(val)
-        elif datatype in ('ATOM', 'CARDINAL', 'WINDOW'):
-            assert (
-                isinstance(val, types.LongType) or isinstance(val, types.IntType)
-                or (datatype == 'WINDOW' and isinstance(val, drawable.Window))
-            )
-
-    def verify(self, agg):
-        if self.spec[1] == 'array':
-            iter(agg)
-            assert len(agg) % self.spec[2] == 0
-            for x in agg:
-                self.verify_single(x)
-        else:
-            self.verify_single(agg)
-
-    # this belongs outside of here as it's used for both reading and writing
-    datatype_sizes = {
-        'UTF8_STRING': 8,
-        'STRING': 8,
-        'ATOM': 32,
-        'CARDINAL': 32,
-        'WINDOW': 32,
-    }
-
-    def convert_single(self, val):
-        # doing change_prop(..., [ w.id for w in windows ]) gets real old, so
-        # we allow window objects to be passed in and we pick the id off of
-        # them automatically
-        if self.spec[0] == 'WINDOW' and isinstance(val, drawable.Window):
-            return val.id
-        return val
-
-    def convert_for_write(self, val):
-        if self.spec[1] == 'array':
-            return [ self.convert_single(v) for v in val ]
-        elif self.spec[1] == 'nullarray':
-            return [ self.convert_single(v) + '\0' for v in val ]
-        elif self.datatype_sizes[self.spec[0]] == 32:
-            return [ self.convert_single(val) ]
-        return self.convert_single(val)
-
-
-    def get_property_info(self, val):
-        self.verify(val)
-        atomname = self.spec[0]
-        if atomname in vars(Xatom):
-            atom = getattr(Xatom, atomname)
-        else:
-            atom = self.dpy.get_atom(atomname)
-        return (
-            atom,
-            self.datatype_sizes[self.spec[0]],
-            self.convert_for_write(val),
-        )
+def prepare_prop_for_write(dpy, name, value):
+    definition = all_props[name]
+    definition.validate(value)
+    return (
+        dpy.get_atom(definition.type),
+        definition.format,
+        definition.convert(value)
+    )
 
 def change_prop(dpy, win, name, value):
-    propinfo = property_info(dpy, name)
-    type, format, processed_val = propinfo.get(value)
+    type, format, processed_val = prepare_prop_for_write(dpy, name, value)
     win.change_property(dpy.get_atom(name), int(type), format, processed_val)
 
 def get_prop(dpy, win, name):
-    spec = _window_props[name]
-    prop = win.get_full_property(dpy.get_atom(name), dpy.get_atom(spec[0]))
+    definition = all_props[name]
+    prop = win.get_full_property(dpy.get_atom(name), dpy.get_atom(definition.type))
 
     if prop is None:
-        return None if spec[1] == 'single' else []
+        return None if definition.aggregate_type == 'single' else []
 
-    if spec[1] == 'array':
+    if definition.aggregate_type == 'array':
         return list(prop.value)
 
-    if spec[1] == 'nullarray':
+    if definition.aggregate_type == 'nullarray':
         return prop.value.split('\0')[:-1]
 
-    if property_info.datatype_sizes[spec[0]] == 32:
+    if definition.format == 32:
         assert len(prop.value) in (0, 1)
         if not len(prop.value):
             return None
