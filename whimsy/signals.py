@@ -1,6 +1,6 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
-import logging, types, time
+import types, time
 
 # aha!  the signal should be nothing more than a string.  functions will name
 # the keyword args they require and use **kw to ignore the rest.
@@ -23,7 +23,6 @@ class publisher(object):
                     break
             else:
                 ret = func(sig)
-        logging.debug("took %.3fms to emit %s signal" % ((time.time() - begin) * 1000, name))
 
     def register(self, mapping, callobj, *filters):
         if isinstance(mapping, types.DictType):
