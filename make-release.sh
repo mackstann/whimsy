@@ -20,7 +20,8 @@ git tag -m "$release release" "$release" || die "git tag failed"
 
 dir=whimsy-"$release"
 
-cp -a * "$dir"
+mkdir "$dir"
+cp -a * "$dir"/
 rm -rf "$dir"/Xlib
 find "$dir" -name '*.pyc' | while read i; do rm -f "$i"; done
 
