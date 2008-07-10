@@ -43,7 +43,6 @@ class managed_client:
         self.win.change_attributes(event_mask=X.NoEventMask)
         self.ungrab_all()
         self.dpy.sync()
-        print catch.get_error()
 
     def update_prop(self, propname):
         # some properties are specified to only change at certain times (such
