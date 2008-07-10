@@ -2,7 +2,7 @@
 
 from Xlib import X
 
-from whimsy import event, signals
+from whimsy import signals
 
 class interactive_pointer_transform(object):
     def __init__(self, dpy, client, begin_event):

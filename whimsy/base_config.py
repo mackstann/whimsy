@@ -2,11 +2,12 @@
 
 from Xlib import X
 
-from whimsy import event, main
+from whimsy import main
 from whimsy.actions import ewmh
 from whimsy.actions.builtins import *
 from whimsy.actions.transformers import *
 from whimsy.actions.event_handling import *
+from whimsy.actions.replay import *
 from whimsy.filters.bindings import *
 from whimsy.filters import *
 from whimsy.x11.modifiers import modifier_mask, modifier_core
@@ -110,7 +111,7 @@ actions = [
 
     ('client_init_after', client_method('map_normal')),
 
-    ('event_done', event.smart_replay(),
+    ('event_done', smart_replay(),
      if_event_type(X.KeyPress, X.KeyRelease, X.ButtonPress, X.ButtonRelease)),
 ]
 
