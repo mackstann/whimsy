@@ -46,42 +46,6 @@ class focus_last_focused:
             wins.pop(0)
         props.change_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_CLIENT_LIST_FOCUS', wins)
 
-pixel_distance = 15
-timeout_ms = 400
-
-class update_last_button_press:
-    def __call__(self, signal):
-        try:
-            class prev:
-                window_id, detail, state, time, root_x, root_y = props.get_prop(
-                    signal.wm.dpy, signal.wm.root, '_WHIMSY_LAST_BUTTON_PRESS'
-                )
-        except ValueError:
-            is_repeat = False
-        else:
-            is_repeat = (
-                signal.ev.window.id == prev.window_id and
-                signal.ev.detail == prev.detail and
-                signal.ev.state == prev.state and
-                (signal.ev.time - prev.time) <= timeout_ms and
-                abs(signal.ev.root_x - prev.root_x) <= pixel_distance and
-                abs(signal.ev.root_y - prev.root_y) <= pixel_distance
-            )
-
-        count = 1
-        if is_repeat:
-            count += props.get_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_MULTICLICK_COUNT')
-
-        props.change_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_MULTICLICK_COUNT', count)
-        props.change_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_LAST_BUTTON_PRESS', [
-            signal.ev.window.id,
-            signal.ev.detail,
-            signal.ev.state,
-            signal.ev.time,
-            signal.ev.root_x,
-            signal.ev.root_y
-        ])
-
 class start_move:
     def __call__(self, signal):
         signal.hub.register('event_begin',

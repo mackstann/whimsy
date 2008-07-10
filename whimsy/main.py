@@ -60,6 +60,11 @@ viewport_tracking_signal_methods = {
     'after_viewport_move': 'refresh',
 }
 
+clicks = click_counter()
+
+def if_doubleclick(signal):
+    return clicks.if_multi(2)(signal)
+
 actions = [
     (startup_shutdown_signal_methods,     ewmh.net_supported()),
     (startup_shutdown_signal_methods,     ewmh.net_supporting_wm_check()),
@@ -97,7 +102,7 @@ actions = [
 
     ('event', configure_request_handler(), if_(X.ConfigureRequest)),
 
-    ('event', update_last_button_press(), if_(X.ButtonPress)),
+    ('event', clicks, if_(X.ButtonPress)),
 
     ('client_init_after', client_method('configure', border_width=0)),
 
@@ -107,8 +112,8 @@ actions = [
      if_event_type(X.KeyPress, X.KeyRelease, X.ButtonPress, X.ButtonRelease)),
 ]
 
-for entry in actions:
-    hub.register(entry[0], entry[1], *entry[2:])
+for action in actions:
+    hub.register(action[0], action[1], *action[2:])
 
 ### SECTION 3 - the playground
 
@@ -138,7 +143,7 @@ actions = [
     (viewport_relative_move( 0, +H), if_key_press("Down",  C)),
 
     (execute("aterm"), if_key_press("x", C+A)),
-    (execute("aterm"), if_root, if_button_press(1, Any), if_multiclick(2)),
+    (execute("aterm"), if_root, if_button_press(1, Any), if_doubleclick),
 
     (execute("sleep 1; xset s activate"), if_key_press("s", C+A)),
 
@@ -167,8 +172,8 @@ actions = [
      if_key_press("l", M4)),
 ]
 
-for entry in actions:
-    hub.register("event", entry[0], *entry[1:])
+for action in actions:
+    hub.register("event", action[0], *action[1:])
 
 ### SECTION 4 - run the damn thing
 
