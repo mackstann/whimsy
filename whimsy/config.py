@@ -58,6 +58,7 @@ actions = [
 for action in actions:
     app.hub.register("event", action[0], *action[1:])
 
-app.log_filename = "/home/death/.whimsy.log"
+import os.path
+app.log_filename = os.path.expanduser("~/.whimsy.log")
 app.run()
 
