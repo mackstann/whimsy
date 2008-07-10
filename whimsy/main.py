@@ -1,18 +1,27 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
 import os, signal, logging, logging.handlers
+
 from Xlib import display
-from whimsy import infrastructure, signals
+from Xlib.support.connect import get_display
+
+from whimsy.signals import publisher
 from whimsy.models.window_manager import window_manager
 from whimsy.controllers.x_event_controller import x_event_controller
 from whimsy.controllers.tick_controller import tick_controller
 
+def wait_signal_handler(*args):
+    try:
+        os.waitpid(-1, os.WNOHANG | os.WUNTRACED)
+    except OSError:
+        pass
+
 class main(object):
     def __init__(self):
-        infrastructure.set_display_env()
+        os.environ['DISPLAY'] = get_display(None)[0]
 
         self.dpy    = dpy    = display.Display()
-        self.hub    = hub    = signals.publisher()
+        self.hub    = hub    = publisher()
         self.wm     = wm     = window_manager(hub, dpy)
         self.xec    = xec    = x_event_controller(hub, dpy)
         self.ticker = ticker = tick_controller(hub)
@@ -44,7 +53,7 @@ class main(object):
     def run(self):
         self.setup_logging()
 
-        signal.signal(signal.SIGCHLD, infrastructure.wait_signal_handler)
+        signal.signal(signal.SIGCHLD, wait_signal_handler)
         signal.signal(signal.SIGTERM, lambda signum, frame: self.ticker.stop())
         signal.signal(signal.SIGINT,  lambda signum, frame: self.ticker.stop())
         signal.signal(signal.SIGPIPE, lambda signum, frame: self.ticker.stop())
