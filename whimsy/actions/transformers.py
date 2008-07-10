@@ -21,7 +21,8 @@ class interactive_pointer_transform(object):
         ev = signal.ev
 
         if ev.__class__.__name__ == "MotionNotify":
-            #ev = event.check_typed_window_event(signal.wm.dpy, ev, type=X.MotionNotify, window=self.client.win)
+            # if we had XCheckTypedWindowEvent we could compress motionnotifies
+            # here
 
             xdelta = ev.root_x - self.begin_event.root_x
             ydelta = ev.root_y - self.begin_event.root_y

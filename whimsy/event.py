@@ -27,12 +27,3 @@ class smart_replay(object):
             if len(self.replayed) > 100:
                 self.replayed.pop(0)
 
-def check_typed_window_event(dpy, start_event, type=None, window=None):
-    last_good = start_event
-    while dpy.pending_events():
-        e = dpy.next_event(type=type, window=window)
-        if not e:
-            return last_good
-        last_good = e
-    return last_good
-
