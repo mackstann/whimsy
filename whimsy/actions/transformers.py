@@ -48,3 +48,23 @@ class resize_transformer(interactive_pointer_transform):
             height = self.begin_geom['height'] + ydelta
         )
 
+class start_move:
+    def __call__(self, signal):
+        signal.hub.register('event_begin',
+            move_transformer(
+                signal.wm.dpy,
+                signal.wm.window_to_client(signal.win),
+                signal.ev
+            )
+        )
+
+class start_resize:
+    def __call__(self, signal):
+        signal.hub.register('event_begin',
+            resize_transformer(
+                signal.wm.dpy,
+                signal.wm.window_to_client(signal.win),
+                signal.ev
+            )
+        )
+

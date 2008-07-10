@@ -2,7 +2,7 @@
 
 import os, subprocess
 
-from whimsy import transformers, props, window_manager, util, client
+from whimsy import props, window_manager, util, client
 
 def _unmanage(signal, delete=False):
     c = signal.wm.window_to_client(signal.win)
@@ -45,26 +45,6 @@ class focus_last_focused:
                 break
             wins.pop(0)
         props.change_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_CLIENT_LIST_FOCUS', wins)
-
-class start_move:
-    def __call__(self, signal):
-        signal.hub.register('event_begin',
-            transformers.move_transformer(
-                signal.wm.dpy,
-                signal.wm.window_to_client(signal.win),
-                signal.ev
-            )
-        )
-
-class start_resize:
-    def __call__(self, signal):
-        signal.hub.register('event_begin',
-            transformers.resize_transformer(
-                signal.wm.dpy,
-                signal.wm.window_to_client(signal.win),
-                signal.ev
-            )
-        )
 
 class client_method:
     def __init__(self, methodname, *a, **kw):

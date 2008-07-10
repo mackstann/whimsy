@@ -5,6 +5,7 @@ from Xlib import X
 from whimsy import event, main
 from whimsy.actions import ewmh
 from whimsy.actions.builtins import *
+from whimsy.actions.transformers import *
 from whimsy.actions.event_handling import *
 from whimsy.filters.bindings import *
 from whimsy.filters import *
