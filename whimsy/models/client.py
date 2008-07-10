@@ -3,7 +3,8 @@
 from Xlib import X, Xutil
 from Xlib import error as Xerror
 
-from whimsy import util, props
+from whimsy import util
+from whimsy.x11 import props
 
 class managed_client(object):
 

@@ -2,7 +2,7 @@
 
 import unittest, traceback, sys
 from Xlib import display, X
-from whimsy import props
+from whimsy.x11 import props
 
 class TestPropertyInfo(unittest.TestCase):
     def setUp(self):

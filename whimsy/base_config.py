@@ -9,7 +9,7 @@ from whimsy.actions.transformers import *
 from whimsy.actions.event_handling import *
 from whimsy.filters.bindings import *
 from whimsy.filters import *
-from whimsy.modifiers import modifier_mask, modifier_core
+from whimsy.x11.modifiers import modifier_mask, modifier_core
 
 app = main.main()
 dpy = app.dpy

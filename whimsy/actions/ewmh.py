@@ -2,7 +2,8 @@
 
 from Xlib import X
 
-from whimsy import props, util, signals
+from whimsy import util, signals
+from whimsy.x11 import props
 
 class net_supported(object):
     def startup(self, signal):

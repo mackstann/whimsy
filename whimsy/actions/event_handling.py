@@ -1,6 +1,7 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
-from whimsy import util, props
+from whimsy import util
+from whimsy.x11 import props
 
 class update_client_property(object):
     def __call__(self, signal):

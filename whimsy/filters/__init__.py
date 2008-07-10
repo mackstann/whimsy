@@ -5,7 +5,7 @@ import logging
 from Xlib import X, Xutil
 from Xlib import error as Xerror
 
-from whimsy import util, props
+from whimsy import util
 
 class if_event_type(object):
     def __init__(self, *evtypes):

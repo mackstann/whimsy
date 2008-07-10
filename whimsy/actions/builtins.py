@@ -2,7 +2,8 @@
 
 import os, subprocess
 
-from whimsy import props, client
+from whimsy.models import client
+from whimsy.x11 import props
 
 def _unmanage(signal, delete=False):
     c = signal.wm.window_to_client(signal.win)
