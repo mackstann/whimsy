@@ -5,7 +5,7 @@ from Xlib import error as Xerror
 
 from whimsy import util, props
 
-class managed_client:
+class managed_client(object):
 
     mask = (
         X.KeyReleaseMask | X.ButtonReleaseMask |

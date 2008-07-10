@@ -4,7 +4,7 @@ from Xlib import X, XK
 
 # hmmm, is it really necessary to swallow the release events?
 
-class binding_base:
+class binding_base(object):
     def __init__(self, detail, mods, **options):
         self.detail = detail
         self.mods = mods

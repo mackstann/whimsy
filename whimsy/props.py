@@ -12,7 +12,7 @@ datatype_sizes = {
     'WINDOW': 32,
 }
 
-class prop_definition:
+class prop_definition(object):
     def __init__(self, type, aggregate_type='single', aggregate_size_multiple=1):
         self.type = type
         self.aggregate_type = aggregate_type

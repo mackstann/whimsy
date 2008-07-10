@@ -15,7 +15,7 @@ def replay_or_swallow(dpy, ev, replay):
     if replay:
         dpy.flush()
 
-class smart_replay:
+class smart_replay(object):
     def __init__(self):
         self.replayed = []
     def __call__(self, signal):

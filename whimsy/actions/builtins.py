@@ -13,11 +13,11 @@ def _unmanage(signal, delete=False):
             c.delete()
     signal.hub.signal('after_unmanage_window', win=signal.win)
 
-class unmanage_window:
+class unmanage_window(object):
     def __call__(self, signal):
         _unmanage(signal)
 
-class delete_client:
+class delete_client(object):
     def __call__(self, signal):
         _unmanage(signal, delete=True)
 
@@ -25,7 +25,7 @@ class delete_client:
 # _WHIMSY_CLIENT_LIST_FOCUS: lists managed windows that have been
 # focused, most recent first
 
-class update_client_list_focus:
+class update_client_list_focus(object):
     def __call__(self, signal):
         wins = props.get_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_CLIENT_LIST_FOCUS')
         try:
@@ -35,7 +35,7 @@ class update_client_list_focus:
         wins.insert(0, signal.win.id)
         props.change_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_CLIENT_LIST_FOCUS', wins)
 
-class focus_last_focused:
+class focus_last_focused(object):
     def __call__(self, signal):
         wins = props.get_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_CLIENT_LIST_FOCUS')
         while wins:
@@ -46,7 +46,7 @@ class focus_last_focused:
             wins.pop(0)
         props.change_prop(signal.wm.dpy, signal.wm.root, '_WHIMSY_CLIENT_LIST_FOCUS', wins)
 
-class client_method:
+class client_method(object):
     def __init__(self, methodname, *a, **kw):
         self.methodname = methodname
         self.a = a
@@ -59,7 +59,7 @@ class client_method:
             c = signal.wm.window_to_client(signal.win)
         getattr(c, self.methodname)(*self.a, **self.kw)
 
-class execute:
+class execute(object):
     def __init__(self, cmd):
         self.cmd = cmd
     def __call__(self, signal):
@@ -68,7 +68,7 @@ class execute:
             subprocess.Popen(['/bin/sh', '-c', self.cmd], close_fds=True)
             os._exit(0)
 
-class viewport_absolute_move:
+class viewport_absolute_move(object):
     def __init__(self, x, y):
         self.x, self.y = x, y
 
@@ -89,7 +89,7 @@ class viewport_absolute_move:
 
         signal.hub.signal('after_viewport_move', x=to_x, y=to_y)
 
-class viewport_relative_move:
+class viewport_relative_move(object):
     def __init__(self, x, y):
         self.x, self.y = x, y
 
@@ -113,12 +113,12 @@ class viewport_relative_move:
         if 0 <= move_to_x <= limit_x and 0 <= move_to_y <= limit_y:
             viewport_absolute_move(move_to_x, move_to_y)(signal)
 
-class discover_existing_windows:
+class discover_existing_windows(object):
     def __call__(self, signal):
         for win in signal.wm.root.query_tree().children:
             signal.hub.signal('existing_window_discovered', win=win)
 
-class manage_window:
+class manage_window(object):
     def __call__(self, signal):
         c = client.managed_client(signal.hub, signal.wm.dpy, signal.win)
         signal.wm.clients.append(c)

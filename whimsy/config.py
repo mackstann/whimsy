@@ -2,7 +2,7 @@
 
 from whimsy.base_config import *
 
-class mpd:
+class mpd(object):
     def __init__(self, cmd):
         self.cmd = cmd
     def __call__(self, ev):

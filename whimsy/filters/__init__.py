@@ -7,7 +7,7 @@ from Xlib import error as Xerror
 
 from whimsy import util, props
 
-class if_event_type:
+class if_event_type(object):
     def __init__(self, *evtypes):
         self.evtypes = evtypes
     def __call__(self, signal):
@@ -25,13 +25,13 @@ def if_root(signal):
         util.window_type(signal.wm, signal.win) == 'root'
     )
 
-class if_state:
+class if_state(object):
     def __init__(self, mods):
         self.mods = mods
     def __call__(self, signal):
         return self.mods.matches(signal.ev.state)
 
-class if_:
+class if_(object):
     def __init__(self, evtype, wintype=None):
         self.evtype = evtype
         self.wintype = wintype
@@ -42,7 +42,7 @@ class if_:
             return True
         return util.window_type(signal.wm, signal.win) == self.wintype
 
-class click_counter:
+class click_counter(object):
     """built like an action but yields a filter which is its main purpose -- to
     filter for double clicks, triple clicks, etc"""
 

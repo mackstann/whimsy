@@ -4,7 +4,7 @@ from Xlib import X
 
 from whimsy import event, signals
 
-class interactive_pointer_transform:
+class interactive_pointer_transform(object):
     def __init__(self, dpy, client, begin_event):
         self.dpy = dpy
         self.client = client
@@ -48,7 +48,7 @@ class resize_transformer(interactive_pointer_transform):
             height = self.begin_geom['height'] + ydelta
         )
 
-class start_move:
+class start_move(object):
     def __call__(self, signal):
         signal.hub.register('event_begin',
             move_transformer(
@@ -58,7 +58,7 @@ class start_move:
             )
         )
 
-class start_resize:
+class start_resize(object):
     def __call__(self, signal):
         signal.hub.register('event_begin',
             resize_transformer(

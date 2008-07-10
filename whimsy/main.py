@@ -7,7 +7,7 @@ from whimsy.window_manager import window_manager
 from whimsy.x_event_controller import x_event_controller
 from whimsy.tick_controller import tick_controller
 
-class main:
+class main(object):
     def __init__(self):
         infrastructure.set_display_env()
 

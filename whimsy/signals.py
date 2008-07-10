@@ -4,10 +4,10 @@ import logging, types
 
 from whimsy import util
 
-class return_code:
+class return_code(object):
     DELETE_HANDLER = 0x10
 
-class publisher:
+class publisher(object):
     def __init__(self, **defaults):
         self.signals = {}
         self.defaults = defaults
