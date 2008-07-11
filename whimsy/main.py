@@ -48,6 +48,8 @@ class main(object):
             logging.handlers.RotatingFileHandler(self.log_filename, backupCount=5)
         )
         if os.path.exists(self.log_filename):
+            # rollover upon every startup, not based on file size.  most recent
+            # is log_filename, previous is log_filename+".1", and so on.
             root_logger.handlers[0].doRollover()
 
     def run(self):
