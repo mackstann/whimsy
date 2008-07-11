@@ -2,12 +2,19 @@
 
 from whimsy.base_config import *
 
+import socket
+
 class mpd(object):
     def __init__(self, cmd):
         self.cmd = cmd
-    def __call__(self, ev):
-        from whimsy.util import socksend
-        socksend('localhost', 6600, "%s\n" % self.cmd)
+    def __call__(self, signal):
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect(('localhost', 6600))
+            s.send("%s\n" % self.cmd)
+            s.close()
+        except socket.error:
+            pass
 
 actions = [
     (viewport_absolute_move(  0,   0), if_key_press("u",      C+A)),

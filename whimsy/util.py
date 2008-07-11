@@ -1,7 +1,7 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
 from Xlib import X, Xutil
-import sys, select, errno, socket
+import sys, select, errno
 
 class size_hints(object):
     def __init__(self, **kw):
@@ -126,15 +126,6 @@ def window_type(wm, window):
     elif wm.window_to_client(window):
         return "client"
     return "unmanaged"
-
-def socksend(host, port, text):
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((host, port))
-        s.send(text)
-        s.close()
-    except socket.error:
-        pass
 
 def lenient_select(r, w, x, timeout):
     # sigchld for example will interrupt select() and cause an unhandled
