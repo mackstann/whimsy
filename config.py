@@ -8,6 +8,7 @@ actions = [
     #     u i o
     #     j k l
     #     m , .
+    # W is the screen width and H is the screen height.
     (viewport_absolute_move(  0,   0), if_key_press("u",      C+A)),
     (viewport_absolute_move(  W,   0), if_key_press("i",      C+A)),
     (viewport_absolute_move(W*2,   0), if_key_press("o",      C+A)),
