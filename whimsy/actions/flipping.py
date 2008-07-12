@@ -4,52 +4,78 @@ from whimsy.actions import transformers
 from whimsy.actions.builtins import viewport_relative_move
 
 class flipping_transformer(transformers.interactive_pointer_transformer):
+    # so an edge flip doesn't trigger another opposite edge flip, and so on
+    # continuously, we warp the pointer from, say, the rightmost pixel, to the
+    # leftmost pixel PLUS this margin
+    safety_margin = 10
+
     def __call__(self, signal):
         super(flipping_transformer, self).__call__(signal)
         self.root_geometry = signal.wm.root.get_geometry()
 
     def motion(self, signal):
         super(flipping_transformer, self).motion(signal)
-        ev = signal.ev
-        warp_pointer = signal.wm.dpy.warp_pointer
         width = self.root_geometry.width
         height = self.root_geometry.height
-        safety_margin = 10
-        vert_warp = height - safety_margin
-        horiz_warp = width - safety_margin
+
+        vert_warp = height - self.safety_margin
+        horiz_warp = width - self.safety_margin
+
         left = 0
-        right = width - 1
         top = 0
+        right = width - 1
         bottom = height - 1
-        print (ev.root_x, ev.root_y)
-        if ev.root_x == right:
-            warp_by     = (-horiz_warp, 0)
-            viewport_by = (+width, 0)
-            client_by   = (+safety_margin, 0)
-        elif ev.root_y == bottom:
-            warp_by     = (0, -vert_warp)
-            viewport_by = (0, +height)
-            client_by   = (0, +safety_margin)
-        elif ev.root_x == left:
-            warp_by     = (+horiz_warp, 0)
-            viewport_by = (-width, 0)
-            client_by   = (-safety_margin, 0)
-        elif ev.root_y == top:
-            warp_by     = (0, +vert_warp)
-            viewport_by = (0, -height)
-            client_by   = (0, -safety_margin)
+
+        if signal.ev.root_x == right:
+            self.warp_by     = (-horiz_warp, 0)
+            self.viewport_by = (+width, 0)
+            self.client_by   = (+self.safety_margin, 0)
+        elif signal.ev.root_y == bottom:
+            self.warp_by     = (0, -vert_warp)
+            self.viewport_by = (0, +height)
+            self.client_by   = (0, +self.safety_margin)
+        elif signal.ev.root_x == left:
+            self.warp_by     = (+horiz_warp, 0)
+            self.viewport_by = (-width, 0)
+            self.client_by   = (-self.safety_margin, 0)
+        elif signal.ev.root_y == top:
+            self.warp_by     = (0, +vert_warp)
+            self.viewport_by = (0, -height)
+            self.client_by   = (0, -self.safety_margin)
         else:
             return
 
-        print "warp_by:", warp_by
-        print "viewport_relative_move by:", viewport_by
-        warp_pointer(*warp_by)
-        viewport_relative_move(*viewport_by)(signal)
-        self.state.client.moveresize_rel(x=client_by[0], y=client_by[1])
+        if not signal.wm.can_move_viewport_by(*self.viewport_by):
+            return
+
+        self.warp(signal)
+
+        del self.warp_by
+        del self.viewport_by
+        del self.client_by
+
+    def warp(self, signal):
+        self.state.client.dpy.warp_pointer(*self.warp_by)
+        viewport_relative_move(*self.viewport_by)(signal)
+        self.client_adjust()
         signal.wm.dpy.sync()
 
+    def client_adjust(self):
+        raise NotImplementedError
+
 class flipping_move(transformers.move_transformer, flipping_transformer):
-    pass
+    def client_adjust(self):
+        self.state.client.moveresize_rel(
+            x=self.client_by[0],
+            y=self.client_by[1],
+        )
 
 class flipping_resize(transformers.resize_transformer, flipping_transformer):
-    pass
+    def client_adjust(self):
+        self.state.initial_pointer_x -= self.viewport_by[0]
+        self.state.initial_pointer_y -= self.viewport_by[1]
+        self.state.client.moveresize_rel(
+            width=self.client_by[0],
+            height=self.client_by[1],
+        )
+

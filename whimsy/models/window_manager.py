@@ -6,7 +6,7 @@ from Xlib import error as Xerror
 from itertools import *
 
 from whimsy import signals
-
+from whimsy.x11 import props
 from whimsy.models import client
 
 class wm_already_running(Exception):
@@ -37,10 +37,18 @@ class window_manager(object):
         self.root_geometry = self.root.get_geometry()
         self.vwidth = self.root_geometry.width
         self.vheight = self.root_geometry.height
+        self.vx = 0
+        self.vy = 0
         self.clients = []
+        hub.register('viewport_discovered', self.update_viewport)
+        hub.register('after_viewport_move', self.update_viewport)
         hub.signal("wm_init_after")
 
     # MOVE TO SCREEN CLASS?
+
+    def update_viewport(self, signal):
+        self.vx = signal.x
+        self.vy = signal.y
 
     def shutdown(self):
         self.hub.signal("wm_shutdown_before")
@@ -84,4 +92,19 @@ class window_manager(object):
         for client in self.clients:
             if wid == client.win.id:
                 return client
+
+    def can_move_viewport_to(self, x, y):
+        total_width, total_height = props.get_prop(
+            self.dpy, self.root, '_NET_DESKTOP_GEOMETRY')
+
+        limit_x = total_width - self.root_geometry.width
+        limit_y = total_height - self.root_geometry.height
+
+        return 0 <= x <= limit_x and 0 <= y <= limit_y
+
+    def can_move_viewport_by(self, x, y):
+        current_x, current_y = props.get_prop(
+            self.dpy, self.root, '_NET_DESKTOP_VIEWPORT')
+
+        return self.can_move_viewport_to(current_x + x, current_y + y)
 

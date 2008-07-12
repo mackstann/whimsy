@@ -63,12 +63,15 @@ class net_client_list(object):
 
 class net_desktop_viewport(object):
     def startup(self, signal):
-        current = props.get_prop(signal.wm.dpy, signal.wm.root, '_NET_DESKTOP_VIEWPORT')
-        if not current:
-            props.change_prop(
-                signal.wm.dpy, signal.wm.root, '_NET_DESKTOP_VIEWPORT',
-                [0, 0]
-            )
+        viewport = props.get_prop(signal.wm.dpy, signal.wm.root,
+            '_NET_DESKTOP_VIEWPORT')
+
+        if not viewport:
+            viewport = [0, 0]
+            props.change_prop(signal.wm.dpy, signal.wm.root,
+                '_NET_DESKTOP_VIEWPORT', viewport)
+
+        signal.hub.signal('viewport_discovered', x=viewport[0], y=viewport[1])
 
     def refresh(self, signal):
         props.change_prop(

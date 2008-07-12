@@ -1,6 +1,6 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
-import os, subprocess
+import os, subprocess, logging
 
 from whimsy.x11 import props
 
@@ -73,19 +73,26 @@ class viewport_absolute_move(object):
         self.x, self.y = x, y
 
     def __call__(self, signal):
-        current_x, current_y = props.get_prop(
-            signal.wm.dpy, signal.wm.root, '_NET_DESKTOP_VIEWPORT'
-        )
         to_x, to_y = self.x, self.y
 
-        if (current_x, current_y) != (to_x, to_y):
-            xdelta = current_x - to_x
-            ydelta = current_y - to_y
+        if not signal.wm.can_move_viewport_to(to_x, to_y):
+            logging.error("viewport_absolute_move: can't move to %r; "
+                "desktop isn't big enough" % ((to_x, to_y)))
+            return
 
-            for c in signal.wm.clients:
-                c.moveresize_rel(x=xdelta, y=ydelta)
-                #c.dpy.sync() # necessary?  maybe not
-                #todo: discard enternotifies
+        current_x = signal.wm.vx
+        current_y = signal.wm.vy
+
+        if (current_x, current_y) == (to_x, to_y):
+            return
+
+        xdelta = current_x - to_x
+        ydelta = current_y - to_y
+
+        for c in signal.wm.clients:
+            c.moveresize_rel(x=xdelta, y=ydelta)
+            #c.dpy.sync() # necessary?  maybe not
+            #wish list: discard enternotifies
 
         signal.hub.signal('after_viewport_move', x=to_x, y=to_y)
 
@@ -94,24 +101,11 @@ class viewport_relative_move(object):
         self.x, self.y = x, y
 
     def __call__(self, signal):
-        if not hasattr(self, 'root_geom'):
-            self.root_geom = signal.wm.root.get_geometry()
+        current_x = signal.wm.vx
+        current_y = signal.wm.vy
 
-        total_width, total_height = props.get_prop(
-            signal.wm.dpy, signal.wm.root, '_NET_DESKTOP_GEOMETRY'
-        )
-        current_x, current_y = props.get_prop(
-            signal.wm.dpy, signal.wm.root, '_NET_DESKTOP_VIEWPORT'
-        )
-
-        move_to_x = current_x + self.x
-        move_to_y = current_y + self.y
-
-        limit_x = total_width - self.root_geom.width
-        limit_y = total_height - self.root_geom.height
-
-        if 0 <= move_to_x <= limit_x and 0 <= move_to_y <= limit_y:
-            viewport_absolute_move(move_to_x, move_to_y)(signal)
+        if signal.wm.can_move_viewport_by(self.x, self.y):
+            viewport_absolute_move(current_x+self.x, current_y+self.y)(signal)
 
 class discover_existing_windows(object):
     def __call__(self, signal):
