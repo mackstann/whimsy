@@ -73,16 +73,16 @@ actions = [
     (startup_shutdown_signal_methods,     ewmh.net_supporting_wm_check()),
     (startup_shutdown_signal_methods,     ewmh.net_number_of_desktops()),
     (startup_shutdown_signal_methods,     ewmh.net_current_desktop()),
-    (startup_shutdown_signal_methods,     ewmh.net_desktop_geometry(W*3, H*3)),
+    (startup_shutdown_signal_methods,     ewmh.net_desktop_geometry()),
     (viewport_tracking_signal_methods,    ewmh.net_desktop_viewport()),
     (client_list_tracking_signal_methods, ewmh.net_client_list()),
 
     ('wm_manage_after', discover_existing_windows()),
 
-    ('existing_window_discovered', manage_window(),
+    ('existing_window_discovered', lambda s: wm.manage_window(s.win),
      if_should_manage_existing_window),
 
-    ('event', manage_window(),
+    ('event', lambda s: wm.manage_window(s.win),
      if_(X.MapRequest, wintype="unmanaged"), if_should_manage_new_window),
 
     ('event', client_method('focus'), if_(X.MapRequest, wintype='client')),

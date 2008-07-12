@@ -7,6 +7,8 @@ from itertools import *
 
 from whimsy import signals
 
+from whimsy.models import client
+
 class wm_already_running(Exception):
     def __str__(self):
         return "Another WM appears to be running already."
@@ -32,6 +34,9 @@ class window_manager(object):
         self.hub = hub
         self.dpy = dpy
         self.root = dpy.screen().root
+        self.root_geometry = self.root.get_geometry()
+        self.vwidth = self.root_geometry.width
+        self.vheight = self.root_geometry.height
         self.clients = []
         hub.signal("wm_init_after")
 
@@ -59,6 +64,10 @@ class window_manager(object):
             raise wm_already_running()
 
         # TODO: ewmh selection
+
+    def manage_window(self, win):
+        self.clients.append(client.managed_client(self.hub, self.dpy, win))
+        self.hub.signal('after_manage_window', win=win)
 
     # move to action
     def shutdown_all(self):

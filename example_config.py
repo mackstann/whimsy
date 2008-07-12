@@ -16,6 +16,9 @@ class mpd(object):
         except socket.error:
             pass
 
+wm.vwidth = W * 3
+wm.vheight = H * 3
+
 actions = [
     (viewport_absolute_move(  0,   0), if_key_press("u",      C+A)),
     (viewport_absolute_move(  W,   0), if_key_press("i",      C+A)),

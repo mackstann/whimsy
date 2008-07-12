@@ -2,7 +2,6 @@
 
 import os, subprocess
 
-from whimsy.models import client
 from whimsy.x11 import props
 
 def _unmanage(signal, delete=False):
@@ -118,10 +117,4 @@ class discover_existing_windows(object):
     def __call__(self, signal):
         for win in signal.wm.root.query_tree().children:
             signal.hub.signal('existing_window_discovered', win=win)
-
-class manage_window(object):
-    def __call__(self, signal):
-        c = client.managed_client(signal.hub, signal.wm.dpy, signal.win)
-        signal.wm.clients.append(c)
-        signal.hub.signal('after_manage_window', win=signal.win)
 

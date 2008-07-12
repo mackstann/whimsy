@@ -2,6 +2,9 @@
 
 from whimsy.base_config import *
 
+wm.vwidth = W * 3
+wm.vheight = H * 3
+
 actions = [
     # these take you to the nine viewports, laid out in a 3x3 grid.
     # Ctrl+Alt+...

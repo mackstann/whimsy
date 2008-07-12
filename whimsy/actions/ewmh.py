@@ -42,14 +42,10 @@ class net_supporting_wm_check(object):
         self.win.destroy()
 
 class net_desktop_geometry(object):
-    def __init__(self, vwidth, vheight):
-        self.vwidth = vwidth
-        self.vheight = vheight
-
     def startup(self, signal):
         props.change_prop(
             signal.wm.dpy, signal.wm.root, '_NET_DESKTOP_GEOMETRY',
-            [self.vwidth, self.vheight]
+            [signal.wm.vwidth, signal.wm.vheight]
         )
 
     def shutdown(self, signal):
