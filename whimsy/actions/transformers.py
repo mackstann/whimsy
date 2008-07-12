@@ -2,70 +2,61 @@
 
 from Xlib import X
 
-from whimsy import signals
-
-class interactive_pointer_transform(object):
-    def __init__(self, dpy, client, begin_event):
-        self.dpy = dpy
+class transformation(object):
+    def __init__(self, client, initial_pointer_x, initial_pointer_y):
         self.client = client
-        self.begin_event = begin_event
-        self.begin_geom = client.geom.copy()
-        self.client.win.grab_pointer(True,
+        self.initial_pointer_x = initial_pointer_x
+        self.initial_pointer_y = initial_pointer_y
+        self.initial_client_x = client.geom['x']
+        self.initial_client_y = client.geom['y']
+        self.initial_client_width = client.geom['width']
+        self.initial_client_height = client.geom['height']
+
+class interactive_pointer_transformer(object):
+    state = None
+
+    def __call__(self, signal):
+        self.grab(signal)
+        #signal.hub.push_context()
+        signal.hub.register('motion_notify', self.motion)
+        signal.hub.register('button_release', self.ungrab)
+
+    def grab(self, signal):
+        client = signal.wm.window_to_client(signal.win)
+        self.state = transformation(client, signal.ev.root_x, signal.ev.root_y)
+        client.win.grab_pointer(True,
             X.PointerMotionMask | X.ButtonReleaseMask,
             X.GrabModeAsync, X.GrabModeAsync, X.NONE,
             X.NONE, # why doesn't Xcursorfont.left_ptr work for pointer?
             X.CurrentTime
         )
 
-    def __call__(self, signal):
-        ev = signal.ev
+    def motion(self, signal):
+        # if we had XCheckTypedWindowEvent we could compress motionnotifies here
+        xdelta = signal.ev.root_x - self.state.initial_pointer_x
+        ydelta = signal.ev.root_y - self.state.initial_pointer_y
+        self.transform(xdelta, ydelta)
 
-        if ev.__class__.__name__ == "MotionNotify":
-            # if we had XCheckTypedWindowEvent we could compress motionnotifies
-            # here
+    def ungrab(self, signal):
+        signal.wm.dpy.ungrab_pointer(X.CurrentTime)
+        signal.hub.unregister(self.motion)
+        signal.hub.unregister(self.ungrab)
+        self.state = None
 
-            xdelta = ev.root_x - self.begin_event.root_x
-            ydelta = ev.root_y - self.begin_event.root_y
-            self._update(xdelta, ydelta)
-
-        elif ev.__class__.__name__ == "ButtonRelease":
-            self.dpy.ungrab_pointer(X.CurrentTime)
-            signal.hub.unregister(self)
-
-    def _update(self, xdelta, ydelta):
+    def transform(self, xdelta, ydelta):
         raise NotImplementedError
 
-class move_transformer(interactive_pointer_transform):
-    def _update(self, xdelta, ydelta):
-        self.client.moveresize(
-            x = self.begin_geom['x'] + xdelta,
-            y = self.begin_geom['y'] + ydelta
+class move_transformer(interactive_pointer_transformer):
+    def transform(self, xdelta, ydelta):
+        self.state.client.moveresize(
+            x = self.state.initial_client_x + xdelta,
+            y = self.state.initial_client_y + ydelta
         )
 
-class resize_transformer(interactive_pointer_transform):
-    def _update(self, xdelta, ydelta):
-        self.client.moveresize(
-            width = self.begin_geom['width'] + xdelta,
-            height = self.begin_geom['height'] + ydelta
-        )
-
-class start_move(object):
-    def __call__(self, signal):
-        signal.hub.register('event_begin',
-            move_transformer(
-                signal.wm.dpy,
-                signal.wm.window_to_client(signal.win),
-                signal.ev
-            )
-        )
-
-class start_resize(object):
-    def __call__(self, signal):
-        signal.hub.register('event_begin',
-            resize_transformer(
-                signal.wm.dpy,
-                signal.wm.window_to_client(signal.win),
-                signal.ev
-            )
+class resize_transformer(interactive_pointer_transformer):
+    def transform(self, xdelta, ydelta):
+        self.state.client.moveresize(
+            width = self.state.initial_client_width + xdelta,
+            height = self.state.initial_client_height + ydelta
         )
 
