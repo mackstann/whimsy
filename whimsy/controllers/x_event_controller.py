@@ -2,11 +2,14 @@
 
 from whimsy.util import lenient_select
 
+import re
+
+capital_letter_re = re.compile(r'\B([A-Z])')
+
 class x_event_controller(object):
-    def __init__(self, hub, dpy, **event_attrs):
+    def __init__(self, hub, dpy):
         self.hub = hub
         self.dpy = dpy
-        self.event_attrs = event_attrs
 
     def select_and_emit_all(self, signal):
         lenient_select([self.dpy], [], [], 1.0/100)
@@ -18,10 +21,10 @@ class x_event_controller(object):
 
     def emit_next_event(self):
         ev = self.dpy.next_event()
-        # signals.publisher already does this...
-        for attr, val in self.event_attrs.items():
-            setattr(ev, attr, val)
+        # the specific event name, like button_press (converted from ButtonPress)
+        lowered = capital_letter_re.sub('_\\1', ev.__class__.__name__).lower()
         self.hub.signal('event_begin', ev=ev, win=ev.window)
+        self.hub.signal(lowered,       ev=ev, win=ev.window)
         self.hub.signal('event',       ev=ev, win=ev.window)
         self.hub.signal('event_done',  ev=ev, win=ev.window)
     
