@@ -21,7 +21,7 @@ git tag -m "$release release" "$release" || die "git tag failed"
 dir=whimsy-"$release"
 
 mkdir "$dir"
-cp -a fetch-python-xlib.sh whimsy *config.py "$dir"/
+cp -a README fetch-python-xlib.sh whimsy *config.py "$dir"/
 find "$dir" -name '*.pyc' | while read i; do rm -f "$i"; done
 
 tar zcvf "$dir".tgz "$dir"
