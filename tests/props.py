@@ -1,6 +1,6 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
-import unittest, traceback, sys
+import unittest
 from Xlib import display, X
 from whimsy.x11 import props
 
