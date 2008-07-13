@@ -5,6 +5,7 @@ from whimsy.base_config import *
 import socket
 
 class mpd(object):
+    'control music player daemon (http://musicpd.org)'
     def __init__(self, cmd):
         self.cmd = cmd
     def __call__(self, **kw):
