@@ -2,26 +2,19 @@
 
 import types
 
-# aha!  the signal should be nothing more than a string.  functions will name
-# the keyword args they require and use **kw to ignore the rest.
-# def func(signal, wm, hub, dpy, **kw)
-class signal(dict):
-    def __getattr__(self, attr):
-        return self[attr]
-
 class publisher(object):
     def __init__(self, **defaults):
         self.signals = {}
         self.defaults = defaults
 
     def signal(self, name, **kw):
-        sig = signal(self.defaults, name=name, **kw)
+        kw_dict = dict(self.defaults, **kw)
         for func, filters in self.signals.get(name, [])[:]:
             for filt in filters:
-                if not filt(sig):
+                if not filt(**kw_dict):
                     break
             else:
-                ret = func(sig)
+                ret = func(**kw_dict)
 
     def register(self, mapping, callobj, *filters):
         if isinstance(mapping, types.DictType):
