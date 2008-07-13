@@ -1,6 +1,6 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
-import types, time
+import types
 
 # aha!  the signal should be nothing more than a string.  functions will name
 # the keyword args they require and use **kw to ignore the rest.
@@ -15,7 +15,6 @@ class publisher(object):
         self.defaults = defaults
 
     def signal(self, name, **kw):
-        begin = time.time()
         sig = signal(self.defaults, name=name, **kw)
         for func, filters in self.signals.get(name, [])[:]:
             for filt in filters:
