@@ -18,13 +18,13 @@ class publisher(object):
 
     def register(self, mapping, callobj, *filters):
         if isinstance(mapping, types.DictType):
-            for signalname, methodname in mapping.items():
-                self.register(signalname, getattr(callobj, methodname), *filters)
-            return
+            for name, methodname in mapping.items():
+                self.register_func(name, getattr(callobj, methodname), *filters)
+        else:
+            self.register_func(mapping, callobj, *filters)
 
-        signalname = mapping
-        func = callobj
-        self.signals[signalname] = self.signals.get(signalname, []) + [[func, filters]]
+    def register_func(self, name, func, *filters):
+        self.signals.setdefault(name, []).append([func, filters])
 
     def unregister(self, func):
         for sigset in self.signals.values():

@@ -11,7 +11,7 @@ class x_event_controller(object):
         self.hub = hub
         self.dpy = dpy
 
-    def select_and_emit_all(self, signal):
+    def select_and_emit_all(self, **kw):
         lenient_select([self.dpy], [], [], 1.0/100)
         self.emit_all_pending_events()
 

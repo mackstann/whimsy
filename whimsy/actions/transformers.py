@@ -15,15 +15,15 @@ class transformation(object):
 class interactive_pointer_transformer(object):
     state = None
 
-    def __call__(self, signal):
-        self.grab(signal)
-        #signal.hub.push_context()
-        signal.hub.register('motion_notify', self.motion)
-        signal.hub.register('button_release', self.ungrab)
+    def __call__(self, hub, **kw):
+        self.grab(hub=hub, **kw)
+        #hub.push_context()
+        hub.register('motion_notify', self.motion)
+        hub.register('button_release', self.ungrab)
 
-    def grab(self, signal):
-        client = signal.wm.window_to_client(signal.win)
-        self.state = transformation(client, signal.ev.root_x, signal.ev.root_y)
+    def grab(self, wm, win, ev, **kw):
+        client = wm.window_to_client(win)
+        self.state = transformation(client, ev.root_x, ev.root_y)
         client.win.grab_pointer(True,
             X.PointerMotionMask | X.ButtonReleaseMask,
             X.GrabModeAsync, X.GrabModeAsync, X.NONE,
@@ -31,29 +31,29 @@ class interactive_pointer_transformer(object):
             X.CurrentTime
         )
 
-    def motion(self, signal):
+    def motion(self, ev, **kw):
         # if we had XCheckTypedWindowEvent we could compress motionnotifies here
-        xdelta = signal.ev.root_x - self.state.initial_pointer_x
-        ydelta = signal.ev.root_y - self.state.initial_pointer_y
+        xdelta = ev.root_x - self.state.initial_pointer_x
+        ydelta = ev.root_y - self.state.initial_pointer_y
         self.transform(xdelta, ydelta)
 
-    def ungrab(self, signal):
-        signal.wm.dpy.ungrab_pointer(X.CurrentTime)
-        signal.hub.unregister(self.motion)
-        signal.hub.unregister(self.ungrab)
+    def ungrab(self, hub, wm, **kw):
+        wm.dpy.ungrab_pointer(X.CurrentTime)
+        hub.unregister(self.motion)
+        hub.unregister(self.ungrab)
         self.state = None
 
     def transform(self, xdelta, ydelta):
         raise NotImplementedError
 
-class move_transformer(interactive_pointer_transformer):
+class start_move(interactive_pointer_transformer):
     def transform(self, xdelta, ydelta):
         self.state.client.moveresize(
             x = self.state.initial_client_x + xdelta,
             y = self.state.initial_client_y + ydelta
         )
 
-class resize_transformer(interactive_pointer_transformer):
+class start_resize(interactive_pointer_transformer):
     def transform(self, xdelta, ydelta):
         self.state.client.moveresize(
             width = self.state.initial_client_width + xdelta,

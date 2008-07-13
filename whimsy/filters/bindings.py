@@ -10,8 +10,7 @@ class binding_base(object):
         self.mods = mods
         self.options = options
 
-    def __call__(self, signal):
-        ev = signal.ev
+    def __call__(self, ev, **kw):
         if self._should_at_least_be_swallowed(ev):
             if not self.options.get('passthru', False):
                 ev.swallow = True
@@ -35,13 +34,13 @@ class if_key_press(binding_base):
         self.keyname = keyname
         binding_base.__init__(self, None, mods, **options)
 
-    def __call__(self, signal):
+    def __call__(self, wm, **kw):
         if self.detail is None:
             # maybe we should just do this in __init__
-            self.detail = signal.wm.dpy.keysym_to_keycode(
+            self.detail = wm.dpy.keysym_to_keycode(
                 XK.string_to_keysym(self.keyname)
             )
-        return binding_base.__call__(self, signal)
+        return binding_base.__call__(self, wm=wm, **kw)
 
 class if_key_release(if_key_press):
     execute_event_types = [X.KeyRelease]

@@ -65,8 +65,8 @@ viewport_tracking_signal_methods = {
 
 clicks = click_counter()
 
-def if_doubleclick(signal):
-    return clicks.if_multi(2)(signal)
+def if_doubleclick(**kw):
+    return clicks.if_multi(2)(**kw)
 
 actions = [
     (startup_shutdown_signal_methods,     ewmh.net_supported()),
@@ -79,10 +79,10 @@ actions = [
 
     ('wm_manage_after', discover_existing_windows()),
 
-    ('existing_window_discovered', lambda s: wm.manage_window(s.win),
+    ('existing_window_discovered', lambda win, **kw: wm.manage_window(win),
      if_should_manage_existing_window),
 
-    ('event', lambda s: wm.manage_window(s.win),
+    ('event', lambda win, **kw: wm.manage_window(win),
      if_(X.MapRequest, wintype="unmanaged"), if_should_manage_new_window),
 
     ('event', client_method('focus'), if_(X.MapRequest, wintype='client')),

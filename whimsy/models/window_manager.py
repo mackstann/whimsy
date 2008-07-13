@@ -46,9 +46,9 @@ class window_manager(object):
 
     # MOVE TO SCREEN CLASS?
 
-    def update_viewport(self, signal):
-        self.vx = signal.x
-        self.vy = signal.y
+    def update_viewport(self, x, y, **kw):
+        self.vx = x
+        self.vy = y
 
     def shutdown(self):
         self.hub.signal("wm_shutdown_before")

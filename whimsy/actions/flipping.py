@@ -9,12 +9,12 @@ class flipping_transformer(transformers.interactive_pointer_transformer):
     # leftmost pixel PLUS this margin
     safety_margin = 10
 
-    def __call__(self, signal):
-        super(flipping_transformer, self).__call__(signal)
-        self.root_geometry = signal.wm.root.get_geometry()
+    def __call__(self, wm, **kw):
+        super(flipping_transformer, self).__call__(wm=wm, **kw)
+        self.root_geometry = wm.root.get_geometry()
 
-    def motion(self, signal):
-        super(flipping_transformer, self).motion(signal)
+    def motion(self, wm, ev, **kw):
+        super(flipping_transformer, self).motion(wm=wm, ev=ev, **kw)
         width = self.root_geometry.width
         height = self.root_geometry.height
 
@@ -26,39 +26,39 @@ class flipping_transformer(transformers.interactive_pointer_transformer):
         right = width - 1
         bottom = height - 1
 
-        if signal.ev.root_x == right:
+        if ev.root_x == right:
             self.warp_by     = (-horiz_warp, 0)
             self.viewport_by = (+width, 0)
             self.client_by   = (+self.safety_margin, 0)
-        elif signal.ev.root_y == bottom:
+        elif ev.root_y == bottom:
             self.warp_by     = (0, -vert_warp)
             self.viewport_by = (0, +height)
             self.client_by   = (0, +self.safety_margin)
-        elif signal.ev.root_x == left:
+        elif ev.root_x == left:
             self.warp_by     = (+horiz_warp, 0)
             self.viewport_by = (-width, 0)
             self.client_by   = (-self.safety_margin, 0)
-        elif signal.ev.root_y == top:
+        elif ev.root_y == top:
             self.warp_by     = (0, +vert_warp)
             self.viewport_by = (0, -height)
             self.client_by   = (0, -self.safety_margin)
         else:
             return
 
-        if not signal.wm.can_move_viewport_by(*self.viewport_by):
+        if not wm.can_move_viewport_by(*self.viewport_by):
             return
 
-        self.warp(signal)
+        self.warp(wm=wm, **kw)
 
         del self.warp_by
         del self.viewport_by
         del self.client_by
 
-    def warp(self, signal):
+    def warp(self, wm, **kw):
         self.state.client.dpy.warp_pointer(*self.warp_by)
-        viewport_relative_move(*self.viewport_by)(signal)
+        viewport_relative_move(*self.viewport_by)(wm=wm, **kw)
         self.client_adjust()
-        signal.wm.dpy.sync()
+        wm.dpy.sync()
 
     def client_adjust(self):
         raise NotImplementedError

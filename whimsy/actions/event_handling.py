@@ -4,20 +4,20 @@ from whimsy import util
 from whimsy.x11 import props
 
 class update_client_property(object):
-    def __call__(self, signal):
-        propname = signal.wm.dpy.get_atom_name(signal.ev.atom)
+    def __call__(self, wm, win, ev, **kw):
+        propname = wm.dpy.get_atom_name(ev.atom)
         if propname in props.supported_props():
-            signal.wm.window_to_client(signal.win).update_prop(propname)
+            wm.window_to_client(win).update_prop(propname)
 
 # todo: click focus handler & sloppy focus handler
 
 #todo: circulate request
 class configure_request_handler(object):
-    def __call__(self, signal):
-        client_or_win = signal.wm.window_to_client(signal.win) or signal.win
-        client_or_win.configure(**util.configure_request_changes(signal.ev))
+    def __call__(self, wm, win, ev, **kw):
+        client_or_win = wm.window_to_client(win) or win
+        client_or_win.configure(**util.configure_request_changes(ev))
 
 class install_colormap(object):
-    def __call__(self, signal):
-        signal.ev.colormap.install_colormap()
+    def __call__(self, ev, **kw):
+        ev.colormap.install_colormap()
 

@@ -8,37 +8,37 @@ from whimsy import util
 class if_event_type(object):
     def __init__(self, *evtypes):
         self.evtypes = evtypes
-    def __call__(self, signal):
-        return signal.ev.type in self.evtypes
+    def __call__(self, ev, **kw):
+        return ev.type in self.evtypes
 
-def if_client(signal):
+def if_client(wm, win, ev, **kw):
     return (
-        hasattr(signal.ev, 'window') and
-        util.window_type(signal.wm, signal.win) == 'client'
+        hasattr(ev, 'window') and
+        util.window_type(wm, win) == 'client'
     )
 
-def if_root(signal):
+def if_root(wm, win, ev, **kw):
     return (
-        hasattr(signal.ev, 'window') and
-        util.window_type(signal.wm, signal.win) == 'root'
+        hasattr(ev, 'window') and
+        util.window_type(wm, win) == 'root'
     )
 
 class if_state(object):
     def __init__(self, mods):
         self.mods = mods
-    def __call__(self, signal):
-        return self.mods.matches(signal.ev.state)
+    def __call__(self, ev, **kw):
+        return self.mods.matches(ev.state)
 
 class if_(object):
     def __init__(self, evtype, wintype=None):
         self.evtype = evtype
         self.wintype = wintype
-    def __call__(self, signal):
-        if signal.ev.type != self.evtype:
+    def __call__(self, wm, win, ev, **kw):
+        if ev.type != self.evtype:
             return False
         if self.wintype is None:
             return True
-        return util.window_type(signal.wm, signal.win) == self.wintype
+        return util.window_type(wm, win) == self.wintype
 
 class click_counter(object):
     """built like an action but yields a filter which is its main purpose -- to
@@ -52,11 +52,11 @@ class click_counter(object):
     def if_multi(self, desired_count):
         """returns a filter that will tell you whether the current click is a
         double click or triple click or whatever you specify"""
-        def filt(signal):
+        def filt(**kw):
             return self.count == desired_count
         return filt
 
-    def __call__(self, signal):
+    def __call__(self, ev, **kw):
         """should be called on every button press event, to keep track of fast
         successive clicks"""
 
@@ -66,12 +66,12 @@ class click_counter(object):
             is_repeat = False
         else:
             is_repeat = (
-                signal.ev.window.id == prev.window.id and
-                signal.ev.detail == prev.detail and
-                signal.ev.state == prev.state and
-                (signal.ev.time - prev.time) <= self.timeout_ms and
-                abs(signal.ev.root_x - prev.root_x) <= self.pixel_distance and
-                abs(signal.ev.root_y - prev.root_y) <= self.pixel_distance
+                ev.window.id == prev.window.id and
+                ev.detail == prev.detail and
+                ev.state == prev.state and
+                (ev.time - prev.time) <= self.timeout_ms and
+                abs(ev.root_x - prev.root_x) <= self.pixel_distance and
+                abs(ev.root_y - prev.root_y) <= self.pixel_distance
             )
 
         if is_repeat:
@@ -79,21 +79,21 @@ class click_counter(object):
         else:
             self.count = 1
 
-        self.prev_click = signal.ev
+        self.prev_click = ev
 
 # move these into window_manager, minus the if_; keep if_ versions here as
 # wrapper filters
-def if_should_manage_existing_window(signal):
-    attr = signal.win.get_attributes()
+def if_should_manage_existing_window(win, **kw):
+    attr = win.get_attributes()
     return (
         not attr.override_redirect
         and attr.map_state == X.IsViewable
-        and getattr(signal.win.get_wm_hints(), 'initial_state', not Xutil.NormalState)
+        and getattr(win.get_wm_hints(), 'initial_state', not Xutil.NormalState)
             == Xutil.NormalState
     )
 
-def if_should_manage_new_window(signal):
+def if_should_manage_new_window(win, **kw):
     catch = Xerror.CatchError(Xerror.BadWindow)
-    return not signal.win.get_attributes().override_redirect and not catch.get_error()
+    return not win.get_attributes().override_redirect and not catch.get_error()
 
 

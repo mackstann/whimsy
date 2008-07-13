@@ -30,7 +30,7 @@ class main(object):
         self.hub.defaults['hub'] = hub
 
         # if a tick hasn't happened for 10 seconds we've definitely gotten stuck
-        self.hub.register('tick', lambda s: signal.alarm(10))
+        self.hub.register('tick', lambda **kw: signal.alarm(10))
         self.hub.register('tick', xec.select_and_emit_all)
 
         self.log_filename = None
