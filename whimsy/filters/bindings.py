@@ -5,14 +5,14 @@ from Xlib import X, XK
 # hmmm, is it really necessary to swallow the release events?
 
 class binding_base(object):
-    def __init__(self, detail, mods, **options):
+    def __init__(self, detail, mods, passthrough=False):
         self.detail = detail
         self.mods = mods
-        self.options = options
+        self.passthrough = passthrough
 
     def __call__(self, ev, **kw):
         if self._should_at_least_be_swallowed(ev):
-            if not self.options.get('passthru', False):
+            if not self.passthrough:
                 ev.swallow = True
             return self._should_be_executed(ev)
 
@@ -30,9 +30,9 @@ class if_key_press(binding_base):
     execute_event_types = [X.KeyPress]
     swallow_event_types = [X.KeyPress, X.KeyRelease]
 
-    def __init__(self, keyname, mods, **options):
+    def __init__(self, keyname, mods, **kw):
         self.keyname = keyname
-        binding_base.__init__(self, None, mods, **options)
+        binding_base.__init__(self, None, mods, **kw)
 
     def __call__(self, wm, **kw):
         if self.detail is None:

@@ -46,7 +46,7 @@ actions = [
     (mpd("pause"),    if_key_press("v", M4)),
     (mpd("next"),     if_key_press("b", M4)),
 
-    (client_method('focus'), if_client, if_button_press(1, Any, passthru=True)),
+    (client_method('focus'), if_client, if_button_press(1, Any, passthrough=True)),
     (delete_client(),        if_client, if_key_press('w', C+A)),
     (start_move(),           if_button_press(1, A), if_client),
     (start_resize(),         if_button_press(3, A), if_client),

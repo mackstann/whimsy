@@ -33,7 +33,7 @@ actions = [
     (execute("xterm"), if_root, if_button_press(1, Any), if_doubleclick),
 
     # click on client to focus
-    (client_method('focus'), if_client, if_button_press(1, Any, passthru=True)),
+    (client_method('focus'), if_client, if_button_press(1, Any, passthrough=True)),
 
     # Ctrl+Alt+w to close window
     (delete_client(), if_client, if_key_press('w', C+A)),
