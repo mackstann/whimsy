@@ -7,7 +7,7 @@ import socket
 class mpd(object):
     def __init__(self, cmd):
         self.cmd = cmd
-    def __call__(self, signal):
+    def __call__(self, **kw):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect(('localhost', 6600))
