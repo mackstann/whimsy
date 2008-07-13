@@ -6,30 +6,35 @@ from Xlib import error as Xerror
 from whimsy import util
 
 class if_event_type(object):
+    'true if the event type is one of *evtypes'
     def __init__(self, *evtypes):
         self.evtypes = evtypes
     def __call__(self, ev, **kw):
         return ev.type in self.evtypes
 
 def if_client(wm, win, ev, **kw):
+    'true if the window is an application window managed by the window manager'
     return (
         hasattr(ev, 'window') and
         util.window_type(wm, win) == 'client'
     )
 
 def if_root(wm, win, ev, **kw):
+    'true if the window is the root window (desktop/background)'
     return (
         hasattr(ev, 'window') and
         util.window_type(wm, win) == 'root'
     )
 
 class if_state(object):
+    'true if modifier (shift/control/etc) keys currently match mods'
     def __init__(self, mods):
         self.mods = mods
     def __call__(self, ev, **kw):
         return self.mods.matches(ev.state)
 
 class if_(object):
+    'convenience class for filtering by event type and/or window type'
     def __init__(self, evtype, wintype=None):
         self.evtype = evtype
         self.wintype = wintype
@@ -81,8 +86,8 @@ class click_counter(object):
 
         self.prev_click = ev
 
-# move these into window_manager, minus the if_; keep if_ versions here as
-# wrapper filters
+# TODO: move these into window_manager, minus the if_; keep if_ versions here
+# as wrapper filters
 def if_should_manage_existing_window(win, **kw):
     attr = win.get_attributes()
     return (
