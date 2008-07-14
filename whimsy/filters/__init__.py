@@ -12,19 +12,13 @@ class if_event_type(object):
     def __call__(self, ev, **kw):
         return ev.type in self.evtypes
 
-def if_client(wm, win, ev, **kw):
+def if_client(wm, ev, **kw):
     'true if the window is an application window managed by the window manager'
-    return (
-        hasattr(ev, 'window') and
-        util.window_type(wm, win) == 'client'
-    )
+    return 'win' in kw and util.window_type(wm, kw['win']) == 'client'
 
-def if_root(wm, win, ev, **kw):
+def if_root(wm, ev, **kw):
     'true if the window is the root window (desktop/background)'
-    return (
-        hasattr(ev, 'window') and
-        util.window_type(wm, win) == 'root'
-    )
+    return 'win' in kw and util.window_type(wm, kw['win']) == 'root'
 
 class if_state(object):
     'true if modifier (shift/control/etc) keys currently match mods'
@@ -38,12 +32,12 @@ class if_(object):
     def __init__(self, evtype, wintype=None):
         self.evtype = evtype
         self.wintype = wintype
-    def __call__(self, wm, win, ev, **kw):
-        if ev.type != self.evtype:
+    def __call__(self, wm, ev, **kw):
+        if ev.type != self.evtype or 'win' not in kw:
             return False
         if self.wintype is None:
             return True
-        return util.window_type(wm, win) == self.wintype
+        return util.window_type(wm, kw['win']) == self.wintype
 
 class click_counter(object):
     """built like an action but yields a filter which is its main purpose -- to

@@ -21,10 +21,13 @@ class x_event_controller(object):
 
     def emit_next_event(self):
         ev = self.dpy.next_event()
+        kw = dict(ev=ev)
+        if hasattr(ev, 'window'):
+            kw['win'] = ev.window
         # the specific event name, like button_press (converted from ButtonPress)
         lowered = capital_letter_re.sub('_\\1', ev.__class__.__name__).lower()
-        self.hub.signal('event_begin', ev=ev, win=ev.window)
-        self.hub.signal(lowered,       ev=ev, win=ev.window)
-        self.hub.signal('event',       ev=ev, win=ev.window)
-        self.hub.signal('event_done',  ev=ev, win=ev.window)
+        self.hub.signal('event_begin', **kw)
+        self.hub.signal(lowered,       **kw)
+        self.hub.signal('event',       **kw)
+        self.hub.signal('event_done',  **kw)
     
