@@ -88,9 +88,6 @@ class size_hints(object):
 
         minaspect, maxaspect = self.min_aspect, self.max_aspect
 
-        if minaspect > maxaspect:
-            warning('minaspect is larger than maxaspect!')
-
         # only one of these two should happen, but in case they step on each
         # other, we will err on the side of a more wide/short aspect ratio
 
