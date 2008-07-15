@@ -10,8 +10,8 @@ class size_hints(object):
         elif 'win' in kw:
             self.hints = kw["win"].get_wm_normal_hints()
         else:
-            raise ValueError("pass either a 'win' or 'hints' argument, "
-                             "but not both")
+            raise ValueError(
+                "pass either a 'win' or 'hints' argument, but not both")
 
     def __get(self, attr, flag, lowerbound, default):
         if self.hints and self.hints.flags & flag:
