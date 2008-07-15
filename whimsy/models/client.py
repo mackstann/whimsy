@@ -4,7 +4,7 @@ from Xlib import X, Xutil
 from Xlib import error as Xerror
 
 from whimsy import util
-from whimsy.x11 import props
+from whimsy.x11 import props, size_hints
 
 class managed_client(object):
 
@@ -30,7 +30,7 @@ class managed_client(object):
             height = geom.height,
         )
 
-        self.sizehints = util.size_hints(win=self.win)
+        self.sizehints = size_hints.size_hints(win=self.win)
 
         self.props = {}
 
