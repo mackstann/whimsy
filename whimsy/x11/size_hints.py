@@ -1,7 +1,7 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
 from Xlib import Xutil
-import sys
+import sys, math
 
 class size_hints(object):
     def __init__(self, **kw):
@@ -100,8 +100,25 @@ class size_hints(object):
         return w, h
 
     def change_to_aspect(self, aspect, width, height):
-        # but retain same area
-        h = int(round(float(width + height) / (aspect + 1)))
-        w = int(round(h * aspect))
-        return w, h
+        """
+        aspect is a float, e.g. 1.3... for 4:3 (4/3), 1.7... for 16:9 (16/9)
+
+        take a non-aspect-ratio-conforming width and height, and return a new
+        width and height that conforms (as close as possible) to the respective
+        aspect ratio while maintaining (as close as possible) the same amount
+        of area
+
+        new_height x new_height x aspect = orig_width x orig_height
+        new_height**2 x aspect = orig_width x orig_height
+        new_height**2 = (orig_width x orig_height) / aspect
+        new_height = sqrt((orig_width x orig_height) / aspect)
+
+        so: 4096 x 75
+        becomes: 480 x (4/3.0) x 480
+        which is: 640 x 480
+        4096 x 75 = 640 x 480 = 307200
+        """
+        new_height = int(round(math.sqrt((width * height) / aspect)))
+        new_width = int(round(new_height * aspect))
+        return new_width, new_height
 
