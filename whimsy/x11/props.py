@@ -89,6 +89,8 @@ all_props = {
     "_NET_WM_STRUT":             prop_definition("CARDINAL", "array", 4),
     "_NET_WM_STRUT_PARTIAL":     prop_definition("CARDINAL", "array", 12),
 
+    "_NET_WM_ICON":              prop_definition("CARDINAL", "array"),
+
     # client and root
     "_NET_SUPPORTING_WM_CHECK":  prop_definition("WINDOW"),
 
@@ -116,6 +118,18 @@ all_props = {
 
     "_WHIMSY_LAST_BUTTON_PRESS": prop_definition("CARDINAL", "array", 6),
     "_WHIMSY_MULTICLICK_COUNT":  prop_definition("CARDINAL"),
+
+    # ewmh message atoms that are not also window props and thus left out here:
+    # _NET_CLOSE_WINDOW
+    # _NET_MOVERESIZE_WINDOW
+    # _NET_WM_MOVERESIZE
+    # _NET_RESTACK_WINDOW
+    # _NET_REQUEST_FRAME_EXTENTS
+    # _NET_WM_PING
+    # _NET_WM_SYNC_REQUEST
+
+    # not here for other reasons:
+    # _NET_WM_HANDLED_ICONS -- under-specified and icons are mostly obsolete
 }
 
 def supported_props():
