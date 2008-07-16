@@ -46,8 +46,6 @@ class prop_definition(object):
     def convert(self, val):
         if self.aggregate_type == 'array':
             return [ self.convert_single_element(v) for v in val ]
-        elif self.aggregate_type == 'nullarray':
-            return [ self.convert_single_element(v) + '\0' for v in val ]
         elif self.format == 32:
             return [ self.convert_single_element(val) ]
         return self.convert_single_element(val)
@@ -65,17 +63,6 @@ class prop_definition(object):
 all_props = {
     # client
 
-    # WM_STATE is such a gross beast because it has its own type which contains
-    # two items, each of a different type.  it is basically like a struct when
-    # ALL of the other properties are like arrays or scalars.  so fuck it.
-    # besides, python-xlib provides special getters/setters for these icccm
-    # WM_* properties -- but the schism between that interface and this one is
-    # worth avoiding, generally speaking.
-
-    #"WM_STATE":                  prop_definition("WM_STATE"),
-    "WM_NAME":                   prop_definition("STRING"),
-    "WM_CLASS":                  prop_definition("STRING", "nullarray"),
-    "WM_ICON_NAME":              prop_definition("STRING"),
     "WM_PROTOCOLS":              prop_definition("ATOM", "array"),
 
     "_NET_WM_NAME":              prop_definition("UTF8_STRING"),
@@ -183,9 +170,6 @@ def get_prop(dpy, win, name):
 
     if definition.aggregate_type == 'array':
         return list(prop.value)
-
-    if definition.aggregate_type == 'nullarray':
-        return prop.value.split('\0')[:-1]
 
     if definition.format == 32:
         return prop.value[0] if len(prop.value) else None
