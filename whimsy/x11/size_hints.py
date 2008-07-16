@@ -22,8 +22,8 @@ class size_hints(object):
         if self.hints and self.hints.flags & Xutil.PAspect:
             aspect = getattr(self.hints, attr)
             if aspect.num and aspect.denum:
-                return float(aspect.num) / aspect.denum
-        return 0
+                return max(float(aspect.num) / aspect.denum, 0.0)
+        return 0.0
 
     base_width  = property(lambda self: self.__get("base_width",  Xutil.PBaseSize, 0, 0))
     base_height = property(lambda self: self.__get("base_height", Xutil.PBaseSize, 0, 0))
@@ -36,22 +36,35 @@ class size_hints(object):
     min_aspect  = property(lambda self: self.__get_aspect("min_aspect"))
     max_aspect  = property(lambda self: self.__get_aspect("max_aspect"))
 
-    # "human" height/width means that it takes increments into account, i.e.
-    # 80x25 for a terminal
+    # icccm:
+    #
+    # "The base_width and base_height elements in conjunction with width_inc
+    # and height_inc define an arithmetic progression of preferred window
+    # widths and heights for nonnegative integers i and j:
+    #
+    #     width = base_width + (i x width_inc)
+    #     height = base_height + (j x height_inc) 
+    #
+    # Window managers are encouraged to use i and j instead of width and height
+    # in reporting window sizes to users. If a base size is not provided, the
+    # minimum size is to be used in its place and vice versa."
+    #
+    # (last sentence ONLY applies to dealing with incremental window sizes)
 
     def get_human_width(self, width):
-        return (width - self.base_width) / self.width_inc
+        base_width = self.base_width if self.hints.flags & Xutil.PBaseSize \
+            else self.min_width
+        return (width - base_width) / self.width_inc
 
     def get_human_height(self, height):
-        return (height - self.base_height) / self.height_inc
+        base_width = self.base_height if self.hints.flags & Xutil.PBaseSize \
+            else self.min_height
+        return (height - base_height) / self.height_inc
 
     def get_gravity(self, default):
         if self.hints and self.hints.flags & Xutil.PWinGravity:
             return self.hints.win_gravity
         return default
-
-    # from icccm: "If a base size is not provided, the minimum size is to be
-    # used in its place and vice versa."
 
     def fix_increments(self, width, height):
         if self.hints and self.hints.flags & Xutil.PBaseSize:
@@ -76,8 +89,19 @@ class size_hints(object):
         return w, h
 
     def fix_aspect(self, width, height):
-        w, h = max(width, 1), max(height, 1)
-        if w == self.base_width and h == self.base_height:
+        # icccm: "If a base size is provided along with the aspect ratio
+        # fields, the base size should be subtracted from the window size prior
+        # to checking that the aspect ratio falls in range. If a base size is
+        # not provided, nothing should be subtracted from the window size. (The
+        # minimum size is not to be used in place of the base size for this
+        # purpose.)"
+
+        w = max(width, 1)
+        h = max(height, 1)
+        base_width = self.base_width
+        base_height = self.base_height
+
+        if w == base_width and h == base_height:
             return w, h
 
         aspect_relevant_width = w - self.base_width
@@ -91,13 +115,9 @@ class size_hints(object):
         minaspect = self.min_aspect
         maxaspect = self.max_aspect
 
-        # only one of these two should happen, but in case they step on each
-        # other, we will err on the side of a more wide/short aspect ratio
-
         if maxaspect and aspect > maxaspect:
             w, h = self.change_to_aspect(maxaspect, w, h)
-
-        if minaspect and aspect < minaspect:
+        elif minaspect and aspect < minaspect:
             w, h = self.change_to_aspect(minaspect, w, h)
 
         return w, h
