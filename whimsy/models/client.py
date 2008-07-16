@@ -102,12 +102,11 @@ class managed_client(object):
 
     def stack_top(self):
         self.win.configure(stack_mode=X.Above)
+        self.hub.signal('after_raise_window', client=self, win=self.win)
 
     def stack_bottom(self):
         self.win.configure(stack_mode=X.Below)
-
-    def stack_opposite(self):
-        self.win.configure(stack_mode=X.Opposite)
+        self.hub.signal('after_lower_window', client=self, win=self.win)
 
     def delete(self):
         wm_del = self.dpy.get_atom('WM_DELETE_WINDOW')
