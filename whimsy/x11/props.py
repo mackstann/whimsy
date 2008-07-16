@@ -178,10 +178,8 @@ def get_prop(dpy, win, name):
         return prop.value.split('\0')[:-1]
 
     if definition.format == 32:
-        assert len(prop.value) in (0, 1)
-        if not len(prop.value):
-            return None
-        return prop.value[0]
+        return prop.value[0] if len(prop.value) else None
+
     return prop.value
 
 def delete_prop(dpy, win, name):
