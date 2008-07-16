@@ -202,9 +202,6 @@ class net_wm_strut_partial(object):
             wm.root_geometry.height - (margin_top + margin_bottom),
         ])
 
-# _NET_WM_STRUT
-# _NET_WM_STRUT_PARTIAL
-
 # _NET_WM_ICON_GEOMETRY
 # _NET_WM_ICON
 # _NET_WM_PID
