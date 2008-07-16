@@ -6,6 +6,7 @@ from whimsy.x11 import props
 
 def _unmanage(hub, wm, win, delete=False, **kw):
     c = wm.window_to_client(win)
+    hub.signal('before_unmanage_window', client=c, win=win)
     if c:
         wm.clients.remove(c)
         c.shutdown()

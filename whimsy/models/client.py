@@ -19,7 +19,7 @@ class managed_client(object):
         self.dpy = dpy
         self.win = win
 
-        self.hub.signal("client_init_before", client=self)
+        self.hub.signal("client_init_before", client=self, win=self.win)
 
         self.win.change_attributes(event_mask=self.mask)
 
@@ -43,7 +43,7 @@ class managed_client(object):
         self.update_prop('WM_STATE')
         self.update_prop('WM_PROTOCOLS')
 
-        self.hub.signal("client_init_after", client=self)
+        self.hub.signal("client_init_after", client=self, win=self.win)
 
     def shutdown(self):
         catch = Xerror.CatchError(Xerror.BadWindow, Xerror.BadValue) # not working...

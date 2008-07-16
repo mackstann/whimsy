@@ -7,11 +7,16 @@ from whimsy.x11 import props
 
 class net_supported(object):
     def startup(self, wm, **kw):
-        props.change_prop(wm.dpy, wm.root, '_NET_SUPPORTED', [
-            wm.dpy.get_atom('_' + attr.upper())
-            for attr in globals().keys()
-            if attr.startswith('net_')
-        ])
+        supported = []
+        for attr in globals().keys():
+            if attr.startswith('net_'):
+                supported.append(wm.dpy.get_atom('_' + attr.upper()))
+                if hasattr(attr, 'also_implements'):
+                    supported += [
+                        wm.dpy.get_atom(a) for a in attr.also_implements
+                    ]
+
+        props.change_prop(wm.dpy, wm.root, '_NET_SUPPORTED', supported)
 
     def shutdown(self, wm, **kw):
         props.delete_prop(wm.dpy, wm.root, '_NET_SUPPORTED')
@@ -100,8 +105,6 @@ class net_active_window(object):
     def shutdown(self, wm, **kw):
         props.delete_prop(wm.dpy, wm.root, '_NET_ACTIVE_WINDOW')
 
-# _NET_WORKAREA -- dependent on strut props
-
 class net_supporting_wm_check(object):
     def startup(self, wm, **kw):
         self.win = wm.root.create_window(-5000, -5000, 1, 1, 0, X.CopyFromParent)
@@ -114,6 +117,7 @@ class net_supporting_wm_check(object):
         props.delete_prop(wm.dpy, self.win, '_NET_SUPPORTING_WM_CHECK')
         props.delete_prop(wm.dpy, self.win, '_NET_WM_NAME')
         self.win.destroy()
+
 
 # _NET_VIRTUAL_ROOTS
 # _NET_DESKTOP_LAYOUT
@@ -131,8 +135,76 @@ class net_supporting_wm_check(object):
 # _NET_WM_WINDOW_TYPE
 # _NET_WM_STATE
 # _NET_WM_ALLOWED_ACTIONS
+
+# strut example:
+#
+# for a 50px tall, 400px wide panel that starts at x=200 and runs along the
+# bottom of the screen:
+#
+# bottom = 50
+# bottom_start_x = 200
+# bottom_end_x = 599
+
+def make_strut(wm, prop_data):
+    keys = '''left right top bottom left_start_y left_end_y right_start_y
+    right_end_y top_start_x top_end_x bottom_start_x bottom_end_x'''.split()
+
+    defaults_for_non_partial_struts = [
+        0, wm.root_geometry.height - 1, 0, wm.root_geometry.height - 1,
+        0, wm.root_geometry.width - 1, 0, wm.root_geometry.width - 1,
+    ]
+
+    return dict(zip(
+        keys,
+        prop_data + (
+            defaults_for_non_partial_struts if len(prop_data) == 4 else []
+        )
+    ))
+
+class net_wm_strut_partial(object):
+    also_implements = '_NET_WM_STRUT', '_NET_WORKAREA'
+    def __init__(self):
+        self.struts = {}
+
+    def check(self, wm, client, win, **kw):
+        # these will trigger our update()
+        client.update_prop('_NET_WM_STRUT_PARTIAL')
+        client.update_prop('_NET_WM_STRUT')
+
+    def property_updated(self, wm, client, win, **kw):
+        prop_data = []
+        if '_NET_WM_STRUT_PARTIAL' in client.props:
+            prop_data = client.props['_NET_WM_STRUT_PARTIAL']
+        elif '_NET_WM_STRUT' in client.props:
+            prop_data = client.props['_NET_WM_STRUT']
+        if not prop_data:
+            return
+        self.struts[win.id] = make_strut(wm, prop_data)
+        self.update_workarea(wm)
+
+    def remove_client(self, wm, win, **kw):
+        if win.id in self.struts:
+            del self.struts[win.id]
+            self.update_workarea(wm)
+
+    def update_workarea(self, wm):
+        if self.struts:
+            margin_left = max(map(lambda s: s['left'], self.struts.values()))
+            margin_right = min(map(lambda s: s['right'], self.struts.values()))
+            margin_top = max(map(lambda s: s['top'], self.struts.values()))
+            margin_bottom = min(map(lambda s: s['bottom'], self.struts.values()))
+        else:
+            margin_left = margin_right = margin_top = margin_bottom = 0
+
+        props.change_prop(wm.dpy, wm.root, '_NET_WORKAREA', [
+            margin_left, margin_top,
+            wm.root_geometry.width - (margin_left + margin_right),
+            wm.root_geometry.height - (margin_top + margin_bottom),
+        ])
+
 # _NET_WM_STRUT
 # _NET_WM_STRUT_PARTIAL
+
 # _NET_WM_ICON_GEOMETRY
 # _NET_WM_ICON
 # _NET_WM_PID

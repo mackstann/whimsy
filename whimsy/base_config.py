@@ -75,6 +75,8 @@ viewport_tracking_signal_methods = {
 
 clicks = click_counter()
 
+ewmh_struts = ewmh.net_wm_strut_partial()
+
 def if_doubleclick(**kw):
     return clicks.if_multi(2)(**kw)
 
@@ -89,6 +91,16 @@ actions = [
     (client_list_tracking_signal_methods, ewmh.net_client_list()),
     (client_stacking_tracking_signal_methods, ewmh.net_client_list_stacking()),
     (client_focus_tracking_signal_methods, ewmh.net_active_window()),
+
+    ('client_init_after', ewmh_struts.check),
+
+    ('client_property_updated', ewmh_struts.property_updated,
+     lambda propname, **kw: propname.startswith('_NET_WM_STRUT')),
+
+    ('before_unmanage_window', ewmh_struts.remove_client,
+     lambda client, **kw: '_NET_WM_STRUT' in client.props
+                       or '_NET_WM_STRUT_PARTIAL' in client.props
+    ),
 
     ('wm_manage_after', discover_existing_windows()),
 
@@ -109,8 +121,7 @@ actions = [
 
     ('event', update_client_list_focus(), if_(X.FocusIn, wintype='client')),
 
-    ('event', update_client_property(),
-     if_(X.PropertyNotify, wintype='client')),
+    ('property_notify', update_client_property(), if_client),
 
     ('event', focus_last_focused(), if_(X.DestroyNotify)),
 
