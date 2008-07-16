@@ -37,10 +37,6 @@ class managed_client(object):
 
         self.grab_all()
 
-        self.update_prop('WM_NAME')
-        self.update_prop('WM_ICON_NAME')
-        self.update_prop('WM_CLASS')
-        self.update_prop('WM_STATE')
         self.update_prop('WM_PROTOCOLS')
 
         self.hub.signal("client_init_after", client=self, win=self.win)

@@ -64,7 +64,15 @@ class prop_definition(object):
 
 all_props = {
     # client
-    "WM_STATE":                  prop_definition("CARDINAL"),
+
+    # WM_STATE is such a gross beast because it has its own type which contains
+    # two items, each of a different type.  it is basically like a struct when
+    # ALL of the other properties are like arrays or scalars.  so fuck it.
+    # besides, python-xlib provides special getters/setters for these icccm
+    # WM_* properties -- but the schism between that interface and this one is
+    # worth avoiding, generally speaking.
+
+    #"WM_STATE":                  prop_definition("WM_STATE"),
     "WM_NAME":                   prop_definition("STRING"),
     "WM_CLASS":                  prop_definition("STRING", "nullarray"),
     "WM_ICON_NAME":              prop_definition("STRING"),
@@ -92,9 +100,11 @@ all_props = {
     "_NET_WM_ICON":              prop_definition("CARDINAL", "array"),
 
     # client and root
+
     "_NET_SUPPORTING_WM_CHECK":  prop_definition("WINDOW"),
 
     # root
+
     "_NET_NUMBER_OF_DESKTOPS":   prop_definition("CARDINAL"),
     "_NET_SHOWING_DESKTOP":      prop_definition("CARDINAL"),
     "_NET_CURRENT_DESKTOP":      prop_definition("CARDINAL"),
