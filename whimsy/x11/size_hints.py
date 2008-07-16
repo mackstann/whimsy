@@ -80,13 +80,16 @@ class size_hints(object):
         if w == self.base_width and h == self.base_height:
             return w, h
 
-        # this could very well be stupid
-        try:
-            aspect = float(w - self.base_width) / (h - self.base_height)
-        except ZeroDivisionError:
-            aspect = 1.0
+        aspect_relevant_width = w - self.base_width
+        aspect_relevant_height = h - self.base_height
 
-        minaspect, maxaspect = self.min_aspect, self.max_aspect
+        try:
+            aspect = float(aspect_relevant_width / aspect_relevant_height)
+        except ZeroDivisionError:
+            aspect = 0.0
+
+        minaspect = self.min_aspect
+        maxaspect = self.max_aspect
 
         # only one of these two should happen, but in case they step on each
         # other, we will err on the side of a more wide/short aspect ratio
@@ -107,6 +110,9 @@ class size_hints(object):
         width and height that conforms (as close as possible) to the respective
         aspect ratio while maintaining (as close as possible) the same amount
         of area
+
+        width = height x aspect, so:
+        area = height x height x aspect
 
         new_height x new_height x aspect = orig_width x orig_height
         new_height**2 x aspect = orig_width x orig_height
