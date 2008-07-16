@@ -63,6 +63,11 @@ client_stacking_tracking_signal_methods = \
 client_stacking_tracking_signal_methods['after_raise_window'] = 'raise_window'
 client_stacking_tracking_signal_methods['after_lower_window'] = 'lower_window'
 
+client_focus_tracking_signal_methods = {
+    'after_focus_window': 'refresh',
+    'wm_shutdown_before': 'shutdown',
+}
+
 viewport_tracking_signal_methods = {
     'wm_manage_after': 'startup',
     'after_viewport_move': 'refresh',
@@ -83,6 +88,7 @@ actions = [
     (viewport_tracking_signal_methods, ewmh.net_desktop_viewport()),
     (client_list_tracking_signal_methods, ewmh.net_client_list()),
     (client_stacking_tracking_signal_methods, ewmh.net_client_list_stacking()),
+    (client_focus_tracking_signal_methods, ewmh.net_active_window()),
 
     ('wm_manage_after', discover_existing_windows()),
 

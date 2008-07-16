@@ -99,6 +99,7 @@ class managed_client(object):
 
     def focus(self):
         self.dpy.set_input_focus(self.win, X.RevertToPointerRoot, X.CurrentTime)
+        self.hub.signal('after_focus_window', client=self, win=self.win)
 
     def stack_top(self):
         self.win.configure(stack_mode=X.Above)

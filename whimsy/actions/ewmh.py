@@ -59,8 +59,7 @@ class net_desktop_geometry(object):
     def startup(self, wm, **kw):
         props.change_prop(
             wm.dpy, wm.root, '_NET_DESKTOP_GEOMETRY',
-            [wm.vwidth, wm.vheight]
-        )
+            [wm.vwidth, wm.vheight])
 
     def shutdown(self, wm, **kw):
         props.delete_prop(wm.dpy, wm.root, '_NET_DESKTOP_GEOMETRY')
@@ -95,7 +94,12 @@ class net_desktop_names(object):
     def shutdown(self, wm, **kw):
         props.delete_prop(wm.dpy, wm.root, '_NET_DESKTOP_NAMES')
 
-# _NET_ACTIVE_WINDOW
+class net_active_window(object):
+    def refresh(self, wm, win, **kw):
+        props.change_prop(wm.dpy, wm.root, '_NET_ACTIVE_WINDOW', win.id)
+    def shutdown(self, wm, **kw):
+        props.delete_prop(wm.dpy, wm.root, '_NET_ACTIVE_WINDOW')
+
 # _NET_WORKAREA
 
 class net_supporting_wm_check(object):
