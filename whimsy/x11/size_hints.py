@@ -71,22 +71,18 @@ class size_hints(object):
             basew, baseh = self.base_width, self.base_height
         else:
             basew, baseh = self.min_width, self.min_height
-
-        w, h = (width - (width - basew) % self.width_inc,
-                height - (height - baseh) % self.height_inc)
-        return w, h
+        return width - (width - basew) % self.width_inc, \
+            height - (height - baseh) % self.height_inc
 
     def fix_max(self, width, height):
-        w, h = (min(width, self.max_width), min(height, self.max_height))
-        return w, h
+        return min(width, self.max_width), min(height, self.max_height)
 
     def fix_min(self, width, height):
         if self.hints and self.hints.flags & Xutil.PMinSize:
             minw, minh = self.min_width, self.min_height
         else:
             minw, minh = self.base_width, self.base_height
-        w, h = (max(width, minw), max(height, minh))
-        return w, h
+        return max(width, minw), max(height, minh)
 
     def fix_aspect(self, width, height):
         # icccm: "If a base size is provided along with the aspect ratio
@@ -116,9 +112,9 @@ class size_hints(object):
         maxaspect = self.max_aspect
 
         if maxaspect and aspect > maxaspect:
-            w, h = self.change_to_aspect(maxaspect, w, h)
+            return self.change_to_aspect(maxaspect, w, h)
         elif minaspect and aspect < minaspect:
-            w, h = self.change_to_aspect(minaspect, w, h)
+            return self.change_to_aspect(minaspect, w, h)
 
         return w, h
 
