@@ -10,7 +10,8 @@ class managed_client(object):
 
     mask = (
         X.KeyReleaseMask | X.ButtonReleaseMask |
-        X.EnterWindowMask | X.FocusChangeMask
+        X.EnterWindowMask | X.FocusChangeMask |
+        X.PropertyChangeMask
     )
 
     def __init__(self, hub, dpy, win):
@@ -54,6 +55,8 @@ class managed_client(object):
         # some properties are specified to only change at certain times (such
         # as when the window is mapped), so we keep a property cache for them
         self.props[propname] = self.fetch_prop(propname)
+        self.hub.signal('client_property_updated',
+            propname=propname, client=self, win=self.win)
 
     def fetch_prop(self, propname):
         return props.get_prop(self.dpy, self.win, propname)

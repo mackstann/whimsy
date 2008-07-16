@@ -4,7 +4,7 @@ from whimsy import util
 from whimsy.x11 import props
 
 class update_client_property(object):
-    def __call__(self, wm, win, ev, **kw):
+    def __call__(self, hub, wm, win, ev, **kw):
         propname = wm.dpy.get_atom_name(ev.atom)
         if propname in props.supported_props():
             wm.window_to_client(win).update_prop(propname)

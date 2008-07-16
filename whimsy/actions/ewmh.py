@@ -100,7 +100,7 @@ class net_active_window(object):
     def shutdown(self, wm, **kw):
         props.delete_prop(wm.dpy, wm.root, '_NET_ACTIVE_WINDOW')
 
-# _NET_WORKAREA
+# _NET_WORKAREA -- dependent on strut props
 
 class net_supporting_wm_check(object):
     def startup(self, wm, **kw):
