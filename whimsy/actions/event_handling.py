@@ -7,7 +7,11 @@ class update_client_property(object):
     def __call__(self, hub, wm, win, ev, **kw):
         propname = wm.dpy.get_atom_name(ev.atom)
         if propname in props.supported_props():
-            wm.window_to_client(win).update_prop(propname)
+            c = wm.window_to_client(win)
+            if propname in c.props:
+                c.update_prop(propname)
+
+            #catch = Xerror.CatchError(Xerror.BadWindow, Xerror.BadResource)
 
 # todo: click focus handler & sloppy focus handler
 
