@@ -41,11 +41,12 @@ actions = [
 
     (execute("sleep 1; xset s activate"), if_key_press("s", C+A)),
 
-    (mpd("previous"), if_key_press("z", M4)),
-    (mpd("stop"),     if_key_press("x", M4)),
-    (mpd("play"),     if_key_press("c", M4)),
-    (mpd("pause"),    if_key_press("v", M4)),
-    (mpd("next"),     if_key_press("b", M4)),
+    (execute("sh $HOME/scripts/mpc_osd.sh prev"), if_key_press("z", M4)),
+    (execute("mpc stop"),                             if_key_press("x", M4)),
+    (execute("sh $HOME/scripts/mpc_osd.sh play"),     if_key_press("c", M4)),
+    (execute("mpc pause"),                            if_key_press("v", M4)),
+    (execute("sh $HOME/scripts/mpc_osd.sh next"),     if_key_press("b", M4)),
+    (execute("sh $HOME/scripts/killsong.sh; sh $HOME/scripts/mpc_osd.sh next"),     if_key_press("k", M4)),
 
     (client_method('focus'), if_client, if_button_press(1, Any, passthrough=True)),
     (delete_client(),        if_client, if_key_press('w', C+A)),
@@ -69,7 +70,16 @@ actions = [
 for action in actions:
     app.hub.register("event", action[0], *action[1:])
 
-import os.path
+import os.path, pprint
 app.log_filename = os.path.expanduser("~/.whimsy.log")
-app.run()
+try:
+    app.run()
+except Exception, e:
+    print "class name of exception: %r" % e.__class__.__name__
+    print "repr of exception: %r" % e
+    print "str of exception: %s" % e
+    print "__dict__ of exception:", pprint.pformat(e.__dict__)
+    print "vars of exception:", pprint.pformat(vars(e))
+    print "hub call stack:", pprint.pformat(hub.call_stack)
+    raise
 
