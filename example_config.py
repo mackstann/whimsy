@@ -80,6 +80,5 @@ except Exception, e:
     print "str of exception: %s" % e
     print "__dict__ of exception:", pprint.pformat(e.__dict__)
     print "vars of exception:", pprint.pformat(vars(e))
-    print "hub call stack:", pprint.pformat(hub.call_stack)
     raise
 
