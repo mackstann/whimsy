@@ -22,9 +22,9 @@ class main(object):
 
         self.dpy    = display.Display()
         self.hub    = publisher()
-        self.wm     = window_manager(hub, dpy)
-        self.xec    = x_event_controller(hub, dpy)
-        self.ticker = tick_controller(hub)
+        self.wm     = window_manager(self.hub, self.dpy)
+        self.xec    = x_event_controller(self.hub, self.dpy)
+        self.ticker = tick_controller(self.hub)
 
         self.hub.defaults['wm'] = self.wm
         self.hub.defaults['hub'] = self.hub
