@@ -20,18 +20,16 @@ class main(object):
     def __init__(self):
         os.environ['DISPLAY'] = get_display(None)[0]
 
-        self.dpy    = dpy    = display.Display()
-        self.hub    = hub    = publisher()
-        self.wm     = wm     = window_manager(hub, dpy)
-        self.xec    = xec    = x_event_controller(hub, dpy)
-        self.ticker = ticker = tick_controller(hub)
+        self.dpy    = display.Display()
+        self.hub    = publisher()
+        self.wm     = window_manager(hub, dpy)
+        self.xec    = x_event_controller(hub, dpy)
+        self.ticker = tick_controller(hub)
 
-        self.hub.defaults['wm'] = wm
-        self.hub.defaults['hub'] = hub
+        self.hub.defaults['wm'] = self.wm
+        self.hub.defaults['hub'] = self.hub
 
-        # if a tick hasn't happened for 10 seconds we've definitely gotten stuck
-        self.hub.register('tick', lambda **kw: signal.alarm(10))
-        self.hub.register('tick', xec.select_and_emit_all)
+        self.hub.register('tick', self.xec.select_and_emit_all)
 
         self.log_filename = None
 
