@@ -8,10 +8,10 @@ class binding_base(object):
         self.mods = mods
         self.passthrough = passthrough
 
-    def __call__(self, ev, **kw):
+    def __call__(self, hub, ev, **kw):
         if self._should_at_least_be_swallowed(ev):
             if not self.passthrough:
-                ev.swallow = True
+                hub.signal('swallow_this_event', ev=ev)
             return self._should_be_executed(ev)
 
     def _should_at_least_be_swallowed(self, ev):
@@ -32,12 +32,16 @@ class if_key_press(binding_base):
         self.keyname = keyname
         binding_base.__init__(self, None, mods, **kw)
 
+    def _setup(self, wm, dpy):
+        if hasattr(self, '_is_setup'):
+            return
+        self.detail = dpy.keysym_to_keycode(
+            XK.string_to_keysym(self.keyname))
+        self._is_setup = True
+        # grab
+
     def __call__(self, wm, **kw):
-        if self.detail is None:
-            # maybe we should just do this in __init__
-            self.detail = wm.dpy.keysym_to_keycode(
-                XK.string_to_keysym(self.keyname)
-            )
+        self._setup(wm, wm.dpy)
         return binding_base.__call__(self, wm=wm, **kw)
 
 class if_key_release(if_key_press):

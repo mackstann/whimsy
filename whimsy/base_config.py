@@ -65,6 +65,8 @@ viewport_tracking_signal_methods = {
 
 clicks = click_counter()
 
+replayer = smart_replay()
+
 def if_doubleclick(**kw):
     return clicks.if_multi(2)(**kw)
 
@@ -111,7 +113,9 @@ actions = [
 
     ('client_init_after', client_method('map_normal')),
 
-    ('event_done', smart_replay(),
+    ('swallow_this_event', replayer.mark_current_event_for_swallowing),
+
+    ('event_done', replayer,
      if_event_type(X.KeyPress, X.KeyRelease, X.ButtonPress, X.ButtonRelease)),
 ]
 
