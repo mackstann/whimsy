@@ -63,7 +63,7 @@ class managed_client(object):
         self.win.ungrab_key(X.AnyKey, X.AnyModifier)
 
     def grab_all(self):
-        self.win.grab_button(X.AnyButton, X.AnyModifier, X.AnyButton,
+        self.win.grab_button(X.AnyButton, X.AnyModifier, 1,
                 X.NoEventMask, X.GrabModeSync, X.GrabModeSync, X.NONE, X.NONE)
         self.win.grab_key(X.AnyKey, X.AnyModifier, 1, X.GrabModeSync,
                 X.GrabModeSync)
