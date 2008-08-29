@@ -26,6 +26,8 @@ class modifier_core(object):
                 self.slock = mask
 
     def every_lock_combination(self, mask):
+        if mask & X.AnyModifier:
+            return (X.AnyModifier,)
         clean = mask & ~(X.LockMask | self.nlock | self.slock)
         return (
             clean | X.LockMask,
@@ -73,3 +75,5 @@ class modifier_mask(object):
         return (self.modcore.modmask_and(modmask, self.match) == self.match and
                  self.modcore.modmask_and(modmask, self.negate) == 0)
 
+    def every_lock_combination(self):
+        return self.modcore.every_lock_combination(self.match)

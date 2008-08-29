@@ -15,6 +15,14 @@ class binding_base(object):
             self.mods.matches(ev.state)
         )
 
+    def grab(self, wm, **kw):
+        win = kw['client'].win if 'client' in kw else wm.root
+        for mask in self.mods.every_lock_combination():
+            self._grab(win, mask)
+
+    def _grab(self, win, detail, mask):
+        raise NotImplementedError
+
 class if_key_press(binding_base):
     event_type = X.KeyPress
 
@@ -24,6 +32,12 @@ class if_key_press(binding_base):
         self.detail = wm.dpy.keysym_to_keycode(
             XK.string_to_keysym(self.detail))
 
+    def _grab(self, win, mask):
+        win.grab_key(self.detail, mask, 1, X.GrabModeAsync, X.GrabModeAsync)
+
 class if_button_press(binding_base):
     event_type = X.ButtonPress
 
+    def _grab(self, win, mask):
+        win.grab_button(self.detail, mask, 1, X.NoEventMask, X.GrabModeAsync,
+                X.GrabModeAsync, X.NONE, X.NONE)
