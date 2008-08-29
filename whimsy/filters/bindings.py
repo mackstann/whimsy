@@ -30,12 +30,6 @@ class if_key_press(binding_base):
                 XK.string_to_keysym(self.keyname))
         return binding_base.__call__(self, wm=wm, **kw)
 
-class if_key_release(if_key_press):
-    execute_event_types = [X.KeyRelease]
-
 class if_button_press(binding_base):
     execute_event_types = [X.ButtonPress]
-
-class if_button_release(if_button_press):
-    execute_event_types = [X.ButtonRelease]
 
