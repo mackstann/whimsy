@@ -21,15 +21,13 @@ class if_key_press(binding_base):
         self.keyname = keyname
         binding_base.__init__(self, None, mods, **kw)
 
-    def _setup(self, wm, dpy):
-        if hasattr(self, '_is_setup'):
-            return
-        self.detail = dpy.keysym_to_keycode(
-            XK.string_to_keysym(self.keyname))
-        self._is_setup = True
-
     def __call__(self, wm, **kw):
-        self._setup(wm, wm.dpy)
+        if self.detail is None:
+            # lazy lookup of keycode, because access to the dpy is needed to
+            # look it up, and we don't want to require the dpy to be passed to
+            # our constructor
+            self.detail = wm.dpy.keysym_to_keycode(
+                XK.string_to_keysym(self.keyname))
         return binding_base.__call__(self, wm=wm, **kw)
 
 class if_key_release(if_key_press):
