@@ -3,30 +3,19 @@
 from Xlib import X, XK
 
 class binding_base(object):
-    def __init__(self, detail, mods, passthrough=False):
+    def __init__(self, detail, mods):
         self.detail = detail
         self.mods = mods
-        self.passthrough = passthrough
 
     def __call__(self, hub, ev, **kw):
-        if self._should_at_least_be_swallowed(ev):
-            if not self.passthrough:
-                hub.signal('swallow_this_event', ev=ev)
-            return self._should_be_executed(ev)
-
-    def _should_at_least_be_swallowed(self, ev):
         return (
-            ev.type in self.swallow_event_types and
+            ev.type in self.execute_event_types and
             self.detail == ev.detail and
             self.mods.matches(ev.state)
         )
-                                                                                                           
-    def _should_be_executed(self, ev):
-        return ev.type in self.execute_event_types
 
 class if_key_press(binding_base):
     execute_event_types = [X.KeyPress]
-    swallow_event_types = [X.KeyPress, X.KeyRelease]
 
     def __init__(self, keyname, mods, **kw):
         self.keyname = keyname
@@ -38,7 +27,6 @@ class if_key_press(binding_base):
         self.detail = dpy.keysym_to_keycode(
             XK.string_to_keysym(self.keyname))
         self._is_setup = True
-        # grab
 
     def __call__(self, wm, **kw):
         self._setup(wm, wm.dpy)
@@ -46,13 +34,10 @@ class if_key_press(binding_base):
 
 class if_key_release(if_key_press):
     execute_event_types = [X.KeyRelease]
-    swallow_event_types = [X.KeyRelease]
 
 class if_button_press(binding_base):
     execute_event_types = [X.ButtonPress]
-    swallow_event_types = [X.ButtonPress, X.ButtonRelease]
 
 class if_button_release(if_button_press):
     execute_event_types = [X.ButtonRelease]
-    swallow_event_types = [X.ButtonRelease]
 

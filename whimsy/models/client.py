@@ -9,7 +9,7 @@ from whimsy.x11 import props
 class managed_client(object):
 
     mask = (
-        X.KeyReleaseMask | X.ButtonReleaseMask |
+        #X.KeyReleaseMask | X.ButtonReleaseMask |
         X.EnterWindowMask | X.FocusChangeMask
     )
 
@@ -34,7 +34,7 @@ class managed_client(object):
 
         self.props = {}
 
-        self.grab_all()
+        #self.grab_all()
 
         self.update_prop('WM_NAME')
         self.update_prop('WM_ICON_NAME')
@@ -62,11 +62,11 @@ class managed_client(object):
         self.win.ungrab_button(X.AnyButton, X.AnyModifier)
         self.win.ungrab_key(X.AnyKey, X.AnyModifier)
 
-    def grab_all(self):
-        self.win.grab_button(X.AnyButton, X.AnyModifier, 1,
-                X.NoEventMask, X.GrabModeSync, X.GrabModeSync, X.NONE, X.NONE)
-        self.win.grab_key(X.AnyKey, X.AnyModifier, 1, X.GrabModeSync,
-                X.GrabModeSync)
+    #def grab_all(self):
+    #    self.win.grab_button(X.AnyButton, X.AnyModifier, 1,
+    #            X.NoEventMask, X.GrabModeSync, X.GrabModeSync, X.NONE, X.NONE)
+    #    self.win.grab_key(X.AnyKey, X.AnyModifier, 1, X.GrabModeSync,
+    #            X.GrabModeSync)
 
     def map_normal(self):
         self.win.map()

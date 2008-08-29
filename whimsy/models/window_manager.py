@@ -20,8 +20,8 @@ class window_manager(object):
     """
 
     mask = (
-        X.ButtonPressMask | X.ButtonReleaseMask |
-        X.KeyPressMask | X.KeyReleaseMask |
+        #X.ButtonPressMask | X.ButtonReleaseMask |
+        #X.KeyPressMask | X.KeyReleaseMask |
         X.EnterWindowMask | X.LeaveWindowMask |
         X.PropertyChangeMask | X.FocusChangeMask |
         X.SubstructureRedirectMask | X.SubstructureNotifyMask

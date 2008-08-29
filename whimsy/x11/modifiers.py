@@ -25,6 +25,17 @@ class modifier_core(object):
             if slock_key and slock_key in mapping[index]:
                 self.slock = mask
 
+    def every_lock_combination(self, mask):
+        clean = mask & ~(X.LockMask | self.nlock | self.slock)
+        return (
+            clean | X.LockMask,
+            clean | X.LockMask | self.nlock,
+            clean | X.LockMask | self.nlock | self.slock,
+            clean | self.nlock,
+            clean | self.nlock | self.slock,
+            clean | self.slock,
+        )
+
     def modmask_eq(self, lhs, rhs):
         if lhs & X.AnyModifier or rhs & X.AnyModifier:
             return True
