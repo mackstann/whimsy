@@ -8,9 +8,9 @@ class publisher(object):
         self.defaults = defaults
 
     def signal(self, name, **kw):
-        import time
-        if name != 'tick':
-            print time.time(), name
+        #import time
+        #if name != 'tick':
+        #    print time.time(), name
         kw_dict = dict(self.defaults, **kw)
         for func, filters in self.signals.get(name, [])[:]:
             for filt in filters:
@@ -28,6 +28,10 @@ class publisher(object):
 
     def register_func(self, name, func, *filters):
         self.signals.setdefault(name, []).append([func, filters])
+        # HACK -- filters and actions should be made into the same thing
+        for f in filters:
+            if hasattr(f, '__connected__'):
+                f.__connected__(**self.defaults)
 
     def unregister(self, func):
         for sigset in self.signals.values():

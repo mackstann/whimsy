@@ -9,27 +9,21 @@ class binding_base(object):
 
     def __call__(self, hub, ev, **kw):
         return (
-            ev.type in self.execute_event_types and
+            # type must be first because the attributes of ev depend on it
+            ev.type == self.event_type and
             self.detail == ev.detail and
             self.mods.matches(ev.state)
         )
 
 class if_key_press(binding_base):
-    execute_event_types = [X.KeyPress]
+    event_type = X.KeyPress
 
-    def __init__(self, keyname, mods, **kw):
-        self.keyname = keyname
-        binding_base.__init__(self, None, mods, **kw)
-
-    def __call__(self, wm, **kw):
-        if self.detail is None:
-            # lazy lookup of keycode, because access to the dpy is needed to
-            # look it up, and we don't want to require the dpy to be passed to
-            # our constructor
-            self.detail = wm.dpy.keysym_to_keycode(
-                XK.string_to_keysym(self.keyname))
-        return binding_base.__call__(self, wm=wm, **kw)
+    def __connected__(self, wm, **kw):
+        # for convenience, what we initially get passed is a string of a key
+        # name; convert that to a real keycode before anyone tries to call us
+        self.detail = wm.dpy.keysym_to_keycode(
+            XK.string_to_keysym(self.detail))
 
 class if_button_press(binding_base):
-    execute_event_types = [X.ButtonPress]
+    event_type = X.ButtonPress
 
