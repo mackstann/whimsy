@@ -83,14 +83,14 @@ class window_manager(object):
             # make wm method for removing client
             self.clients.pop().shutdown()
 
-    # move to util?
-    def window_to_client(self, win):
-        return self.window_id_to_client(win.id)
+    def find_client(self, win_or_xid):
+        if hasattr(win_or_xid, 'id'):
+            xid = win_or_xid.id
+        else:
+            xid = win_or_xid
 
-    # move to util?
-    def window_id_to_client(self, wid):
         for client in self.clients:
-            if wid == client.win.id:
+            if client.win.id == xid:
                 return client
 
     def can_move_viewport_to(self, x, y):

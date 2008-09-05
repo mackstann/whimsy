@@ -123,7 +123,7 @@ def configure_request_changes(ev):
 def window_type(wm, window):
     if window == wm.root:
         return "root"
-    elif wm.window_to_client(window):
+    elif wm.find_client(window):
         return "client"
     return "unmanaged"
 

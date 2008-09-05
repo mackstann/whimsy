@@ -7,7 +7,7 @@ from whimsy.x11 import props
 class delete_client(object):
     """this is when we tell the client to go away"""
     def __call__(self, wm, win, **kw):
-        wm.window_to_client(win).delete()
+        wm.find_client(win).delete()
 
 class unmanage_window(object):
     """
@@ -15,7 +15,7 @@ class unmanage_window(object):
     or maybe it decided to do so)
     """
     def __call__(self, hub, wm, win, **kw):
-        wm.clients.remove(wm.window_to_client(win))
+        wm.clients.remove(wm.find_client(win))
         hub.signal('after_unmanage_window', win=win)
 
 
@@ -36,7 +36,7 @@ class focus_last_focused(object):
     def __call__(self, wm, win, **kw):
         wins = props.get_prop(wm.dpy, wm.root, '_WHIMSY_CLIENT_LIST_FOCUS')
         while wins:
-            c = wm.window_id_to_client(wins[0])
+            c = wm.find_client(wins[0])
             if c:
                 c.focus()
                 break
@@ -53,7 +53,7 @@ class client_method(object):
         if 'client' in kw:
             c = kw['client']
         else:
-            c = wm.window_to_client(kw['win'])
+            c = wm.find_client(kw['win'])
         getattr(c, self.methodname)(*self.a, **self.kw)
 
 class execute(object):

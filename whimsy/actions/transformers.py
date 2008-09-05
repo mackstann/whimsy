@@ -22,7 +22,7 @@ class interactive_pointer_transformer(object):
         hub.register('button_release', self.ungrab)
 
     def grab(self, wm, win, ev, **kw):
-        client = wm.window_to_client(win)
+        client = wm.find_client(win)
         self.state = transformation(client, ev.root_x, ev.root_y)
         client.win.grab_pointer(True,
             X.PointerMotionMask | X.ButtonReleaseMask,
