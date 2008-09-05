@@ -44,12 +44,6 @@ class managed_client(object):
 
         self.hub.signal("client_init_after", client=self)
 
-    def shutdown(self):
-        catch = Xerror.CatchError(Xerror.BadWindow, Xerror.BadValue) # not working...
-        self.win.change_attributes(event_mask=X.NoEventMask)
-        self.ungrab_all()
-        self.dpy.sync()
-
     def update_prop(self, propname):
         # some properties are specified to only change at certain times (such
         # as when the window is mapped), so we keep a property cache for them
@@ -57,10 +51,6 @@ class managed_client(object):
 
     def fetch_prop(self, propname):
         return props.get_prop(self.dpy, self.win, propname)
-
-    def ungrab_all(self):
-        self.win.ungrab_button(X.AnyButton, X.AnyModifier)
-        self.win.ungrab_key(X.AnyKey, X.AnyModifier)
 
     #def grab_all(self):
     #    self.win.grab_button(X.AnyButton, X.AnyModifier, 1,

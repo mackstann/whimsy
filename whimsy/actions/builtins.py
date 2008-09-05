@@ -4,22 +4,19 @@ import os, subprocess, logging
 
 from whimsy.x11 import props
 
-def _unmanage(hub, wm, win, delete=False, **kw):
-    c = wm.window_to_client(win)
-    if c:
-        wm.clients.remove(c)
-        c.shutdown()
-        if delete:
-            c.delete()
-    hub.signal('after_unmanage_window', win=win)
+class delete_client(object):
+    """this is when we tell the client to go away"""
+    def __call__(self, wm, win, **kw):
+        wm.window_to_client(win).delete()
 
 class unmanage_window(object):
-    def __call__(self, **kw):
-        _unmanage(**kw)
-
-class delete_client(object):
-    def __call__(self, **kw):
-        _unmanage(delete=True, **kw)
+    """
+    this is when a client has gone away (potentially after we told it to do so,
+    or maybe it decided to do so)
+    """
+    def __call__(self, hub, wm, win, **kw):
+        wm.clients.remove(wm.window_to_client(win))
+        hub.signal('after_unmanage_window', win=win)
 
 
 # _WHIMSY_CLIENT_LIST_FOCUS: lists managed windows that have been
