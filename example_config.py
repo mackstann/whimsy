@@ -61,6 +61,9 @@ actions = [
     (client_method('moveresize', x=W/2, y=0, width=W/2, height=H), if_key_press("l", M4), if_client),
 ]
 
+# the recursiveness of grabbing on root is also causing global keybindings to
+# temporarily shift focus to root when using them.
+
 for action in actions:
     filters = action[1:]
     app.hub.register("event", action[0], *filters)
