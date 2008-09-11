@@ -93,5 +93,5 @@ chains = [
 for chaininfo in chains:
     name = chaininfo[0]
     chain = chaininfo[1:]
-    hub.register(name, *chain)
+    hub.attach(name, *chain)
 

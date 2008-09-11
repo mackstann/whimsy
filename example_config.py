@@ -64,13 +64,13 @@ chains = [
 # temporarily shift focus to root when using them.
 
 for chain in chains:
-    app.hub.register("event", *chain)
+    app.hub.attach("event", *chain)
     for func in chain:
         if isinstance(func, binding_base):
             if if_client not in chain:
-                app.hub.register('wm_manage_after', func.grab)
+                app.hub.attach('wm_manage_after', func.grab)
             if if_root not in chain:
-                app.hub.register('client_init_after', func.grab)
+                app.hub.attach('client_init_after', func.grab)
 
 app.run()
 

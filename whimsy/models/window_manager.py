@@ -30,7 +30,7 @@ class window_manager(object):
     running = False
 
     def __init__(self, hub, dpy):
-        hub.signal("wm_init_before")
+        hub.emit("wm_init_before")
         self.hub = hub
         self.dpy = dpy
         self.root = dpy.screen().root
@@ -40,9 +40,9 @@ class window_manager(object):
         self.vx = 0
         self.vy = 0
         self.clients = []
-        hub.register('viewport_discovered', self.update_viewport)
-        hub.register('after_viewport_move', self.update_viewport)
-        hub.signal("wm_init_after")
+        hub.attach('viewport_discovered', self.update_viewport)
+        hub.attach('after_viewport_move', self.update_viewport)
+        hub.emit("wm_init_after")
 
     # MOVE TO SCREEN CLASS?
 
@@ -51,18 +51,18 @@ class window_manager(object):
         self.vy = y
 
     def shutdown(self):
-        self.hub.signal("wm_shutdown_before")
+        self.hub.emit("wm_shutdown_before")
         self.root.change_attributes(event_mask=X.NoEventMask)
         self.dpy.set_input_focus(X.PointerRoot, X.RevertToPointerRoot, X.CurrentTime)
         self.shutdown_all()
         self.running = False
-        self.hub.signal("wm_shutdown_after")
+        self.hub.emit("wm_shutdown_after")
 
     def manage(self):
-        self.hub.signal("wm_manage_before")
+        self.hub.emit("wm_manage_before")
         self.get_wm_selection()
         self.running = True
-        self.hub.signal("wm_manage_after")
+        self.hub.emit("wm_manage_after")
 
     def get_wm_selection(self):
         catch = Xerror.CatchError(Xerror.BadAccess)
@@ -75,7 +75,7 @@ class window_manager(object):
 
     def manage_window(self, win):
         self.clients.append(client.managed_client(self.hub, self.dpy, win))
-        self.hub.signal('after_manage_window', win=win)
+        self.hub.emit('after_manage_window', win=win)
 
     # move to action
     def shutdown_all(self):

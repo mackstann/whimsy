@@ -23,8 +23,8 @@ class x_event_controller(object):
         ev = self.dpy.next_event()
         # the specific event name, like button_press (converted from ButtonPress)
         lowered = capital_letter_re.sub('_\\1', ev.__class__.__name__).lower()
-        self.hub.signal('event_begin', ev=ev, win=ev.window)
-        self.hub.signal(lowered,       ev=ev, win=ev.window)
-        self.hub.signal('event',       ev=ev, win=ev.window)
-        self.hub.signal('event_done',  ev=ev, win=ev.window)
+        self.hub.emit('event_begin', ev=ev, win=ev.window)
+        self.hub.emit(lowered,       ev=ev, win=ev.window)
+        self.hub.emit('event',       ev=ev, win=ev.window)
+        self.hub.emit('event_done',  ev=ev, win=ev.window)
     

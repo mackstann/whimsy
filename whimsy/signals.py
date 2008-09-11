@@ -5,7 +5,7 @@ class publisher(object):
         self.signals = {}
         self.defaults = defaults
 
-    def signal(self, name, **kw):
+    def emit(self, name, **kw):
         import time, sys
         if name != 'tick':
             print >>sys.stderr, time.time(), name, sorted(kw.keys())
@@ -15,15 +15,15 @@ class publisher(object):
                 if not func(**kw_dict):
                     break
 
-    def register(self, name, *chain):
+    def attach(self, name, *chain):
         self.signals.setdefault(name, []).append(chain)
         for f in chain: # HACK
             if hasattr(f, '__connected__'):
                 f.__connected__(**self.defaults)
 
-    def unregister(self, func):
+    def detach(self, func):
         for chains in self.signals.values():
-            for chain in chains:
+            for i, chain in enumerate(chains):
                 if func in chain:
-                    sigset.remove(chain)
+                    chains.pop(i)
 

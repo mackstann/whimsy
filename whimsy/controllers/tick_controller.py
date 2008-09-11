@@ -8,7 +8,7 @@ class tick_controller(object):
     def tick_forever(self):
         self.alive = True
         while self.alive:
-            self.hub.signal('tick')
+            self.hub.emit('tick')
 
     def stop(self):
         self.alive = False

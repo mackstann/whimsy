@@ -16,7 +16,7 @@ class unmanage_window(object):
     """
     def __call__(self, hub, wm, win, **kw):
         wm.clients.remove(wm.find_client(win))
-        hub.signal('after_unmanage_window', win=win)
+        hub.emit('after_unmanage_window', win=win)
 
 
 # _WHIMSY_CLIENT_LIST_FOCUS: lists managed windows that have been
@@ -91,7 +91,7 @@ class viewport_absolute_move(object):
             #c.dpy.sync() # necessary?  maybe not
             #wish list: discard enternotifies
 
-        hub.signal('after_viewport_move', x=to_x, y=to_y)
+        hub.emit('after_viewport_move', x=to_x, y=to_y)
 
 class viewport_relative_move(object):
     def __init__(self, x, y):
@@ -107,5 +107,5 @@ class viewport_relative_move(object):
 class discover_existing_windows(object):
     def __call__(self, hub, wm, **kw):
         for win in wm.root.query_tree().children:
-            hub.signal('existing_window_discovered', win=win)
+            hub.emit('existing_window_discovered', win=win)
 

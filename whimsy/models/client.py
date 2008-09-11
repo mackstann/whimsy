@@ -18,7 +18,7 @@ class managed_client(object):
         self.dpy = dpy
         self.win = win
 
-        self.hub.signal("client_init_before", client=self)
+        self.hub.emit("client_init_before", client=self)
 
         self.win.change_attributes(event_mask=self.mask)
 
@@ -42,7 +42,7 @@ class managed_client(object):
         self.update_prop('WM_STATE')
         self.update_prop('WM_PROTOCOLS')
 
-        self.hub.signal("client_init_after", client=self)
+        self.hub.emit("client_init_after", client=self)
 
     def update_prop(self, propname):
         # some properties are specified to only change at certain times (such

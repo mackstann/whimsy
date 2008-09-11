@@ -18,8 +18,8 @@ class interactive_pointer_transformer(object):
     def __call__(self, hub, **kw):
         self.grab(hub=hub, **kw)
         #hub.push_context()
-        hub.register('motion_notify', self.motion)
-        hub.register('button_release', self.ungrab)
+        hub.attach('motion_notify', self.motion)
+        hub.attach('button_release', self.ungrab)
 
     def grab(self, wm, win, ev, **kw):
         client = wm.find_client(win)
@@ -39,8 +39,8 @@ class interactive_pointer_transformer(object):
 
     def ungrab(self, hub, wm, **kw):
         wm.dpy.ungrab_pointer(X.CurrentTime)
-        hub.unregister(self.motion)
-        hub.unregister(self.ungrab)
+        hub.detach(self.motion)
+        hub.detach(self.ungrab)
         self.state = None
 
     def transform(self, xdelta, ydelta):

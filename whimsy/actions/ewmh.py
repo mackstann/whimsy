@@ -7,8 +7,8 @@ from whimsy.x11 import props
 
 class startup_and_shutdown_with_wm(object):
     def __init__(self, hub):
-        hub.register('wm_manage_after', self.startup)
-        hub.register('wm_shutdown_before', self.shutdown)
+        hub.attach('wm_manage_after', self.startup)
+        hub.attach('wm_shutdown_before', self.shutdown)
 
 class net_supported(startup_and_shutdown_with_wm):
     def startup(self, wm, **kw):
@@ -58,9 +58,9 @@ class net_desktop_geometry(startup_and_shutdown_with_wm):
 
 class net_client_list(object):
     def __init__(self, hub):
-        hub.register('after_manage_window', self.refresh)
-        hub.register('after_unmanage_window', self.refresh)
-        hub.register('wm_shutdown_before', self.shutdown)
+        hub.attach('after_manage_window', self.refresh)
+        hub.attach('after_unmanage_window', self.refresh)
+        hub.attach('wm_shutdown_before', self.shutdown)
 
     def refresh(self, wm, **kw):
         props.change_prop(
@@ -73,8 +73,8 @@ class net_client_list(object):
 
 class net_desktop_viewport(object):
     def __init__(self, hub):
-        hub.register('wm_manage_after', self.startup)
-        hub.register('after_viewport_move', self.refresh)
+        hub.attach('wm_manage_after', self.startup)
+        hub.attach('after_viewport_move', self.refresh)
 
     def startup(self, hub, wm, **kw):
         viewport = props.get_prop(wm.dpy, wm.root,
@@ -85,7 +85,7 @@ class net_desktop_viewport(object):
             props.change_prop(wm.dpy, wm.root,
                 '_NET_DESKTOP_VIEWPORT', viewport)
 
-        hub.signal('viewport_discovered', x=viewport[0], y=viewport[1])
+        hub.emit('viewport_discovered', x=viewport[0], y=viewport[1])
 
     def refresh(self, wm, x, y, **kw):
         props.change_prop(

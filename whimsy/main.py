@@ -29,7 +29,7 @@ class main(object):
         self.hub.defaults['wm'] = self.wm
         self.hub.defaults['hub'] = self.hub
 
-        self.hub.register('tick', self.xec.select_and_emit_all)
+        self.hub.attach('tick', self.xec.select_and_emit_all)
 
     def run(self):
         signal.signal(signal.SIGCHLD, wait_signal_handler)
