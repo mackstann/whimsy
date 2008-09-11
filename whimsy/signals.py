@@ -8,9 +8,9 @@ class publisher(object):
         self.defaults = defaults
 
     def signal(self, name, **kw):
-        #import time
-        #if name != 'tick':
-        #    print time.time(), name
+        import time
+        if name != 'tick':
+            print time.time(), name, sorted(kw.keys())
         kw_dict = dict(self.defaults, **kw)
         for func, filters in self.signals.get(name, [])[:]:
             for filt in filters:
