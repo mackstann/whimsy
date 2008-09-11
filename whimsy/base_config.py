@@ -47,21 +47,13 @@ root_geometry = app.wm.root.get_geometry()
 W = root_geometry.width
 H = root_geometry.height
 
-startup_shutdown_signal_methods = {
-    'wm_manage_after': 'startup',
-    'wm_shutdown_before': 'shutdown',
-}
-
-client_list_tracking_signal_methods = {
-    'after_manage_window': 'refresh',
-    'after_unmanage_window': 'refresh',
-    'wm_shutdown_before': 'shutdown',
-}
-
-viewport_tracking_signal_methods = {
-    'wm_manage_after': 'startup',
-    'after_viewport_move': 'refresh',
-}
+ewmh.net_supported(hub)
+ewmh.net_supporting_wm_check(hub)
+ewmh.net_number_of_desktops(hub)
+ewmh.net_current_desktop(hub)
+ewmh.net_desktop_geometry(hub)
+ewmh.net_client_list(hub)
+ewmh.net_desktop_viewport(hub)
 
 clicks = click_counter()
 
@@ -71,14 +63,6 @@ def if_doubleclick(**kw):
     return clicks.if_multi(2)(**kw)
 
 actions = [
-    (startup_shutdown_signal_methods,     ewmh.net_supported()),
-    (startup_shutdown_signal_methods,     ewmh.net_supporting_wm_check()),
-    (startup_shutdown_signal_methods,     ewmh.net_number_of_desktops()),
-    (startup_shutdown_signal_methods,     ewmh.net_current_desktop()),
-    (startup_shutdown_signal_methods,     ewmh.net_desktop_geometry()),
-    (viewport_tracking_signal_methods,    ewmh.net_desktop_viewport()),
-    (client_list_tracking_signal_methods, ewmh.net_client_list()),
-
     ('wm_manage_after', discover_existing_windows()),
 
     ('existing_window_discovered', lambda wm, win, **kw: wm.manage_window(win),
