@@ -1,6 +1,6 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
-import os, signal, logging, logging.handlers
+import os, signal
 
 from Xlib import display
 from Xlib.support.connect import get_display
@@ -31,28 +31,7 @@ class main(object):
 
         self.hub.register('tick', self.xec.select_and_emit_all)
 
-        self.log_filename = None
-
-    def setup_logging(self):
-        root_logger = logging.getLogger('')
-        for handler in root_logger.handlers:
-            root_logger.removeHandler(handler)
-
-        if not self.log_filename:
-            return
-
-        root_logger.setLevel(logging.DEBUG)
-        root_logger.addHandler(
-            logging.handlers.RotatingFileHandler(self.log_filename, backupCount=5)
-        )
-        if os.path.exists(self.log_filename):
-            # rollover upon every startup, not based on file size.  most recent
-            # is log_filename, previous is log_filename+".1", and so on.
-            root_logger.handlers[0].doRollover()
-
     def run(self):
-        self.setup_logging()
-
         signal.signal(signal.SIGCHLD, wait_signal_handler)
         signal.signal(signal.SIGTERM, lambda signum, frame: self.ticker.stop())
         signal.signal(signal.SIGINT,  lambda signum, frame: self.ticker.stop())

@@ -73,7 +73,5 @@ for action in actions:
             if if_root not in filters:
                 app.hub.register('client_init_after', filt.grab)
 
-import os.path
-app.log_filename = os.path.expanduser("~/.whimsy.log")
 app.run()
 
