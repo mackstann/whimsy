@@ -1,0 +1,8 @@
+no more hub -- wm and xec and whatnot will have their own signals
+
+actions SHOULD optionally know about what methods they want to attach to what
+signals.  you just construct them and pass them a few things and they set
+themselves up.  this will clean up config a lot.  actions that you might want
+to reconfigure (bindings, focus model, etc) should not do this -- only actions
+that can only conceivably work one way.
+
