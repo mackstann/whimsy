@@ -26,6 +26,12 @@ def if_root(wm, win, ev, **kw):
         util.window_type(wm, win) == 'root'
     )
 
+def if_unmanaged(wm, win, ev, **kw):
+    return (
+        hasattr(ev, 'window') and
+        util.window_type(wm, win) == 'unmanaged'
+    )
+
 class if_state(object):
     'true if modifier (shift/control/etc) keys currently match mods'
     def __init__(self, mods):

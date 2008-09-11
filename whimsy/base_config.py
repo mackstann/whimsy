@@ -54,44 +54,44 @@ ewmh.net_desktop_geometry(hub)
 ewmh.net_client_list(hub)
 ewmh.net_desktop_viewport(hub)
 
-actions = [
+# XXX use event names as signal names
+chains = [
     ('wm_manage_after', discover_existing_windows()),
 
-    ('existing_window_discovered', lambda wm, win, **kw: wm.manage_window(win),
-     if_should_manage_existing_window),
+    ('existing_window_discovered', if_should_manage_existing_window,
+                                   lambda wm, win, **kw: wm.manage_window(win)),
 
-    ('event', lambda wm, win, **kw: wm.manage_window(win),
-     if_(X.MapRequest, wintype="unmanaged"), if_should_manage_new_window),
+    ('map_request', if_unmanaged,
+                    if_should_manage_new_window,
+                    lambda wm, win, **kw: wm.manage_window(win)),
 
-    ('event', client_method('focus'), if_(X.MapRequest, wintype='client')),
+    ('map_request', if_client,
+                    client_method('focus')),
 
-    ('event', client_method('focus'),
-     if_(X.EnterNotify, wintype='client'), if_state(~ButtonMask)),
+    ('enter_notify', if_client,
+                     if_state(~ButtonMask),
+                     client_method('focus')),
 
-    ('event', lambda wm, **kw:
-        wm.dpy.set_input_focus(wm.root, X.RevertToPointerRoot, X.CurrentTime),
-     if_(X.EnterNotify, wintype='root'), if_state(~ButtonMask)),
+    ('enter_notify', if_root,
+                     if_state(~ButtonMask),
+                     lambda wm, **kw: wm.dpy.set_input_focus(wm.root,
+                                      X.RevertToPointerRoot, X.CurrentTime)),
 
-    ('event', unmanage_window(), if_(X.DestroyNotify, wintype='client')),
+    ('destroy_notify',  if_client, unmanage_window()),
+    ('unmap_notify',    if_client, unmanage_window()),
+    ('focus_in',        if_client, update_client_list_focus()),
+    ('property_notify', if_client, update_client_property()),
 
-    ('event', unmanage_window(), if_(X.UnmapNotify, wintype='client')),
-
-    ('event', update_client_list_focus(), if_(X.FocusIn, wintype='client')),
-
-    ('event', update_client_property(),
-     if_(X.PropertyNotify, wintype='client')),
-
-    ('event', focus_last_focused(), if_(X.DestroyNotify)),
-
-    ('event', install_colormap(), if_(X.ColormapNotify)),
-
-    ('event', configure_request_handler(), if_(X.ConfigureRequest)),
+    ('destroy_notify',    focus_last_focused()),
+    ('colormap_notify',   install_colormap()),
+    ('configure_request', configure_request_handler()), # rename this function
 
     ('client_init_after', client_method('configure', border_width=0)),
-
     ('client_init_after', client_method('map_normal')),
 ]
 
-for action in actions:
-    app.hub.register(action[0], action[1], *action[2:])
+for chaininfo in chains:
+    name = chaininfo[0]
+    chain = chaininfo[1:]
+    hub.register(name, *chain)
 
