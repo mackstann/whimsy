@@ -45,47 +45,6 @@ class if_(object):
             return True
         return util.window_type(wm, win) == self.wintype
 
-class click_counter(object):
-    """built like an action but yields a filter which is its main purpose -- to
-    filter for double clicks, triple clicks, etc"""
-
-    def __init__(self, pixel_distance=15, timeout_ms=400):
-        self.pixel_distance = pixel_distance
-        self.timeout_ms = timeout_ms
-        self.count = 0
-
-    def if_multi(self, desired_count):
-        """returns a filter that will tell you whether the current click is a
-        double click or triple click or whatever you specify"""
-        def filt(**kw):
-            return self.count == desired_count
-        return filt
-
-    def __call__(self, ev, **kw):
-        """should be called on every button press event, to keep track of fast
-        successive clicks"""
-
-        try:
-            prev = self.prev_click
-        except:
-            is_repeat = False
-        else:
-            is_repeat = (
-                ev.window.id == prev.window.id and
-                ev.detail == prev.detail and
-                ev.state == prev.state and
-                (ev.time - prev.time) <= self.timeout_ms and
-                abs(ev.root_x - prev.root_x) <= self.pixel_distance and
-                abs(ev.root_y - prev.root_y) <= self.pixel_distance
-            )
-
-        if is_repeat:
-            self.count += 1
-        else:
-            self.count = 1
-
-        self.prev_click = ev
-
 # TODO: move these into window_manager, minus the if_; keep if_ versions here
 # as wrapper filters
 def if_should_manage_existing_window(win, **kw):

@@ -37,7 +37,6 @@ actions = [
     (viewport_relative_move( 0, +H), if_key_press("Down",  C)),
 
     (execute("aterm"), if_key_press("x", C+A)),
-    #(execute("aterm"), if_root, if_button_press(1, Any)),# if_doubleclick),
 
     (execute("sleep 1; xset s activate"), if_key_press("s", C+A)),
 

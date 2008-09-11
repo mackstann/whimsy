@@ -54,11 +54,6 @@ ewmh.net_desktop_geometry(hub)
 ewmh.net_client_list(hub)
 ewmh.net_desktop_viewport(hub)
 
-clicks = click_counter()
-
-def if_doubleclick(**kw):
-    return clicks.if_multi(2)(**kw)
-
 actions = [
     ('wm_manage_after', discover_existing_windows()),
 
@@ -91,8 +86,6 @@ actions = [
     ('event', install_colormap(), if_(X.ColormapNotify)),
 
     ('event', configure_request_handler(), if_(X.ConfigureRequest)),
-
-    ('event', clicks, if_(X.ButtonPress)),
 
     ('client_init_after', client_method('configure', border_width=0)),
 
