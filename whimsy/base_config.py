@@ -7,7 +7,6 @@ from whimsy.actions import ewmh
 from whimsy.actions.builtins import *
 from whimsy.actions.transformers import *
 from whimsy.actions.event_handling import *
-from whimsy.actions.replay import *
 from whimsy.filters.bindings import *
 from whimsy.filters import *
 from whimsy.x11.modifiers import modifier_mask, modifier_core
@@ -57,8 +56,6 @@ ewmh.net_desktop_viewport(hub)
 
 clicks = click_counter()
 
-#replayer = smart_replay()
-
 def if_doubleclick(**kw):
     return clicks.if_multi(2)(**kw)
 
@@ -100,11 +97,6 @@ actions = [
     ('client_init_after', client_method('configure', border_width=0)),
 
     ('client_init_after', client_method('map_normal')),
-
-    #('swallow_this_event', replayer.mark_current_event_for_swallowing),
-
-    #('event_done', replayer,
-    # if_event_type(X.KeyPress, X.KeyRelease, X.ButtonPress, X.ButtonRelease)),
 ]
 
 for action in actions:
