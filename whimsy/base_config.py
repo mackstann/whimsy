@@ -81,16 +81,20 @@ actions = [
 
     ('wm_manage_after', discover_existing_windows()),
 
-    ('existing_window_discovered', lambda win, **kw: wm.manage_window(win),
+    ('existing_window_discovered', lambda wm, win, **kw: wm.manage_window(win),
      if_should_manage_existing_window),
 
-    ('event', lambda win, **kw: wm.manage_window(win),
+    ('event', lambda wm, win, **kw: wm.manage_window(win),
      if_(X.MapRequest, wintype="unmanaged"), if_should_manage_new_window),
 
     ('event', client_method('focus'), if_(X.MapRequest, wintype='client')),
 
     ('event', client_method('focus'),
      if_(X.EnterNotify, wintype='client'), if_state(~ButtonMask)),
+
+    ('event', lambda wm, **kw:
+        wm.dpy.set_input_focus(wm.root, X.RevertToPointerRoot, X.CurrentTime),
+     if_(X.EnterNotify, wintype='root'), if_state(~ButtonMask)),
 
     ('event', unmanage_window(), if_(X.DestroyNotify, wintype='client')),
 
