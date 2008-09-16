@@ -5,7 +5,12 @@ from Xlib import X
 from whimsy import util
 from whimsy.x11 import props
 
-class net_supported(object):
+class startup_and_shutdown_with_wm(object):
+    def __init__(self, hub):
+        hub.attach('wm_manage_after', self.startup)
+        hub.attach('wm_shutdown_before', self.shutdown)
+
+class net_supported(startup_and_shutdown_with_wm):
     def startup(self, wm, **kw):
         supported = []
         for attr in globals().keys():
@@ -21,91 +26,19 @@ class net_supported(object):
     def shutdown(self, wm, **kw):
         props.delete_prop(wm.dpy, wm.root, '_NET_SUPPORTED')
 
-class net_client_list(object):
-    def __init__(self):
-        self.win_ids = []
-
-    @classmethod
-    def propname(cls):
-        return '_'+cls.__name__.upper()
-
-    def change_prop(self, wm):
-        props.change_prop(wm.dpy, wm.root, self.propname(), self.win_ids)
-
-    def add_window(self, wm, win, **kw):
-        self.win_ids.insert(0, win.id)
-        self.change_prop(wm)
-
-    def remove_window(self, wm, win, **kw):
-        self.win_ids.remove(win.id)
-        self.change_prop(wm)
-
-    def shutdown(self, wm, **kw):
-        props.delete_prop(wm.dpy, wm.root, self.propname())
-
-class net_client_list_stacking(net_client_list):
-    def raise_window(self, wm, win, **kw):
-        self.win_ids.remove(win.id)
-        self.win_ids.insert(0, win.id)
-        self.change_prop(wm)
-
-    def lower_window(self, wm, win, **kw):
-        self.win_ids.remove(win.id)
-        self.win_ids.append(win.id)
-        self.change_prop(wm)
-
-class net_number_of_desktops(object):
+class net_number_of_desktops(startup_and_shutdown_with_wm):
     def startup(self, wm, **kw):
         props.change_prop(wm.dpy, wm.root, '_NET_NUMBER_OF_DESKTOPS', 1)
     def shutdown(self, wm, **kw):
         props.delete_prop(wm.dpy, wm.root, '_NET_NUMBER_OF_DESKTOPS')
 
-class net_desktop_geometry(object):
-    def startup(self, wm, **kw):
-        props.change_prop(
-            wm.dpy, wm.root, '_NET_DESKTOP_GEOMETRY',
-            [wm.vwidth, wm.vheight])
-
-    def shutdown(self, wm, **kw):
-        props.delete_prop(wm.dpy, wm.root, '_NET_DESKTOP_GEOMETRY')
-
-class net_desktop_viewport(object):
-    def startup(self, hub, wm, **kw):
-        viewport = props.get_prop(wm.dpy, wm.root,
-            '_NET_DESKTOP_VIEWPORT')
-
-        if not viewport:
-            viewport = [0, 0]
-            props.change_prop(wm.dpy, wm.root,
-                '_NET_DESKTOP_VIEWPORT', viewport)
-
-        hub.signal('viewport_discovered', x=viewport[0], y=viewport[1])
-
-    def refresh(self, wm, x, y, **kw):
-        props.change_prop(
-            wm.dpy, wm.root, '_NET_DESKTOP_VIEWPORT',
-            [x, y]
-        )
-
-class net_current_desktop(object):
+class net_current_desktop(startup_and_shutdown_with_wm):
     def startup(self, wm, **kw):
         props.change_prop(wm.dpy, wm.root, '_NET_CURRENT_DESKTOP', 0)
     def shutdown(self, wm, **kw):
         props.delete_prop(wm.dpy, wm.root, '_NET_CURRENT_DESKTOP')
 
-class net_desktop_names(object):
-    def startup(self, wm, **kw):
-        props.change_prop(wm.dpy, wm.root, '_NET_DESKTOP_NAMES', [])
-    def shutdown(self, wm, **kw):
-        props.delete_prop(wm.dpy, wm.root, '_NET_DESKTOP_NAMES')
-
-class net_active_window(object):
-    def refresh(self, wm, win, **kw):
-        props.change_prop(wm.dpy, wm.root, '_NET_ACTIVE_WINDOW', win.id)
-    def shutdown(self, wm, **kw):
-        props.delete_prop(wm.dpy, wm.root, '_NET_ACTIVE_WINDOW')
-
-class net_supporting_wm_check(object):
+class net_supporting_wm_check(startup_and_shutdown_with_wm):
     def startup(self, wm, **kw):
         self.win = wm.root.create_window(-5000, -5000, 1, 1, 0, X.CopyFromParent)
         props.change_prop(wm.dpy, self.win, '_NET_WM_NAME', 'Whimsy')
@@ -117,6 +50,67 @@ class net_supporting_wm_check(object):
         props.delete_prop(wm.dpy, self.win, '_NET_SUPPORTING_WM_CHECK')
         props.delete_prop(wm.dpy, self.win, '_NET_WM_NAME')
         self.win.destroy()
+
+
+class net_desktop_geometry(startup_and_shutdown_with_wm):
+    def startup(self, wm, **kw):
+        props.change_prop(
+            wm.dpy, wm.root, '_NET_DESKTOP_GEOMETRY',
+            [wm.vwidth, wm.vheight])
+
+    def shutdown(self, wm, **kw):
+        props.delete_prop(wm.dpy, wm.root, '_NET_DESKTOP_GEOMETRY')
+
+class net_client_list(object):
+    def __init__(self, hub):
+        hub.attach('after_manage_window', self.refresh)
+        hub.attach('after_unmanage_window', self.refresh)
+        hub.attach('wm_shutdown_before', self.shutdown)
+
+    def refresh(self, wm, **kw):
+        props.change_prop(
+            wm.dpy, wm.root, '_NET_CLIENT_LIST',
+            [ c.win.id for c in wm.clients ]
+        )
+
+    def shutdown(self, wm, **kw):
+        props.delete_prop(wm.dpy, wm.root, '_NET_CLIENT_LIST')
+
+# what happened to net_client_list_stacking and the focus order one?
+
+class net_desktop_viewport(object):
+    def __init__(self, hub):
+        hub.attach('wm_manage_after', self.startup)
+        hub.attach('after_viewport_move', self.refresh)
+
+    def startup(self, hub, wm, **kw):
+        viewport = props.get_prop(wm.dpy, wm.root,
+            '_NET_DESKTOP_VIEWPORT')
+
+        if not viewport:
+            viewport = [0, 0]
+            props.change_prop(wm.dpy, wm.root,
+                '_NET_DESKTOP_VIEWPORT', viewport)
+
+        hub.emit('viewport_discovered', x=viewport[0], y=viewport[1])
+
+    def refresh(self, wm, x, y, **kw):
+        props.change_prop(
+            wm.dpy, wm.root, '_NET_DESKTOP_VIEWPORT',
+            [x, y]
+        )
+
+#class net_desktop_names(object):
+#    def startup(self, wm, **kw):
+#        props.change_prop(wm.dpy, wm.root, '_NET_DESKTOP_NAMES', [])
+#    def shutdown(self, wm, **kw):
+#        props.delete_prop(wm.dpy, wm.root, '_NET_DESKTOP_NAMES')
+#
+#class net_active_window(object):
+#    def refresh(self, wm, win, **kw):
+#        props.change_prop(wm.dpy, wm.root, '_NET_ACTIVE_WINDOW', win.id)
+#    def shutdown(self, wm, **kw):
+#        props.delete_prop(wm.dpy, wm.root, '_NET_ACTIVE_WINDOW')
 
 
 # _NET_VIRTUAL_ROOTS
@@ -145,62 +139,62 @@ class net_supporting_wm_check(object):
 # bottom_start_x = 200
 # bottom_end_x = 599
 
-def make_strut(wm, prop_data):
-    keys = '''left right top bottom left_start_y left_end_y right_start_y
-    right_end_y top_start_x top_end_x bottom_start_x bottom_end_x'''.split()
-
-    defaults_for_non_partial_struts = [
-        0, wm.root_geometry.height - 1, 0, wm.root_geometry.height - 1,
-        0, wm.root_geometry.width - 1, 0, wm.root_geometry.width - 1,
-    ]
-
-    return dict(zip(
-        keys,
-        prop_data + (
-            defaults_for_non_partial_struts if len(prop_data) == 4 else []
-        )
-    ))
-
-class net_wm_strut_partial(object):
-    also_implements = '_NET_WM_STRUT', '_NET_WORKAREA'
-    def __init__(self):
-        self.struts = {}
-
-    def check(self, wm, client, win, **kw):
-        # these will trigger our update()
-        client.update_prop('_NET_WM_STRUT_PARTIAL')
-        client.update_prop('_NET_WM_STRUT')
-
-    def property_updated(self, wm, client, win, **kw):
-        prop_data = []
-        if '_NET_WM_STRUT_PARTIAL' in client.props:
-            prop_data = client.props['_NET_WM_STRUT_PARTIAL']
-        elif '_NET_WM_STRUT' in client.props:
-            prop_data = client.props['_NET_WM_STRUT']
-        if not prop_data:
-            return
-        self.struts[win.id] = make_strut(wm, prop_data)
-        self.update_workarea(wm)
-
-    def remove_client(self, wm, win, **kw):
-        if win.id in self.struts:
-            del self.struts[win.id]
-            self.update_workarea(wm)
-
-    def update_workarea(self, wm):
-        if self.struts:
-            margin_left = max(map(lambda s: s['left'], self.struts.values()))
-            margin_right = min(map(lambda s: s['right'], self.struts.values()))
-            margin_top = max(map(lambda s: s['top'], self.struts.values()))
-            margin_bottom = min(map(lambda s: s['bottom'], self.struts.values()))
-        else:
-            margin_left = margin_right = margin_top = margin_bottom = 0
-
-        props.change_prop(wm.dpy, wm.root, '_NET_WORKAREA', [
-            margin_left, margin_top,
-            wm.root_geometry.width - (margin_left + margin_right),
-            wm.root_geometry.height - (margin_top + margin_bottom),
-        ])
+#def make_strut(wm, prop_data):
+#    keys = '''left right top bottom left_start_y left_end_y right_start_y
+#    right_end_y top_start_x top_end_x bottom_start_x bottom_end_x'''.split()
+#
+#    defaults_for_non_partial_struts = [
+#        0, wm.root_geometry.height - 1, 0, wm.root_geometry.height - 1,
+#        0, wm.root_geometry.width - 1, 0, wm.root_geometry.width - 1,
+#    ]
+#
+#    return dict(zip(
+#        keys,
+#        prop_data + (
+#            defaults_for_non_partial_struts if len(prop_data) == 4 else []
+#        )
+#    ))
+#
+#class net_wm_strut_partial(object):
+#    also_implements = '_NET_WM_STRUT', '_NET_WORKAREA'
+#    def __init__(self):
+#        self.struts = {}
+#
+#    def check(self, wm, client, win, **kw):
+#        # these will trigger our update()
+#        client.update_prop('_NET_WM_STRUT_PARTIAL')
+#        client.update_prop('_NET_WM_STRUT')
+#
+#    def property_updated(self, wm, client, win, **kw):
+#        prop_data = []
+#        if '_NET_WM_STRUT_PARTIAL' in client.props:
+#            prop_data = client.props['_NET_WM_STRUT_PARTIAL']
+#        elif '_NET_WM_STRUT' in client.props:
+#            prop_data = client.props['_NET_WM_STRUT']
+#        if not prop_data:
+#            return
+#        self.struts[win.id] = make_strut(wm, prop_data)
+#        self.update_workarea(wm)
+#
+#    def remove_client(self, wm, win, **kw):
+#        if win.id in self.struts:
+#            del self.struts[win.id]
+#            self.update_workarea(wm)
+#
+#    def update_workarea(self, wm):
+#        if self.struts:
+#            margin_left = max(map(lambda s: s['left'], self.struts.values()))
+#            margin_right = min(map(lambda s: s['right'], self.struts.values()))
+#            margin_top = max(map(lambda s: s['top'], self.struts.values()))
+#            margin_bottom = min(map(lambda s: s['bottom'], self.struts.values()))
+#        else:
+#            margin_left = margin_right = margin_top = margin_bottom = 0
+#
+#        props.change_prop(wm.dpy, wm.root, '_NET_WORKAREA', [
+#            margin_left, margin_top,
+#            wm.root_geometry.width - (margin_left + margin_right),
+#            wm.root_geometry.height - (margin_top + margin_bottom),
+#        ])
 
 # _NET_WM_ICON_GEOMETRY
 # _NET_WM_ICON

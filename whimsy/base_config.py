@@ -7,7 +7,6 @@ from whimsy.actions import ewmh
 from whimsy.actions.builtins import *
 from whimsy.actions.transformers import *
 from whimsy.actions.event_handling import *
-from whimsy.actions.replay import *
 from whimsy.filters.bindings import *
 from whimsy.filters import *
 from whimsy.x11.modifiers import modifier_mask, modifier_core
@@ -47,98 +46,52 @@ root_geometry = app.wm.root.get_geometry()
 W = root_geometry.width
 H = root_geometry.height
 
-startup_shutdown_signal_methods = {
-    'wm_manage_after': 'startup',
-    'wm_shutdown_before': 'shutdown',
-}
+ewmh.net_supported(hub)
+ewmh.net_supporting_wm_check(hub)
+ewmh.net_number_of_desktops(hub)
+ewmh.net_current_desktop(hub)
+ewmh.net_desktop_geometry(hub)
+ewmh.net_client_list(hub)
+ewmh.net_desktop_viewport(hub)
 
-client_list_tracking_signal_methods = {
-    'after_manage_window': 'add_window',
-    'after_unmanage_window': 'remove_window',
-    'wm_shutdown_before': 'shutdown',
-}
-
-client_stacking_tracking_signal_methods = \
-    client_list_tracking_signal_methods.copy()
-client_stacking_tracking_signal_methods['after_raise_window'] = 'raise_window'
-client_stacking_tracking_signal_methods['after_lower_window'] = 'lower_window'
-
-client_focus_tracking_signal_methods = {
-    'after_focus_window': 'refresh',
-    'wm_shutdown_before': 'shutdown',
-}
-
-viewport_tracking_signal_methods = {
-    'wm_manage_after': 'startup',
-    'after_viewport_move': 'refresh',
-}
-
-clicks = click_counter()
-
-ewmh_struts = ewmh.net_wm_strut_partial()
-
-def if_doubleclick(**kw):
-    return clicks.if_multi(2)(**kw)
-
-actions = [
-    (startup_shutdown_signal_methods, ewmh.net_supported()),
-    (startup_shutdown_signal_methods, ewmh.net_supporting_wm_check()),
-    (startup_shutdown_signal_methods, ewmh.net_number_of_desktops()),
-    (startup_shutdown_signal_methods, ewmh.net_current_desktop()),
-    (startup_shutdown_signal_methods, ewmh.net_desktop_names()),
-    (startup_shutdown_signal_methods, ewmh.net_desktop_geometry()),
-    (viewport_tracking_signal_methods, ewmh.net_desktop_viewport()),
-    (client_list_tracking_signal_methods, ewmh.net_client_list()),
-    (client_stacking_tracking_signal_methods, ewmh.net_client_list_stacking()),
-    (client_focus_tracking_signal_methods, ewmh.net_active_window()),
-
-    ('client_init_after', ewmh_struts.check),
-
-    ('client_property_updated', ewmh_struts.property_updated,
-     lambda propname, **kw: propname.startswith('_NET_WM_STRUT')),
-
-    ('before_unmanage_window', ewmh_struts.remove_client,
-     lambda client, **kw: '_NET_WM_STRUT' in client.props
-                       or '_NET_WM_STRUT_PARTIAL' in client.props
-    ),
-
+# XXX use event names as signal names
+chains = [
     ('wm_manage_after', discover_existing_windows()),
 
-    ('existing_window_discovered', lambda win, **kw: wm.manage_window(win),
-     if_should_manage_existing_window),
+    ('existing_window_discovered', if_should_manage_existing_window,
+                                   lambda wm, win, **kw: wm.manage_window(win)),
 
-    ('event', lambda win, **kw: wm.manage_window(win),
-     if_(X.MapRequest, wintype="unmanaged"), if_should_manage_new_window),
+    ('map_request', if_unmanaged,
+                    if_should_manage_new_window,
+                    lambda wm, win, **kw: wm.manage_window(win)),
 
-    ('event', client_method('focus'), if_(X.MapRequest, wintype='client')),
+    ('map_request', if_client,
+                    client_method('focus')),
 
-    ('event', client_method('focus'),
-     if_(X.EnterNotify, wintype='client'), if_state(~ButtonMask)),
+    ('enter_notify', if_client,
+                     if_state(~ButtonMask),
+                     client_method('focus')),
 
-    ('event', unmanage_window(), if_(X.DestroyNotify, wintype='client')),
+    ('enter_notify', if_root,
+                     if_state(~ButtonMask),
+                     lambda wm, **kw: wm.dpy.set_input_focus(wm.root,
+                                      X.RevertToPointerRoot, X.CurrentTime)),
 
-    ('event', unmanage_window(), if_(X.UnmapNotify, wintype='client')),
+    ('destroy_notify',  if_client, unmanage_window()),
+    ('unmap_notify',    if_client, unmanage_window()),
+    ('focus_in',        if_client, update_client_list_focus()),
+    ('property_notify', if_client, update_client_property()),
 
-    ('event', update_client_list_focus(), if_(X.FocusIn, wintype='client')),
-
-    ('property_notify', update_client_property(), if_client),
-
-    ('event', focus_last_focused(), if_(X.DestroyNotify)),
-
-    ('event', install_colormap(), if_(X.ColormapNotify)),
-
-    ('event', configure_request_handler(), if_(X.ConfigureRequest)),
-
-    ('event', clicks, if_(X.ButtonPress)),
+    ('destroy_notify',    focus_last_focused()),
+    ('colormap_notify',   install_colormap()),
+    ('configure_request', configure_request_handler()), # rename this function
 
     ('client_init_after', client_method('configure', border_width=0)),
-
     ('client_init_after', client_method('map_normal')),
-
-    ('event_done', smart_replay(),
-     if_event_type(X.KeyPress, X.KeyRelease, X.ButtonPress, X.ButtonRelease)),
 ]
 
-for action in actions:
-    app.hub.register(action[0], action[1], *action[2:])
+for chaininfo in chains:
+    name = chaininfo[0]
+    chain = chaininfo[1:]
+    hub.attach(name, *chain)
 

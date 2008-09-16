@@ -9,9 +9,8 @@ from whimsy.x11 import props, size_hints
 class managed_client(object):
 
     mask = (
-        X.KeyReleaseMask | X.ButtonReleaseMask |
-        X.EnterWindowMask | X.FocusChangeMask |
-        X.PropertyChangeMask
+        #X.KeyReleaseMask | X.ButtonReleaseMask |
+        X.EnterWindowMask | X.FocusChangeMask
     )
 
     def __init__(self, hub, dpy, win):
@@ -19,7 +18,7 @@ class managed_client(object):
         self.dpy = dpy
         self.win = win
 
-        self.hub.signal("client_init_before", client=self, win=self.win)
+        self.hub.emit("client_init_before", client=self)
 
         self.win.change_attributes(event_mask=self.mask)
 
@@ -35,37 +34,27 @@ class managed_client(object):
 
         self.props = {}
 
-        self.grab_all()
+        #self.grab_all()
 
         self.update_prop('WM_PROTOCOLS')
 
-        self.hub.signal("client_init_after", client=self, win=self.win)
-
-    def shutdown(self):
-        catch = Xerror.CatchError(Xerror.BadWindow, Xerror.BadValue) # not working...
-        self.win.change_attributes(event_mask=X.NoEventMask)
-        self.ungrab_all()
-        self.dpy.sync()
+        self.hub.emit("client_init_after", client=self)
 
     def update_prop(self, propname):
         # some properties are specified to only change at certain times (such
         # as when the window is mapped), so we keep a property cache for them
         self.props[propname] = self.fetch_prop(propname)
-        self.hub.signal('client_property_updated',
+        self.hub.emit('client_property_updated',
             propname=propname, client=self, win=self.win)
 
     def fetch_prop(self, propname):
         return props.get_prop(self.dpy, self.win, propname)
 
-    def ungrab_all(self):
-        self.win.ungrab_button(X.AnyButton, X.AnyModifier)
-        self.win.ungrab_key(X.AnyKey, X.AnyModifier)
-
-    def grab_all(self):
-        self.win.grab_button(X.AnyButton, X.AnyModifier, X.AnyButton,
-                X.NoEventMask, X.GrabModeSync, X.GrabModeSync, X.NONE, X.NONE)
-        self.win.grab_key(X.AnyKey, X.AnyModifier, 1, X.GrabModeSync,
-                X.GrabModeSync)
+    #def grab_all(self):
+    #    self.win.grab_button(X.AnyButton, X.AnyModifier, 1,
+    #            X.NoEventMask, X.GrabModeSync, X.GrabModeSync, X.NONE, X.NONE)
+    #    self.win.grab_key(X.AnyKey, X.AnyModifier, 1, X.GrabModeSync,
+    #            X.GrabModeSync)
 
     def map_normal(self):
         self.win.map()
@@ -98,15 +87,15 @@ class managed_client(object):
 
     def focus(self):
         self.dpy.set_input_focus(self.win, X.RevertToPointerRoot, X.CurrentTime)
-        self.hub.signal('after_focus_window', client=self, win=self.win)
+        self.hub.emit('after_focus_window', client=self, win=self.win)
 
     def stack_top(self):
         self.win.configure(stack_mode=X.Above)
-        self.hub.signal('after_raise_window', client=self, win=self.win)
+        self.hub.emit('after_raise_window', client=self, win=self.win)
 
     def stack_bottom(self):
         self.win.configure(stack_mode=X.Below)
-        self.hub.signal('after_lower_window', client=self, win=self.win)
+        self.hub.emit('after_lower_window', client=self, win=self.win)
 
     def delete(self):
         wm_del = self.dpy.get_atom('WM_DELETE_WINDOW')

@@ -3,52 +3,41 @@
 from Xlib import X, XK
 
 class binding_base(object):
-    def __init__(self, detail, mods, passthrough=False):
+    def __init__(self, detail, mods):
         self.detail = detail
         self.mods = mods
-        self.passthrough = passthrough
 
-    def __call__(self, ev, **kw):
-        if self._should_at_least_be_swallowed(ev):
-            if not self.passthrough:
-                ev.swallow = True
-            return self._should_be_executed(ev)
-
-    def _should_at_least_be_swallowed(self, ev):
+    def __call__(self, hub, ev, **kw):
         return (
-            ev.type in self.swallow_event_types and
+            # type must be first because the attributes of ev depend on it
+            ev.type == self.event_type and
             self.detail == ev.detail and
             self.mods.matches(ev.state)
         )
-                                                                                                           
-    def _should_be_executed(self, ev):
-        return ev.type in self.execute_event_types
+
+    def grab(self, wm, **kw):
+        win = kw['client'].win if 'client' in kw else wm.root
+        for mask in self.mods.every_lock_combination():
+            self._grab(win, mask)
+
+    def _grab(self, win, detail, mask):
+        raise NotImplementedError
 
 class if_key_press(binding_base):
-    execute_event_types = [X.KeyPress]
-    swallow_event_types = [X.KeyPress, X.KeyRelease]
+    event_type = X.KeyPress
 
-    def __init__(self, keyname, mods, **kw):
-        self.keyname = keyname
-        binding_base.__init__(self, None, mods, **kw)
+    def __connected__(self, wm, **kw):
+        # for convenience, what we initially get passed is a string of a key
+        # name; convert that to a real keycode before anyone tries to call us
+        self.detail = wm.dpy.keysym_to_keycode(
+            XK.string_to_keysym(self.detail))
 
-    def __call__(self, wm, **kw):
-        if self.detail is None:
-            # maybe we should just do this in __init__
-            self.detail = wm.dpy.keysym_to_keycode(
-                XK.string_to_keysym(self.keyname)
-            )
-        return binding_base.__call__(self, wm=wm, **kw)
-
-class if_key_release(if_key_press):
-    execute_event_types = [X.KeyRelease]
-    swallow_event_types = [X.KeyRelease]
+    def _grab(self, win, mask):
+        win.grab_key(self.detail, mask, 1, X.GrabModeAsync, X.GrabModeAsync)
 
 class if_button_press(binding_base):
-    execute_event_types = [X.ButtonPress]
-    swallow_event_types = [X.ButtonPress, X.ButtonRelease]
+    event_type = X.ButtonPress
 
-class if_button_release(if_button_press):
-    execute_event_types = [X.ButtonRelease]
-    swallow_event_types = [X.ButtonRelease]
-
+    def _grab(self, win, mask):
+        win.grab_button(self.detail, mask, 1, X.NoEventMask, X.GrabModeAsync,
+                X.GrabModeAsync, X.NONE, X.NONE)

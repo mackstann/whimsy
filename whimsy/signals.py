@@ -1,34 +1,29 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
-import types
-
 class publisher(object):
     def __init__(self, **defaults):
         self.signals = {}
         self.defaults = defaults
 
-    def signal(self, name, **kw):
+    def emit(self, name, **kw):
+        import time, sys
+        if name != 'tick':
+            print >>sys.stderr, time.time(), name, sorted(kw.keys())
         kw_dict = dict(self.defaults, **kw)
-        for func, filters in self.signals.get(name, [])[:]:
-            for filt in filters:
-                if not filt(**kw_dict):
+        for chain in self.signals.get(name, [])[:]:
+            for func in chain:
+                if not func(**kw_dict):
                     break
-            else:
-                ret = func(**kw_dict)
 
-    def register(self, mapping, callobj, *filters):
-        if isinstance(mapping, types.DictType):
-            for name, methodname in mapping.items():
-                self.register_func(name, getattr(callobj, methodname), *filters)
-        else:
-            self.register_func(mapping, callobj, *filters)
+    def attach(self, name, *chain):
+        self.signals.setdefault(name, []).append(chain)
+        for f in chain: # HACK
+            if hasattr(f, '__connected__'):
+                f.__connected__(**self.defaults)
 
-    def register_func(self, name, func, *filters):
-        self.signals.setdefault(name, []).append([func, filters])
-
-    def unregister(self, func):
-        for sigset in self.signals.values():
-            for actionset in sigset:
-                if actionset[0] == func:
-                    sigset.remove(actionset)
+    def detach(self, func):
+        for chains in self.signals.values():
+            for i, chain in enumerate(chains):
+                if func in chain:
+                    chains.pop(i)
 

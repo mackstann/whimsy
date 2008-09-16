@@ -26,8 +26,8 @@ class x_event_controller(object):
             kw['win'] = ev.window
         # the specific event name, like button_press (converted from ButtonPress)
         lowered = capital_letter_re.sub('_\\1', ev.__class__.__name__).lower()
-        self.hub.signal('event_begin', **kw)
-        self.hub.signal(lowered,       **kw)
-        self.hub.signal('event',       **kw)
-        self.hub.signal('event_done',  **kw)
-    
+        self.hub.emit('event_begin', ev=ev, win=ev.window)
+        self.hub.emit(lowered,       ev=ev, win=ev.window)
+        self.hub.emit('event',       ev=ev, win=ev.window)
+        self.hub.emit('event_done',  ev=ev, win=ev.window)
+

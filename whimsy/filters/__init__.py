@@ -20,6 +20,12 @@ def if_root(wm, ev, **kw):
     'true if the window is the root window (desktop/background)'
     return 'win' in kw and util.window_type(wm, kw['win']) == 'root'
 
+def if_unmanaged(wm, win, ev, **kw):
+    return (
+        hasattr(ev, 'window') and
+        util.window_type(wm, win) == 'unmanaged'
+    )
+
 class if_state(object):
     'true if modifier (shift/control/etc) keys currently match mods'
     def __init__(self, mods):
@@ -38,47 +44,6 @@ class if_(object):
         if self.wintype is None:
             return True
         return util.window_type(wm, kw['win']) == self.wintype
-
-class click_counter(object):
-    """built like an action but yields a filter which is its main purpose -- to
-    filter for double clicks, triple clicks, etc"""
-
-    def __init__(self, pixel_distance=15, timeout_ms=400):
-        self.pixel_distance = pixel_distance
-        self.timeout_ms = timeout_ms
-        self.count = 0
-
-    def if_multi(self, desired_count):
-        """returns a filter that will tell you whether the current click is a
-        double click or triple click or whatever you specify"""
-        def filt(**kw):
-            return self.count == desired_count
-        return filt
-
-    def __call__(self, ev, **kw):
-        """should be called on every button press event, to keep track of fast
-        successive clicks"""
-
-        try:
-            prev = self.prev_click
-        except:
-            is_repeat = False
-        else:
-            is_repeat = (
-                ev.window.id == prev.window.id and
-                ev.detail == prev.detail and
-                ev.state == prev.state and
-                (ev.time - prev.time) <= self.timeout_ms and
-                abs(ev.root_x - prev.root_x) <= self.pixel_distance and
-                abs(ev.root_y - prev.root_y) <= self.pixel_distance
-            )
-
-        if is_repeat:
-            self.count += 1
-        else:
-            self.count = 1
-
-        self.prev_click = ev
 
 # TODO: move these into window_manager, minus the if_; keep if_ versions here
 # as wrapper filters

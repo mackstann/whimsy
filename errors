@@ -1,0 +1,29 @@
+when starting inkscape:
+
+Traceback (most recent call last):
+  File "dev/whimsy/example_config.py", line 79, in <module>
+    app.run()
+  File "/home/death/dev/whimsy/whimsy/main.py", line 64, in run
+    self.ticker.tick_forever()
+  File "/home/death/dev/whimsy/whimsy/controllers/tick_controller.py", line 11, in tick_forever
+    self.hub.signal('tick')
+  File "/home/death/dev/whimsy/whimsy/signals.py", line 20, in signal
+    ret = func(**kw_dict)
+  File "/home/death/dev/whimsy/whimsy/controllers/x_event_controller.py", line 16, in select_and_emit_all
+    self.emit_all_pending_events()
+  File "/home/death/dev/whimsy/whimsy/controllers/x_event_controller.py", line 20, in emit_all_pending_events
+    self.emit_next_event()
+  File "/home/death/dev/whimsy/whimsy/controllers/x_event_controller.py", line 28, in emit_next_event
+    self.hub.signal('event',       ev=ev, win=ev.window)
+  File "/home/death/dev/whimsy/whimsy/signals.py", line 17, in signal
+    if not filt(**kw_dict):
+  File "/home/death/dev/whimsy/whimsy/filters/__init__.py", line 102, in if_should_manage_new_window
+    return not win.get_attributes().override_redirect and not catch.get_error()
+  File "/home/death/dev/whimsy/Xlib/xobject/drawable.py", line 354, in get_attributes
+    window = self.id)
+  File "/home/death/dev/whimsy/Xlib/protocol/rq.py", line 1428, in __init__
+    self.reply()
+  File "/home/death/dev/whimsy/Xlib/protocol/rq.py", line 1448, in reply
+    raise self._error
+Xlib.error.BadWindow: <class 'Xlib.error.BadWindow'>: code = 3, resource_id = Xlib.xobject.resource.Resource(0x0120000d), sequence_number = 45668, major_opcode = 3, minor_opcode = 0
+

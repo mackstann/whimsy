@@ -4,23 +4,19 @@ import os, subprocess, logging
 
 from whimsy.x11 import props
 
-def _unmanage(hub, wm, win, delete=False, **kw):
-    c = wm.window_to_client(win)
-    hub.signal('before_unmanage_window', client=c, win=win)
-    if c:
-        wm.clients.remove(c)
-        c.shutdown()
-        if delete:
-            c.delete()
-    hub.signal('after_unmanage_window', win=win)
+class delete_client(object):
+    """this is when we tell the client to go away"""
+    def __call__(self, wm, win, **kw):
+        wm.find_client(win).delete()
 
 class unmanage_window(object):
-    def __call__(self, **kw):
-        _unmanage(**kw)
-
-class delete_client(object):
-    def __call__(self, **kw):
-        _unmanage(delete=True, **kw)
+    """
+    this is when a client has gone away (potentially after we told it to do so,
+    or maybe it decided to do so)
+    """
+    def __call__(self, hub, wm, win, **kw):
+        wm.clients.remove(wm.find_client(win))
+        hub.emit('after_unmanage_window', win=win)
 
 
 # _WHIMSY_CLIENT_LIST_FOCUS: lists managed windows that have been
@@ -40,7 +36,7 @@ class focus_last_focused(object):
     def __call__(self, wm, win, **kw):
         wins = props.get_prop(wm.dpy, wm.root, '_WHIMSY_CLIENT_LIST_FOCUS')
         while wins:
-            c = wm.window_id_to_client(wins[0])
+            c = wm.find_client(wins[0])
             if c:
                 c.focus()
                 break
@@ -57,7 +53,7 @@ class client_method(object):
         if 'client' in kw:
             c = kw['client']
         else:
-            c = wm.window_to_client(kw['win'])
+            c = wm.find_client(kw['win'])
         getattr(c, self.methodname)(*self.a, **self.kw)
 
 class execute(object):
@@ -95,7 +91,7 @@ class viewport_absolute_move(object):
             #c.dpy.sync() # necessary?  maybe not
             #wish list: discard enternotifies
 
-        hub.signal('after_viewport_move', x=to_x, y=to_y)
+        hub.emit('after_viewport_move', x=to_x, y=to_y)
 
 class viewport_relative_move(object):
     def __init__(self, x, y):
@@ -111,5 +107,5 @@ class viewport_relative_move(object):
 class discover_existing_windows(object):
     def __call__(self, hub, wm, **kw):
         for win in wm.root.query_tree().children:
-            hub.signal('existing_window_discovered', win=win)
+            hub.emit('existing_window_discovered', win=win)
 
