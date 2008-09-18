@@ -74,8 +74,14 @@ class window_manager(object):
         # TODO: ewmh selection
 
     def manage_window(self, win):
-        self.clients.append(client.managed_client(self.hub, self.dpy, win))
-        self.hub.emit('after_manage_window', win=win)
+        try:
+            c = client.managed_client(self.hub, self.dpy, win)
+        except (Xerror.BadWindow, Xerror.BadDrawable):
+            # it disappeared
+            pass
+        else:
+            self.clients.append(c)
+            self.hub.emit('after_manage_window', win=win, client=c)
 
     # move to action
     def shutdown_all(self):
