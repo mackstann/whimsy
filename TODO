@@ -2,3 +2,7 @@ no more hub -- wm and xec and whatnot will have their own signals
 
 a prospective_client class
 
+client_method('focus') -> method('client', 'focus')
+
+wm.focus_root()
+
