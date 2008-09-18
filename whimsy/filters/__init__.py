@@ -12,19 +12,12 @@ class if_event_type(object):
     def __call__(self, ev, **kw):
         return ev.type in self.evtypes
 
-def if_client(wm, ev, **kw):
-    'true if the window is an application window managed by the window manager'
-    return 'win' in kw and util.window_type(wm, kw['win']) == 'client'
+def _if_win_type(wtype, wm, ev, **kw):
+    return 'win' in kw and util.window_type(wm, kw['win']) == wtype
 
-def if_root(wm, ev, **kw):
-    'true if the window is the root window (desktop/background)'
-    return 'win' in kw and util.window_type(wm, kw['win']) == 'root'
-
-def if_unmanaged(wm, win, ev, **kw):
-    return (
-        hasattr(ev, 'window') and
-        util.window_type(wm, win) == 'unmanaged'
-    )
+def if_client   (wm, ev, **kw): return _if_win_type('client',    wm, ev, **kw)
+def if_root     (wm, ev, **kw): return _if_win_type('root',      wm, ev, **kw)
+def if_unmanaged(wm, ev, **kw): return _if_win_type('unmanaged', wm, ev, **kw)
 
 class if_state(object):
     'true if modifier (shift/control/etc) keys currently match mods'
