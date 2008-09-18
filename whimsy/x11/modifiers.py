@@ -54,26 +54,19 @@ class modifier_core(object):
 
 
 class modifier_mask(object):
-    def __init__(self, modcore, match=0, negate=0):
+    def __init__(self, modcore, match=0):
         self.modcore = modcore
         self.match = match
-        self.negate = negate
 
     def __add__(self, rhs):
-        return modifier_mask(self.modcore,
-                ~rhs.negate & (self.match | rhs.match),
-                ~rhs.match & (self.negate | rhs.negate))
-
-    def __minus__(self, rhs):
-        return modifier_mask(self.modcore,
-                self.match | ~rhs.match, self.negate | rhs.match)
+        return modifier_mask(self.modcore, self.match | rhs.match)
 
     def __invert__(self):
         return modifier_mask(self.modcore, self.negate, self.match)
 
     def matches(self, modmask):
-        return (self.modcore.modmask_and(modmask, self.match) == self.match and
-                 self.modcore.modmask_and(modmask, self.negate) == 0)
+        # no need for special modmask_and -- just &
+        return self.modcore.modmask_and(modmask, self.match) == self.match
 
     def every_lock_combination(self):
         return self.modcore.every_lock_combination(self.match)

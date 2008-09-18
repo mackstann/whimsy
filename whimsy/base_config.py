@@ -65,15 +65,10 @@ chains = [
                     if_should_manage_new_window,
                     lambda wm, win, **kw: wm.manage_window(win)),
 
-    ('map_request', if_client,
-                    client_method('focus')),
-
-    ('enter_notify', if_client,
-                     if_state(~ButtonMask),
-                     client_method('focus')),
+    ('map_request',  if_client, client_method('focus')),
+    ('enter_notify', if_client, client_method('focus')),
 
     ('enter_notify', if_root,
-                     if_state(~ButtonMask),
                      lambda wm, **kw: wm.dpy.set_input_focus(wm.root,
                                       X.RevertToPointerRoot, X.CurrentTime)),
 

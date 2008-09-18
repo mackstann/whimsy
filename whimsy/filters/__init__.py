@@ -26,6 +26,10 @@ class if_state(object):
     def __call__(self, ev, **kw):
         return self.mods.matches(ev.state)
 
+class if_state_not(if_state):
+    def __call__(self, ev, **kw):
+        return not super(if_state_not, self).__call__(ev, **kw)
+
 class if_(object):
     'convenience class for filtering by event type and/or window type'
     def __init__(self, evtype, wintype=None):
