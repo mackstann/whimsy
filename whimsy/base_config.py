@@ -54,7 +54,6 @@ ewmh.net_desktop_geometry(hub)
 ewmh.net_client_list(hub)
 ewmh.net_desktop_viewport(hub)
 
-# XXX use event names as signal names
 chains = [
     ('wm_manage_after', discover_existing_windows()),
 
