@@ -57,7 +57,10 @@ def if_should_manage_existing_window(win, **kw):
     )
 
 def if_should_manage_new_window(win, **kw):
-    catch = Xerror.CatchError(Xerror.BadWindow)
-    return not win.get_attributes().override_redirect and not catch.get_error()
+    try:
+        return not win.get_attributes().override_redirect
+    except Xerror.BadWindow:
+        # it disappeared
+        return False
 
 
