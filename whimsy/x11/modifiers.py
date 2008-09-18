@@ -38,21 +38,6 @@ class modifier_core(object):
             clean | self.slock,
         )
 
-    def modmask_eq(self, lhs, rhs):
-        if lhs & X.AnyModifier or rhs & X.AnyModifier:
-            return True
-        lhs &= ~(X.LockMask | self.nlock | self.slock)
-        rhs &= ~(X.LockMask | self.nlock | self.slock)
-        return lhs == rhs
-
-    def modmask_and(self, lhs, rhs):
-        if lhs & X.AnyModifier or rhs & X.AnyModifier:
-            return rhs
-        lhs &= ~(X.LockMask | self.nlock | self.slock)
-        rhs &= ~(X.LockMask | self.nlock | self.slock)
-        return lhs & rhs
-
-
 class modifier_mask(object):
     def __init__(self, modcore, match=0):
         self.modcore = modcore
@@ -65,8 +50,7 @@ class modifier_mask(object):
         return modifier_mask(self.modcore, self.negate, self.match)
 
     def matches(self, modmask):
-        # no need for special modmask_and -- just &
-        return self.modcore.modmask_and(modmask, self.match) == self.match
+        return modmask & self.match == self.match
 
     def every_lock_combination(self):
         return self.modcore.every_lock_combination(self.match)
