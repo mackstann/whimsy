@@ -5,10 +5,29 @@ from Xlib import X
 from whimsy import util
 from whimsy.x11 import props
 
-class startup_and_shutdown_with_wm(object):
-    def __init__(self, hub):
+class ewmh_prop(object):
+    def __init__(self, hub, wm):
+        self.wm = wm
+
+    def propname(self):
+        return '_'+self.__class__.__name__.upper()
+
+    def get(self):
+        return props.get_prop(self.wm.dpy, self.wm.root, self.propname())
+
+    def set(self, val):
+        props.change_prop(self.wm.dpy, self.wm.root, self.propname(), val)
+
+    def delete(self):
+        props.delete_prop(self.wm.dpy, self.wm.root, self.propname())
+
+class startup_and_shutdown_with_wm(ewmh_prop):
+    def __init__(self, hub, wm):
+        super(startup_and_shutdown_with_wm, self).__init__(hub, wm)
         hub.attach('wm_manage_after', self.startup)
         hub.attach('wm_shutdown_before', self.shutdown)
+
+# # # #
 
 class net_supported(startup_and_shutdown_with_wm):
     def startup(self, wm, **kw):
@@ -21,84 +40,94 @@ class net_supported(startup_and_shutdown_with_wm):
                         wm.dpy.get_atom(a) for a in attr.also_implements
                     ]
 
-        props.change_prop(wm.dpy, wm.root, '_NET_SUPPORTED', supported)
+        self.set(supported)
 
     def shutdown(self, wm, **kw):
-        props.delete_prop(wm.dpy, wm.root, '_NET_SUPPORTED')
+        self.delete()
 
 class net_number_of_desktops(startup_and_shutdown_with_wm):
     def startup(self, wm, **kw):
-        props.change_prop(wm.dpy, wm.root, '_NET_NUMBER_OF_DESKTOPS', 1)
+        self.set(1)
     def shutdown(self, wm, **kw):
-        props.delete_prop(wm.dpy, wm.root, '_NET_NUMBER_OF_DESKTOPS')
+        self.delete()
 
 class net_current_desktop(startup_and_shutdown_with_wm):
     def startup(self, wm, **kw):
-        props.change_prop(wm.dpy, wm.root, '_NET_CURRENT_DESKTOP', 0)
+        self.set(0)
     def shutdown(self, wm, **kw):
-        props.delete_prop(wm.dpy, wm.root, '_NET_CURRENT_DESKTOP')
+        self.delete()
 
 class net_supporting_wm_check(startup_and_shutdown_with_wm):
     def startup(self, wm, **kw):
         self.win = wm.root.create_window(-5000, -5000, 1, 1, 0, X.CopyFromParent)
         props.change_prop(wm.dpy, self.win, '_NET_WM_NAME', 'Whimsy')
-        props.change_prop(wm.dpy, self.win, '_NET_SUPPORTING_WM_CHECK', self.win.id)
-        props.change_prop(wm.dpy, wm.root, '_NET_SUPPORTING_WM_CHECK', self.win.id)
+        props.change_prop(wm.dpy, self.win, self.propname(), self.win.id)
+        props.change_prop(wm.dpy, wm.root, self.propname(), self.win.id)
 
     def shutdown(self, wm, **kw):
-        props.delete_prop(wm.dpy, wm.root, '_NET_SUPPORTING_WM_CHECK')
-        props.delete_prop(wm.dpy, self.win, '_NET_SUPPORTING_WM_CHECK')
+        props.delete_prop(wm.dpy, wm.root, self.propname())
+        props.delete_prop(wm.dpy, self.win, self.propname())
         props.delete_prop(wm.dpy, self.win, '_NET_WM_NAME')
         self.win.destroy()
 
-
 class net_desktop_geometry(startup_and_shutdown_with_wm):
     def startup(self, wm, **kw):
-        props.change_prop(
-            wm.dpy, wm.root, '_NET_DESKTOP_GEOMETRY',
-            [wm.vwidth, wm.vheight])
-
+        self.set([wm.vwidth, wm.vheight])
     def shutdown(self, wm, **kw):
-        props.delete_prop(wm.dpy, wm.root, '_NET_DESKTOP_GEOMETRY')
+        self.delete()
 
-class net_client_list(object):
-    def __init__(self, hub):
-        hub.attach('after_manage_window', self.refresh)
-        hub.attach('after_unmanage_window', self.refresh)
+class net_client_list(ewmh_prop):
+    def __init__(self, hub, wm):
+        super(net_client_list, self).__init__(hub, wm)
+        self.win_ids = []
+        hub.attach('after_manage_window', self.add_window)
+        hub.attach('after_unmanage_window', self.remove_window)
         hub.attach('wm_shutdown_before', self.shutdown)
 
-    def refresh(self, wm, **kw):
-        props.change_prop(
-            wm.dpy, wm.root, '_NET_CLIENT_LIST',
-            [ c.win.id for c in wm.clients ]
-        )
+    def add_window(self, wm, win, **kw):
+        self.win_ids.insert(0, win.id)
+        self.set(self.win_ids)
+
+    def remove_window(self, wm, win, **kw):
+        self.win_ids.remove(win.id)
+        self.set(self.win_ids)
 
     def shutdown(self, wm, **kw):
-        props.delete_prop(wm.dpy, wm.root, '_NET_CLIENT_LIST')
+        self.delete()
 
-# what happened to net_client_list_stacking and the focus order one?
+class net_client_list_stacking(net_client_list):
+    def __init__(self, hub, wm):
+        super(net_client_list_stacking, self).__init__(hub, wm)
+        hub.attach('after_raise_window', self.raise_window)
+        hub.attach('after_lower_window', self.lower_window)
 
-class net_desktop_viewport(object):
-    def __init__(self, hub):
+    def raise_window(self, wm, win, **kw):
+        self.win_ids.remove(win.id)
+        self.win_ids.insert(0, win.id)
+        self.set(self.win_ids)
+
+    def lower_window(self, wm, win, **kw):
+        self.win_ids.remove(win.id)
+        self.win_ids.append(win.id)
+        self.set(self.win_ids)
+
+class net_desktop_viewport(ewmh_prop):
+    def __init__(self, hub, wm):
+        super(net_desktop_viewport, self).__init__(hub, wm)
         hub.attach('wm_manage_after', self.startup)
         hub.attach('after_viewport_move', self.refresh)
 
     def startup(self, hub, wm, **kw):
-        viewport = props.get_prop(wm.dpy, wm.root,
-            '_NET_DESKTOP_VIEWPORT')
+        viewport = self.get()
 
         if not viewport:
             viewport = [0, 0]
-            props.change_prop(wm.dpy, wm.root,
-                '_NET_DESKTOP_VIEWPORT', viewport)
+            self.set(viewport)
 
         hub.emit('viewport_discovered', x=viewport[0], y=viewport[1])
 
     def refresh(self, wm, x, y, **kw):
-        props.change_prop(
-            wm.dpy, wm.root, '_NET_DESKTOP_VIEWPORT',
-            [x, y]
-        )
+        self.set([x, y])
 
 #class net_desktop_names(object):
 #    def startup(self, wm, **kw):

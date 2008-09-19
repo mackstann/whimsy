@@ -86,7 +86,11 @@ class viewport_absolute_move(object):
         xdelta = current_x - to_x
         ydelta = current_y - to_y
 
-        for c in wm.clients:
+        # moving the top windows first causes fewer redraw artifacts,
+        # especially on slow-drawing apps like firefox
+        wins = props.get_prop(wm.dpy, wm.root, '_NET_CLIENT_LIST_STACKING')
+        for win in wins:
+            c = wm.find_client(win)
             c.moveresize_rel(x=xdelta, y=ydelta)
             #c.dpy.sync() # necessary?  maybe not
             #wish list: discard enternotifies

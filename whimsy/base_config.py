@@ -46,13 +46,14 @@ root_geometry = app.wm.root.get_geometry()
 W = root_geometry.width
 H = root_geometry.height
 
-ewmh.net_supported(hub)
-ewmh.net_supporting_wm_check(hub)
-ewmh.net_number_of_desktops(hub)
-ewmh.net_current_desktop(hub)
-ewmh.net_desktop_geometry(hub)
-ewmh.net_client_list(hub)
-ewmh.net_desktop_viewport(hub)
+ewmh.net_supported(hub, wm)
+ewmh.net_supporting_wm_check(hub, wm)
+ewmh.net_number_of_desktops(hub, wm)
+ewmh.net_current_desktop(hub, wm)
+ewmh.net_desktop_geometry(hub, wm)
+ewmh.net_client_list(hub, wm)
+ewmh.net_client_list_stacking(hub, wm)
+ewmh.net_desktop_viewport(hub, wm)
 
 chains = [
     ('wm_manage_after', discover_existing_windows()),
