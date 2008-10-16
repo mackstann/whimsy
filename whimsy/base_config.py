@@ -54,6 +54,8 @@ ewmh.net_desktop_geometry(hub, wm)
 ewmh.net_client_list(hub, wm)
 ewmh.net_client_list_stacking(hub, wm)
 ewmh.net_desktop_viewport(hub, wm)
+ewmh.net_desktop_names(hub, wm)
+ewmh.net_active_window(hub, wm)
 
 chains = [
     ('wm_manage_after', discover_existing_windows()),
@@ -68,9 +70,7 @@ chains = [
     ('map_request',  if_client, client_method('focus')),
     ('enter_notify', if_client, client_method('focus')),
 
-    ('enter_notify', if_root,
-                     lambda wm, **kw: wm.dpy.set_input_focus(wm.root,
-                                      X.RevertToPointerRoot, X.CurrentTime)),
+    ('enter_notify', if_root, lambda wm, **kw: wm.focus_root()),
 
     ('destroy_notify',  if_client, unmanage_window()),
     ('unmap_notify',    if_client, unmanage_window()),

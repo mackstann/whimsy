@@ -73,6 +73,10 @@ class window_manager(object):
 
         # TODO: ewmh selection
 
+    def focus_root(self):
+        self.dpy.set_input_focus(self.root, X.RevertToPointerRoot, X.CurrentTime)
+        self.hub.emit('after_focus_root')
+
     def manage_window(self, win):
         try:
             c = client.managed_client(self.hub, self.dpy, win)
