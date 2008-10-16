@@ -23,7 +23,7 @@ class binding_base(object):
     def _grab(self, win, detail, mask):
         raise NotImplementedError
 
-class if_key_press(binding_base):
+class if_key(binding_base):
     event_type = X.KeyPress
 
     def __connected__(self, wm, **kw):
@@ -35,7 +35,7 @@ class if_key_press(binding_base):
     def _grab(self, win, mask):
         win.grab_key(self.detail, mask, 1, X.GrabModeAsync, X.GrabModeAsync)
 
-class if_button_press(binding_base):
+class if_button(binding_base):
     event_type = X.ButtonPress
 
     def _grab(self, win, mask):
