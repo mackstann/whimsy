@@ -107,5 +107,28 @@ class managed_client(object):
         self.dpy.sync()
 
 
+class existing_unmanaged_window(object):
+    def __init__(self, win):
+        self.win = win
+    def should_manage(self):
+        attr = self.win.get_attributes()
+        return (
+            not attr.override_redirect
+            and attr.map_state == X.IsViewable
+            and getattr(self.win.get_wm_hints(), 'initial_state', not Xutil.NormalState)
+                == Xutil.NormalState
+        )
+
+class newly_mapped_window(object):
+    def __init__(self, win):
+        self.win = win
+    def should_manage(self):
+        try:
+            return not self.win.get_attributes().override_redirect
+        except Xerror.BadWindow:
+            # it disappeared
+            return False
+
+
 
 

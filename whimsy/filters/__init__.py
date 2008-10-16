@@ -4,6 +4,7 @@ from Xlib import X, Xutil
 from Xlib import error as Xerror
 
 from whimsy import util
+from whimsy.models.client import existing_unmanaged_window, newly_mapped_window
 
 class if_event_type(object):
     'true if the event type is one of *evtypes'
@@ -28,36 +29,12 @@ class if_state(object):
 
 class if_state_not(if_state):
     def __call__(self, ev, **kw):
-        return not super(if_state_not, self).__call__(ev, **kw)
+        return not if_state.__call__(self, ev, **kw)
 
-class if_(object):
-    'convenience class for filtering by event type and/or window type'
-    def __init__(self, evtype, wintype=None):
-        self.evtype = evtype
-        self.wintype = wintype
-    def __call__(self, wm, ev, **kw):
-        if ev.type != self.evtype or 'win' not in kw:
-            return False
-        if self.wintype is None:
-            return True
-        return util.window_type(wm, kw['win']) == self.wintype
-
-# TODO: move these into window_manager, minus the if_; keep if_ versions here
-# as wrapper filters
 def if_should_manage_existing_window(win, **kw):
-    attr = win.get_attributes()
-    return (
-        not attr.override_redirect
-        and attr.map_state == X.IsViewable
-        and getattr(win.get_wm_hints(), 'initial_state', not Xutil.NormalState)
-            == Xutil.NormalState
-    )
+    return existing_unmanaged_window(win).should_manage()
 
 def if_should_manage_new_window(win, **kw):
-    try:
-        return not win.get_attributes().override_redirect
-    except Xerror.BadWindow:
-        # it disappeared
-        return False
+    return newly_mapped_window(win).should_manage()
 
 
