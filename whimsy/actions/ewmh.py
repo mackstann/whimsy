@@ -42,19 +42,19 @@ class net_supported(startup_and_shutdown_with_wm):
 
         self.set(supported)
 
-    def shutdown(self, wm, **kw):
+    def shutdown(self, **kw):
         self.delete()
 
 class net_number_of_desktops(startup_and_shutdown_with_wm):
-    def startup(self, wm, **kw):
+    def startup(self, **kw):
         self.set(1)
-    def shutdown(self, wm, **kw):
+    def shutdown(self, **kw):
         self.delete()
 
 class net_current_desktop(startup_and_shutdown_with_wm):
-    def startup(self, wm, **kw):
+    def startup(self, **kw):
         self.set(0)
-    def shutdown(self, wm, **kw):
+    def shutdown(self, **kw):
         self.delete()
 
 class net_supporting_wm_check(startup_and_shutdown_with_wm):
@@ -73,7 +73,7 @@ class net_supporting_wm_check(startup_and_shutdown_with_wm):
 class net_desktop_geometry(startup_and_shutdown_with_wm):
     def startup(self, wm, **kw):
         self.set([wm.vwidth, wm.vheight])
-    def shutdown(self, wm, **kw):
+    def shutdown(self, **kw):
         self.delete()
 
 class net_client_list(ewmh_prop):
@@ -84,15 +84,15 @@ class net_client_list(ewmh_prop):
         hub.attach('after_unmanage_window', self.remove_window)
         hub.attach('wm_shutdown_before', self.shutdown)
 
-    def add_window(self, wm, win, **kw):
+    def add_window(self, win, **kw):
         self.win_ids.insert(0, win.id)
         self.set(self.win_ids)
 
-    def remove_window(self, wm, win, **kw):
+    def remove_window(self, win, **kw):
         self.win_ids.remove(win.id)
         self.set(self.win_ids)
 
-    def shutdown(self, wm, **kw):
+    def shutdown(self, **kw):
         self.delete()
 
 class net_client_list_stacking(net_client_list):
@@ -101,12 +101,12 @@ class net_client_list_stacking(net_client_list):
         hub.attach('after_raise_window', self.raise_window)
         hub.attach('after_lower_window', self.lower_window)
 
-    def raise_window(self, wm, win, **kw):
+    def raise_window(self, win, **kw):
         self.win_ids.remove(win.id)
         self.win_ids.insert(0, win.id)
         self.set(self.win_ids)
 
-    def lower_window(self, wm, win, **kw):
+    def lower_window(self, win, **kw):
         self.win_ids.remove(win.id)
         self.win_ids.append(win.id)
         self.set(self.win_ids)
@@ -129,17 +129,24 @@ class net_desktop_viewport(ewmh_prop):
     def refresh(self, wm, x, y, **kw):
         self.set([x, y])
 
-#class net_desktop_names(object):
-#    def startup(self, wm, **kw):
-#        props.change_prop(wm.dpy, wm.root, '_NET_DESKTOP_NAMES', [])
-#    def shutdown(self, wm, **kw):
-#        props.delete_prop(wm.dpy, wm.root, '_NET_DESKTOP_NAMES')
-#
-#class net_active_window(object):
-#    def refresh(self, wm, win, **kw):
-#        props.change_prop(wm.dpy, wm.root, '_NET_ACTIVE_WINDOW', win.id)
-#    def shutdown(self, wm, **kw):
-#        props.delete_prop(wm.dpy, wm.root, '_NET_ACTIVE_WINDOW')
+class net_desktop_names(startup_and_shutdown_with_wm):
+    def startup(self, wm, **kw):
+        self.set([])
+    def shutdown(self, **kw):
+        self.delete()
+
+class net_active_window(ewmh_prop):
+    def __init__(self, hub, wm):
+        super(net_active_window, self).__init__(hub, wm)
+        hub.attach('after_focus_window', self.refresh)
+        hub.attach('after_focus_root', self.refresh)
+        hub.attach('wm_shutdown_before', self.shutdown)
+
+    def refresh(self, wm, **kw):
+        self.set(kw['win'].id if 'win' in kw else X.NONE)
+
+    def shutdown(self, **kw):
+        self.delete()
 
 
 # _NET_VIRTUAL_ROOTS
