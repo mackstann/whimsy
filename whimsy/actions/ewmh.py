@@ -179,62 +179,62 @@ class net_active_window(ewmh_prop):
 # bottom_start_x = 200
 # bottom_end_x = 599
 
-#def make_strut(wm, prop_data):
-#    keys = '''left right top bottom left_start_y left_end_y right_start_y
-#    right_end_y top_start_x top_end_x bottom_start_x bottom_end_x'''.split()
-#
-#    defaults_for_non_partial_struts = [
-#        0, wm.root_geometry.height - 1, 0, wm.root_geometry.height - 1,
-#        0, wm.root_geometry.width - 1, 0, wm.root_geometry.width - 1,
-#    ]
-#
-#    return dict(zip(
-#        keys,
-#        prop_data + (
-#            defaults_for_non_partial_struts if len(prop_data) == 4 else []
-#        )
-#    ))
-#
-#class net_wm_strut_partial(object):
-#    also_implements = '_NET_WM_STRUT', '_NET_WORKAREA'
-#    def __init__(self):
-#        self.struts = {}
-#
-#    def check(self, wm, client, win, **kw):
-#        # these will trigger our update()
-#        client.update_prop('_NET_WM_STRUT_PARTIAL')
-#        client.update_prop('_NET_WM_STRUT')
-#
-#    def property_updated(self, wm, client, win, **kw):
-#        prop_data = []
-#        if '_NET_WM_STRUT_PARTIAL' in client.props:
-#            prop_data = client.props['_NET_WM_STRUT_PARTIAL']
-#        elif '_NET_WM_STRUT' in client.props:
-#            prop_data = client.props['_NET_WM_STRUT']
-#        if not prop_data:
-#            return
-#        self.struts[win.id] = make_strut(wm, prop_data)
-#        self.update_workarea(wm)
-#
-#    def remove_client(self, wm, win, **kw):
-#        if win.id in self.struts:
-#            del self.struts[win.id]
-#            self.update_workarea(wm)
-#
-#    def update_workarea(self, wm):
-#        if self.struts:
-#            margin_left = max(map(lambda s: s['left'], self.struts.values()))
-#            margin_right = min(map(lambda s: s['right'], self.struts.values()))
-#            margin_top = max(map(lambda s: s['top'], self.struts.values()))
-#            margin_bottom = min(map(lambda s: s['bottom'], self.struts.values()))
-#        else:
-#            margin_left = margin_right = margin_top = margin_bottom = 0
-#
-#        props.change_prop(wm.dpy, wm.root, '_NET_WORKAREA', [
-#            margin_left, margin_top,
-#            wm.root_geometry.width - (margin_left + margin_right),
-#            wm.root_geometry.height - (margin_top + margin_bottom),
-#        ])
+def make_strut(wm, prop_data):
+    keys = '''left right top bottom left_start_y left_end_y right_start_y
+    right_end_y top_start_x top_end_x bottom_start_x bottom_end_x'''.split()
+
+    bottom = wm.root_geometry.height
+    right = wm.root_geometry.width
+
+    defaults_for_non_partial_struts = [0, bottom, 0, bottom, 0, right, 0, right]
+
+    return dict(zip(
+        keys,
+        prop_data + (
+            defaults_for_non_partial_struts if len(prop_data) == 4 else []
+        )
+    ))
+
+class net_wm_strut_partial(object):
+    also_implements = '_NET_WM_STRUT', '_NET_WORKAREA'
+    def __init__(self):
+        self.struts = {}
+
+    def check(self, wm, client, win, **kw):
+        # these will trigger our update()
+        client.update_prop('_NET_WM_STRUT_PARTIAL')
+        client.update_prop('_NET_WM_STRUT')
+
+    def property_updated(self, wm, client, win, **kw):
+        prop_data = []
+        if '_NET_WM_STRUT_PARTIAL' in client.props:
+            prop_data = client.props['_NET_WM_STRUT_PARTIAL']
+        elif '_NET_WM_STRUT' in client.props:
+            prop_data = client.props['_NET_WM_STRUT']
+        if not prop_data:
+            return
+        self.struts[win.id] = make_strut(wm, prop_data)
+        self.update_workarea(wm)
+
+    def remove_client(self, wm, win, **kw):
+        if win.id in self.struts:
+            del self.struts[win.id]
+            self.update_workarea(wm)
+
+    def update_workarea(self, wm):
+        if self.struts:
+            margin_left = max(map(lambda s: s['left'], self.struts.values()))
+            margin_right = min(map(lambda s: s['right'], self.struts.values()))
+            margin_top = max(map(lambda s: s['top'], self.struts.values()))
+            margin_bottom = min(map(lambda s: s['bottom'], self.struts.values()))
+        else:
+            margin_left = margin_right = margin_top = margin_bottom = 0
+
+        props.change_prop(wm.dpy, wm.root, '_NET_WORKAREA', [
+            margin_left, margin_top,
+            wm.root_geometry.width - (margin_left + margin_right),
+            wm.root_geometry.height - (margin_top + margin_bottom),
+        ])
 
 # _NET_WM_ICON_GEOMETRY
 # _NET_WM_ICON
