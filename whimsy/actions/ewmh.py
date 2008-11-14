@@ -1,5 +1,9 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
+# the github link to this file has been added to
+# <http://www.freedesktop.org/wiki/Specifications/wm-spec>, so if the location
+# of this file changes within the repository, be sure to update that page
+
 from Xlib import X
 
 from whimsy import util
