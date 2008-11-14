@@ -10,6 +10,7 @@ from whimsy import util
 from whimsy.x11 import props
 
 class ewmh_prop(object):
+    also_implements = []
     def __init__(self, hub, wm):
         self.wm = wm
 
@@ -37,12 +38,11 @@ class net_supported(startup_and_shutdown_with_wm):
     def startup(self, wm, **kw):
         supported = []
         for attr in globals().keys():
-            if attr.startswith('net_'):
+            if isinstance(attr, ewmh_prop):
                 supported.append(wm.dpy.get_atom('_' + attr.upper()))
-                if hasattr(attr, 'also_implements'):
-                    supported += [
-                        wm.dpy.get_atom(a) for a in attr.also_implements
-                    ]
+                supported += [
+                    wm.dpy.get_atom(a) for a in attr.also_implements
+                ]
 
         self.set(supported)
 
