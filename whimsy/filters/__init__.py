@@ -13,12 +13,12 @@ class if_event_type(object):
     def __call__(self, ev, **kw):
         return ev.type in self.evtypes
 
-def _if_win_type(wtype, wm, ev, **kw):
+def _if_win_type(wtype, wm, **kw):
     return 'win' in kw and util.window_type(wm, kw['win']) == wtype
 
-def if_client   (wm, ev, **kw): return _if_win_type('client',    wm, ev, **kw)
-def if_root     (wm, ev, **kw): return _if_win_type('root',      wm, ev, **kw)
-def if_unmanaged(wm, ev, **kw): return _if_win_type('unmanaged', wm, ev, **kw)
+def if_client   (wm, **kw): return _if_win_type('client',    wm, **kw)
+def if_root     (wm, **kw): return _if_win_type('root',      wm, **kw)
+def if_unmanaged(wm, **kw): return _if_win_type('unmanaged', wm, **kw)
 
 class if_state(object):
     'true if modifier (shift/control/etc) keys currently match mods'

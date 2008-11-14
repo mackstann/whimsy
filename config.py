@@ -1,7 +1,6 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
 from whimsy.base_config import *
-from whimsy.actions.flipping import flipping_move, flipping_resize
 
 import socket
 
@@ -46,11 +45,11 @@ chains = [
     (if_key("v", M4), mpd("pause")),
     (if_key("b", M4), mpd("next")),
 
-    (if_client, if_key('w', C+A), delete_client()),
-    (if_client, if_button(1, A), flipping_move()),
-    (if_client, if_button(3, A), flipping_resize()),
-    (if_client, if_button(4, A), client_method('stack_bottom')),
-    (if_client, if_button(5, A), client_method('stack_top')),
+    (if_key('w', C+A), if_client, delete_client()),
+    (if_button(1,  A), if_client, flipping_move()),
+    (if_button(3,  A), if_client, flipping_resize()),
+    (if_button(4,  A), if_client, client_method('stack_bottom')),
+    (if_button(5,  A), if_client, client_method('stack_top')),
 
     # maximizations: full screen, left half, right half
 
@@ -64,12 +63,6 @@ chains = [
 
 for chain in chains:
     app.hub.attach("event", *chain)
-    for func in chain:
-        if isinstance(func, binding_base):
-            if if_client not in chain:
-                app.hub.attach('wm_manage_after', func.grab)
-            if if_root not in chain:
-                app.hub.attach('client_init_after', func.grab)
 
 app.run()
 

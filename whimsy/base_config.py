@@ -7,6 +7,7 @@ from whimsy.actions import ewmh
 from whimsy.actions.builtins import *
 from whimsy.actions.transformers import *
 from whimsy.actions.event_handling import *
+from whimsy.actions.flipping import *
 from whimsy.filters.bindings import *
 from whimsy.filters import *
 from whimsy.x11.modifiers import modifier_mask, modifier_core
@@ -70,7 +71,7 @@ chains = [
     ('map_request',  if_client, client_method('focus')),
     ('enter_notify', if_client, client_method('focus')),
 
-    ('enter_notify', if_root, lambda wm, **kw: wm.focus_root()),
+    #('enter_notify', if_root, lambda wm, **kw: wm.focus_root()),
 
     ('destroy_notify',  if_client, unmanage_window()),
     ('unmap_notify',    if_client, unmanage_window()),

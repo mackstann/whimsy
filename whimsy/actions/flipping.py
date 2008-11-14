@@ -1,11 +1,11 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
-import time
+import time as _time
 
-from whimsy.actions import transformers
-from whimsy.actions.builtins import viewport_relative_move
+from whimsy.actions import transformers as _transformers
+from whimsy.actions.builtins import viewport_relative_move as _view_rel_mv
 
-class flipper(object):
+class _flipper(object):
     # so an edge flip doesn't trigger another opposite edge flip, and so on
     # continuously, we warp the pointer from, say, the rightmost pixel, to the
     # leftmost pixel PLUS this margin
@@ -17,7 +17,7 @@ class flipper(object):
     last_flip = 0
 
     def maybe_flip(self, hub, wm, ev, **kw):
-        if time.time() - self.last_flip < self.time_margin:
+        if _time.time() - self.last_flip < self.time_margin:
             return
 
         if not hasattr(self, 'root_geometry'):
@@ -56,16 +56,16 @@ class flipper(object):
     def flip(self, hub, wm, warp_by, viewport_by, client_by):
         wm.dpy.grab_server()
         self.state.client.dpy.warp_pointer(*warp_by)
-        viewport_relative_move(*viewport_by)(hub=hub, wm=wm)
+        _view_rel_mv(*viewport_by)(hub=hub, wm=wm)
         self.client_adjust(warp_by, viewport_by, client_by)
         wm.dpy.sync()
         wm.dpy.ungrab_server()
-        self.last_flip = time.time()
+        self.last_flip = _time.time()
 
     def client_adjust(self):
         raise NotImplementedError
 
-class flipping_move(transformers.start_move, flipper):
+class flipping_move(_transformers.start_move, _flipper):
     def client_adjust(self, warp_by, viewport_by, client_by):
         self.state.client.moveresize_rel(
             x=client_by[0],
@@ -76,7 +76,7 @@ class flipping_move(transformers.start_move, flipper):
         super(flipping_move, self).motion(**kw)
         self.maybe_flip(**kw)
 
-class flipping_resize(transformers.start_resize, flipper):
+class flipping_resize(_transformers.start_resize, _flipper):
     def client_adjust(self, warp_by, viewport_by, client_by):
         self.state.initial_pointer_x -= viewport_by[0]
         self.state.initial_pointer_y -= viewport_by[1]
