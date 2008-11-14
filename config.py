@@ -1,6 +1,7 @@
 # Written by Nick Welch in the years 2005-2008.  Author disclaims copyright.
 
 from whimsy.base_config import *
+from whimsy.actions.flipping import flipping_move, flipping_resize
 
 import socket
 
@@ -46,8 +47,8 @@ chains = [
     (if_key("b", M4), mpd("next")),
 
     (if_client, if_key('w', C+A), delete_client()),
-    (if_client, if_button(1, A), start_move()),
-    (if_client, if_button(3, A), start_resize()),
+    (if_client, if_button(1, A), flipping_move()),
+    (if_client, if_button(3, A), flipping_resize()),
     (if_client, if_button(4, A), client_method('stack_bottom')),
     (if_client, if_button(5, A), client_method('stack_top')),
 
