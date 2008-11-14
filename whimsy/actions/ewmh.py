@@ -205,14 +205,11 @@ class net_wm_strut_partial(object):
         hub.attach('client_property_updated', self.property_updated)
 
     def check(self, wm, client, **kw):
-        print "update props..."
         # these will trigger our property_updated()
         client.update_prop('_NET_WM_STRUT_PARTIAL')
         client.update_prop('_NET_WM_STRUT')
 
-    def property_updated(self, wm, client, propname, **kw):
-        print propname, "updated for", client.props.get('WM_NAME', '')
-
+    def property_updated(self, hub, wm, client, propname, **kw):
         if '_NET_WM_STRUT_PARTIAL' in client.props:
             prop_data = client.props['_NET_WM_STRUT_PARTIAL']
         elif '_NET_WM_STRUT' in client.props:
@@ -220,22 +217,20 @@ class net_wm_strut_partial(object):
         else:
             return
 
-        print prop_data
-
         if prop_data == [0] * len(prop_data):
             if client.win.id in self.struts:
                 del self.struts[client.win.id]
         else:
             self.struts[client.win.id] = make_strut(wm, prop_data)
 
-        self.update_workarea(wm)
+        self.update_workarea(hub, wm)
 
-    def remove_client(self, wm, win, **kw):
+    def remove_client(self, hub, wm, win, **kw):
         if win.id in self.struts:
             del self.struts[win.id]
-            self.update_workarea(wm)
+            self.update_workarea(hub, wm)
 
-    def update_workarea(self, wm):
+    def update_workarea(self, hub, wm):
         margin_left = margin_right = margin_top = margin_bottom = 0
         if self.struts:
             margin_left = max(map(lambda s: s['left'], self.struts.values()))
@@ -243,18 +238,72 @@ class net_wm_strut_partial(object):
             margin_top = max(map(lambda s: s['top'], self.struts.values()))
             margin_bottom = min(map(lambda s: s['bottom'], self.struts.values()))
 
-        props.change_prop(wm.dpy, wm.root, '_NET_WORKAREA', [
+        workarea = (
             margin_left, # x of workarea box, and..
             margin_top,  # y
             wm.root_geometry.width - (margin_left + margin_right),  # width
             wm.root_geometry.height - (margin_top + margin_bottom), # height
-        ])
-        print "workarea is now:", (
-            margin_left, # x of workarea box, and..
-            margin_top,  # y
-            wm.root_geometry.width - (margin_left + margin_right),  # width
-            wm.root_geometry.height - (margin_top + margin_bottom), # height
-            )
+        )
+        props.change_prop(wm.dpy, wm.root, '_NET_WORKAREA', workarea)
+
+        hub.emit('workarea_changed',
+            **dict(zip(('x', 'y', 'width', 'height'), workarea)))
+
+def confine_to_workarea(hub, wm, x, y, width, height, **kw):
+    # this should go somewhere else
+
+    clients = [ c for c in wm.clients if not c.out_of_viewport(wm) ]
+
+    #left edge
+    for c in clients:
+        if c.props.get('_NET_WM_STRUT') or c.props.get('_NET_WM_STRUT_PARTIAL'):
+            continue
+        left_movable = 0 <= c.geom['x']
+        right_movable = c.geom['x']+c.geom['width'] <= wm.root_geometry.width
+        top_movable = 0 <= c.geom['y']
+        bottom_movable = c.geom['y']+c.geom['height'] <= wm.root_geometry.height
+
+        # left_is_encroaching ...
+        # right_is_encroaching ...
+
+        left_needs_move = 0 <= c.geom['x'] < x
+        right_needs_move = x+width < c.geom['x']+c.geom['width'] <= wm.root_geometry.width
+        top_needs_move = 0 <= c.geom['y'] < y
+        bottom_needs_move = y+height < c.geom['y']+c.geom['height'] <= wm.root_geometry.height
+
+        newgeom = c.geom.copy()
+
+        if left_needs_move and right_needs_move:
+            newgeom['width'] = width
+        elif left_needs_move:
+            newgeom['x'] = x
+            if right_movable:
+                newgeom['width'] = min(newgeom['width'], width)
+        elif right_needs_move:
+            newgeom['x'] -= (newgeom['x']+newgeom['width']) - (x+width)
+            if left_movable:
+                left_overlap = x - newgeom['x']
+                if left_overlap > 0:
+                    newgeom['x'] += left_overlap
+                    newgeom['width'] -= left_overlap
+
+        if top_needs_move and bottom_needs_move:
+            newgeom['height'] = height
+        elif top_needs_move:
+            newgeom['y'] = y
+            if bottom_movable:
+                newgeom['height'] = min(newgeom['height'], height)
+        elif bottom_needs_move:
+            newgeom['y'] -= (newgeom['y']+newgeom['height']) - (y+height)
+            if top_movable:
+                top_overlap = y - newgeom['y']
+                if top_overlap > 0:
+                    newgeom['y'] += top_overlap
+                    newgeom['height'] -= top_overlap
+
+        c.moveresize(**newgeom)
+
+
 
 # _NET_WM_ICON_GEOMETRY
 # _NET_WM_ICON

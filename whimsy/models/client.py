@@ -79,6 +79,14 @@ class managed_client(object):
         w, h = sh.fix_aspect(w, h)
         self.geom['width'], self.geom['height'] = w, h
 
+    def out_of_viewport(self, wm):
+        return (
+            self.geom['x'] >= wm.root_geometry.width or
+            self.geom['y'] >= wm.root_geometry.height or
+            self.geom['x']+self.geom['width'] <= 0 or
+            self.geom['y']+self.geom['height'] <= 0
+        )
+
     def configure(self, **changes):
         self.win.configure(**changes)
         for k in "x", "y", "width", "height":
