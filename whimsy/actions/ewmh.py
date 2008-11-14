@@ -10,7 +10,7 @@ from whimsy import util
 from whimsy.x11 import props
 
 class ewmh_prop(object):
-    also_implements = []
+    also_implements = ()
     def __init__(self, hub, wm):
         self.wm = wm
 
@@ -197,23 +197,37 @@ def make_strut(wm, prop_data):
 
 class net_wm_strut_partial(object):
     also_implements = '_NET_WM_STRUT', '_NET_WORKAREA'
-    def __init__(self):
+    def __init__(self, hub, wm):
+        super(net_wm_strut_partial, self).__init__(hub, wm)
         self.struts = {}
+        hub.attach('after_manage_window', self.check)
+        hub.attach('after_unmanage_window', self.remove_client)
+        hub.attach('client_property_updated', self.property_updated)
 
-    def check(self, wm, client, win, **kw):
-        # these will trigger our update()
+    def check(self, wm, client, **kw):
+        print "update props..."
+        # these will trigger our property_updated()
         client.update_prop('_NET_WM_STRUT_PARTIAL')
         client.update_prop('_NET_WM_STRUT')
 
-    def property_updated(self, wm, client, win, **kw):
-        prop_data = []
+    def property_updated(self, wm, client, propname, **kw):
+        print propname, "updated for", client.props.get('WM_NAME', '')
+
         if '_NET_WM_STRUT_PARTIAL' in client.props:
             prop_data = client.props['_NET_WM_STRUT_PARTIAL']
         elif '_NET_WM_STRUT' in client.props:
             prop_data = client.props['_NET_WM_STRUT']
-        if not prop_data:
+        else:
             return
-        self.struts[win.id] = make_strut(wm, prop_data)
+
+        print prop_data
+
+        if prop_data == [0] * len(prop_data):
+            if client.win.id in self.struts:
+                del self.struts[client.win.id]
+        else:
+            self.struts[client.win.id] = make_strut(wm, prop_data)
+
         self.update_workarea(wm)
 
     def remove_client(self, wm, win, **kw):
@@ -222,19 +236,25 @@ class net_wm_strut_partial(object):
             self.update_workarea(wm)
 
     def update_workarea(self, wm):
+        margin_left = margin_right = margin_top = margin_bottom = 0
         if self.struts:
             margin_left = max(map(lambda s: s['left'], self.struts.values()))
             margin_right = min(map(lambda s: s['right'], self.struts.values()))
             margin_top = max(map(lambda s: s['top'], self.struts.values()))
             margin_bottom = min(map(lambda s: s['bottom'], self.struts.values()))
-        else:
-            margin_left = margin_right = margin_top = margin_bottom = 0
 
         props.change_prop(wm.dpy, wm.root, '_NET_WORKAREA', [
-            margin_left, margin_top,
-            wm.root_geometry.width - (margin_left + margin_right),
-            wm.root_geometry.height - (margin_top + margin_bottom),
+            margin_left, # x of workarea box, and..
+            margin_top,  # y
+            wm.root_geometry.width - (margin_left + margin_right),  # width
+            wm.root_geometry.height - (margin_top + margin_bottom), # height
         ])
+        print "workarea is now:", (
+            margin_left, # x of workarea box, and..
+            margin_top,  # y
+            wm.root_geometry.width - (margin_left + margin_right),  # width
+            wm.root_geometry.height - (margin_top + margin_bottom), # height
+            )
 
 # _NET_WM_ICON_GEOMETRY
 # _NET_WM_ICON

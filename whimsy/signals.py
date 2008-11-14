@@ -7,8 +7,8 @@ class publisher(object):
 
     def emit(self, name, **kw):
         import time, sys
-        if name != 'tick':
-            print >>sys.stderr, time.time(), name, sorted(kw.keys())
+        #if name != 'tick':
+            #print >>sys.stderr, time.time(), name, sorted(kw.keys())
         kw_dict = dict(self.defaults, **kw)
         for chain in self.signals.get(name, [])[:]:
             for func in chain:

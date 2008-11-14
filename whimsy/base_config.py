@@ -57,6 +57,7 @@ ewmh.net_client_list_stacking(hub, wm)
 ewmh.net_desktop_viewport(hub, wm)
 ewmh.net_desktop_names(hub, wm)
 ewmh.net_active_window(hub, wm)
+ewmh.net_wm_strut_partial(hub, wm)
 
 chains = [
     ('wm_manage_after', discover_existing_windows()),
