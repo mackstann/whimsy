@@ -221,13 +221,18 @@ class net_wm_strut_partial(object):
             if client.win.id in self.struts:
                 del self.struts[client.win.id]
         else:
-            self.struts[client.win.id] = make_strut(wm, prop_data)
+            new_strut = make_strut(wm, prop_data)
+            if new_strut == self.struts.get(client.win.id):
+                return
+            self.struts[client.win.id] = new_strut
 
         self.update_workarea(hub, wm)
 
     def remove_client(self, hub, wm, win, **kw):
         if win.id in self.struts:
             del self.struts[win.id]
+            # this makes clients think they need to make way for the struts,
+            # even though the struts are going away.
             self.update_workarea(hub, wm)
 
     def update_workarea(self, hub, wm):
@@ -252,58 +257,42 @@ class net_wm_strut_partial(object):
 def confine_to_workarea(hub, wm, x, y, width, height, **kw):
     # this should go somewhere else
 
+    # need to differentiate between encroaching and retreating/disappearing
+
     clients = [ c for c in wm.clients if not c.out_of_viewport(wm) ]
 
     #left edge
     for c in clients:
         if c.props.get('_NET_WM_STRUT') or c.props.get('_NET_WM_STRUT_PARTIAL'):
             continue
-        left_movable = 0 <= c.geom['x']
-        right_movable = c.geom['x']+c.geom['width'] <= wm.root_geometry.width
-        top_movable = 0 <= c.geom['y']
-        bottom_movable = c.geom['y']+c.geom['height'] <= wm.root_geometry.height
-
-        # left_is_encroaching ...
-        # right_is_encroaching ...
-
-        left_needs_move = 0 <= c.geom['x'] < x
-        right_needs_move = x+width < c.geom['x']+c.geom['width'] <= wm.root_geometry.width
-        top_needs_move = 0 <= c.geom['y'] < y
-        bottom_needs_move = y+height < c.geom['y']+c.geom['height'] <= wm.root_geometry.height
 
         newgeom = c.geom.copy()
 
-        if left_needs_move and right_needs_move:
-            newgeom['width'] = width
-        elif left_needs_move:
-            newgeom['x'] = x
-            if right_movable:
-                newgeom['width'] = min(newgeom['width'], width)
-        elif right_needs_move:
-            newgeom['x'] -= (newgeom['x']+newgeom['width']) - (x+width)
-            if left_movable:
-                left_overlap = x - newgeom['x']
-                if left_overlap > 0:
-                    newgeom['x'] += left_overlap
-                    newgeom['width'] -= left_overlap
+        def fix_axis(begin, size, wm_size, work_begin, work_size):
 
-        if top_needs_move and bottom_needs_move:
-            newgeom['height'] = height
-        elif top_needs_move:
-            newgeom['y'] = y
-            if bottom_movable:
-                newgeom['height'] = min(newgeom['height'], height)
-        elif bottom_needs_move:
-            newgeom['y'] -= (newgeom['y']+newgeom['height']) - (y+height)
-            if top_movable:
-                top_overlap = y - newgeom['y']
-                if top_overlap > 0:
-                    newgeom['y'] += top_overlap
-                    newgeom['height'] -= top_overlap
+            near_movable = 0 <= c.geom[begin]
+            far_movable = c.geom[begin]+c.geom[size] <= wm_size
+            near_needs_move = 0 <= c.geom[begin] < work_begin
+            far_needs_move = work_begin+work_size < c.geom[begin]+c.geom[size] <= wm_size
+
+            if near_needs_move and far_needs_move:
+                newgeom[size] = work_size
+            elif near_needs_move:
+                newgeom[begin] = work_begin
+                if far_movable:
+                    newgeom[size] = min(newgeom[size], work_size)
+            elif far_needs_move:
+                newgeom[begin] -= (newgeom[begin]+newgeom[size]) - (work_begin+work_size)
+                if near_movable:
+                    near_overlap = work_begin - newgeom[begin]
+                    if near_overlap > 0:
+                        newgeom[begin] += near_overlap
+                        newgeom[size] -= near_overlap
+
+        fix_axis('x', 'width', wm.root_geometry.width, x, width)
+        fix_axis('y', 'height', wm.root_geometry.height, y, height)
 
         c.moveresize(**newgeom)
-
-
 
 # _NET_WM_ICON_GEOMETRY
 # _NET_WM_ICON
