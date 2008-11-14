@@ -10,7 +10,7 @@ class managed_client(object):
 
     mask = (
         #X.KeyReleaseMask | X.ButtonReleaseMask |
-        X.EnterWindowMask | X.FocusChangeMask
+        X.EnterWindowMask | X.FocusChangeMask | X.PropertyChangeMask
     )
 
     def __init__(self, hub, dpy, win):
