@@ -238,10 +238,10 @@ class net_wm_strut_partial(object):
     def update_workarea(self, hub, wm):
         margin_left = margin_right = margin_top = margin_bottom = 0
         if self.struts:
-            margin_left = max(map(lambda s: s['left'], self.struts.values()))
-            margin_right = min(map(lambda s: s['right'], self.struts.values()))
-            margin_top = max(map(lambda s: s['top'], self.struts.values()))
-            margin_bottom = min(map(lambda s: s['bottom'], self.struts.values()))
+            margin_left   = max(map(lambda s: s['left'],   self.struts.values()))
+            margin_right  = max(map(lambda s: s['right'],  self.struts.values()))
+            margin_top    = max(map(lambda s: s['top'],    self.struts.values()))
+            margin_bottom = max(map(lambda s: s['bottom'], self.struts.values()))
 
         workarea = (
             margin_left, # x of workarea box, and..
@@ -270,14 +270,12 @@ def confine_to_workarea(hub, wm, x, y, width, height, **kw):
 
         def fix_axis(begin, size, wm_size, work_begin, work_size):
 
-            near_movable = 0 <= c.geom[begin]
-            far_movable = c.geom[begin]+c.geom[size] <= wm_size
+            near_movable    = 0 <= c.geom[begin]
             near_needs_move = 0 <= c.geom[begin] < work_begin
-            far_needs_move = work_begin+work_size < c.geom[begin]+c.geom[size] <= wm_size
+            far_movable     =                        c.geom[begin]+c.geom[size] <= wm_size
+            far_needs_move  = work_begin+work_size < c.geom[begin]+c.geom[size] <= wm_size
 
-            if near_needs_move and far_needs_move:
-                newgeom[size] = work_size
-            elif near_needs_move:
+            if near_needs_move:
                 newgeom[begin] = work_begin
                 if far_movable:
                     newgeom[size] = min(newgeom[size], work_size)
