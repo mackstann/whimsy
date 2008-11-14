@@ -3,8 +3,9 @@
 from Xlib import X
 
 class transformation(object):
-    def __init__(self, client, initial_pointer_x, initial_pointer_y):
+    def __init__(self, client, button, initial_pointer_x, initial_pointer_y):
         self.client = client
+        self.button = button
         self.initial_pointer_x = initial_pointer_x
         self.initial_pointer_y = initial_pointer_y
         self.initial_client_x = client.geom['x']
@@ -19,13 +20,13 @@ class interactive_pointer_transformer(object):
         self.grab(hub=hub, **kw)
         #hub.push_context()
         hub.attach('motion_notify', self.motion)
-        hub.attach('button_release', self.ungrab)
+        hub.attach('button_release', self.maybe_ungrab)
 
     def grab(self, wm, win, ev, **kw):
         client = wm.find_client(win)
-        self.state = transformation(client, ev.root_x, ev.root_y)
+        self.state = transformation(client, ev.detail, ev.root_x, ev.root_y)
         client.win.grab_pointer(True,
-            X.PointerMotionMask | X.ButtonReleaseMask,
+            X.PointerMotionMask | X.ButtonPressMask | X.ButtonReleaseMask,
             X.GrabModeAsync, X.GrabModeAsync, X.NONE,
             X.NONE, # why doesn't Xcursorfont.left_ptr work for pointer?
             X.CurrentTime
@@ -37,10 +38,12 @@ class interactive_pointer_transformer(object):
         ydelta = ev.root_y - self.state.initial_pointer_y
         self.transform(xdelta, ydelta)
 
-    def ungrab(self, hub, wm, **kw):
+    def maybe_ungrab(self, hub, wm, ev, **kw):
+        if ev.detail != self.state.button:
+            return
         wm.dpy.ungrab_pointer(X.CurrentTime)
         hub.detach(self.motion)
-        hub.detach(self.ungrab)
+        hub.detach(self.maybe_ungrab)
         self.state = None
 
     def transform(self, xdelta, ydelta):
