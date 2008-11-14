@@ -87,6 +87,7 @@ chains = [
     ('client_init_after', client_method('map_normal')),
 
     ('workarea_changed', ewmh.confine_to_workarea),
+    ('client_message', ewmh.handle_client_message),
 ]
 
 for chaininfo in chains:

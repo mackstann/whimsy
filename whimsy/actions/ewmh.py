@@ -292,6 +292,42 @@ def confine_to_workarea(hub, wm, x, y, width, height, **kw):
 
         c.moveresize(**newgeom)
 
+
+# 'send_event': True,
+# 'type': 33,
+# 'window': <Xlib.display.Window 0x00400002>,
+# 'client_type': 269, # message type!
+# 'data': (32, array('L', [
+#        2L,          # source.  1=app, 2=pager
+#        2162957220L, # time
+#        0L,          # requestor's active window
+#        0L,
+#        0L
+#    ])),
+# 'sequence_number': 3509
+
+def message_type(ev):
+    # Xlib had/has a typo.  support the old broken version and the future fixed
+    # version.
+    try:
+        return ev.message_type # correct
+    except AttributeError:
+        return ev.client_type
+
+def handle_client_message(wm, ev, **kw):
+    _NET_ACTIVE_WINDOW = 269
+    type = message_type(ev)
+    if type == wm.dpy.get_atom('_NET_ACTIVE_WINDOW'):
+        handle_net_active_window_message(wm=wm, ev=ev, **kw)
+
+def handle_net_active_window_message(wm, ev, **kw):
+    win = ev.window
+    c = wm.find_client(win)
+    if not c:
+        return
+    c.focus()
+    c.stack_top()
+
 # _NET_WM_ICON_GEOMETRY
 # _NET_WM_ICON
 # _NET_WM_PID
