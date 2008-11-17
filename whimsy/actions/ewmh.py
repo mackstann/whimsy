@@ -153,8 +153,12 @@ class net_active_window(ewmh_prop):
         self.delete()
 
 
-# _NET_VIRTUAL_ROOTS
-# _NET_DESKTOP_LAYOUT
+# _NET_VIRTUAL_ROOTS n/a
+
+# _NET_DESKTOP_LAYOUT ignored
+# "The Window Manager may use this layout information or may choose to ignore
+# it."
+
 # _NET_SHOWING_DESKTOP
 # _NET_CLOSE_WINDOW
 # _NET_MOVERESIZE_WINDOW
