@@ -36,7 +36,7 @@ chains = [
     (if_key("Up",    C), viewport_relative_move( 0, -H)),
     (if_key("Down",  C), viewport_relative_move( 0, +H)),
 
-    (if_key("x", C+A), execute("aterm")),
+    (if_key("x", C+A), execute("urxvt")),
     (if_key("s", C+A), execute("sleep 1; xset s activate")),
 
     (if_key("z", M4), mpd("previous")),
