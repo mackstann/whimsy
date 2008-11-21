@@ -199,7 +199,7 @@ def make_strut(wm, prop_data):
         )
     ))
 
-class net_wm_strut_partial(object):
+class net_wm_strut_partial(ewmh_prop):
     also_implements = '_NET_WM_STRUT', '_NET_WORKAREA'
     def __init__(self, hub, wm):
         super(net_wm_strut_partial, self).__init__(hub, wm)
