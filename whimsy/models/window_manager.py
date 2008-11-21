@@ -3,6 +3,8 @@
 from Xlib import X
 from Xlib import error as Xerror
 
+from pygame import Rect
+
 from itertools import *
 
 from whimsy import signals
@@ -34,9 +36,9 @@ class window_manager(object):
         self.hub = hub
         self.dpy = dpy
         self.root = dpy.screen().root
-        self.root_geometry = self.root.get_geometry()
-        self.vwidth = self.root_geometry.width
-        self.vheight = self.root_geometry.height
+        getgeom = self.root.get_geometry()
+        self.root_geometry = Rect(getgeom.x, getgeom.y, getgeom.width, getgeom.height)
+        self.vwidth, self.vheight = self.root_geometry.size
         self.vx = 0
         self.vy = 0
         self.clients = []

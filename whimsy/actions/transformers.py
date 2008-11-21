@@ -8,10 +8,7 @@ class transformation(object):
         self.button = button
         self.initial_pointer_x = initial_pointer_x
         self.initial_pointer_y = initial_pointer_y
-        self.initial_client_x = client.geom['x']
-        self.initial_client_y = client.geom['y']
-        self.initial_client_width = client.geom['width']
-        self.initial_client_height = client.geom['height']
+        self.initial_client_geom = client.geom.move(0,0)
 
 class interactive_pointer_transformer(object):
     state = None
@@ -37,6 +34,7 @@ class interactive_pointer_transformer(object):
         xdelta = ev.root_x - self.state.initial_pointer_x
         ydelta = ev.root_y - self.state.initial_pointer_y
         self.transform(xdelta, ydelta)
+        self.state.client.moveresize()
 
     def maybe_ungrab(self, hub, wm, ev, **kw):
         if ev.detail != self.state.button:
@@ -51,15 +49,10 @@ class interactive_pointer_transformer(object):
 
 class start_move(interactive_pointer_transformer):
     def transform(self, xdelta, ydelta):
-        self.state.client.moveresize(
-            x = self.state.initial_client_x + xdelta,
-            y = self.state.initial_client_y + ydelta
-        )
+        self.state.client.geom = self.state.initial_client_geom.move(xdelta, ydelta)
 
 class start_resize(interactive_pointer_transformer):
     def transform(self, xdelta, ydelta):
-        self.state.client.moveresize(
-            width = self.state.initial_client_width + xdelta,
-            height = self.state.initial_client_height + ydelta
-        )
+        self.state.client.geom.size = \
+            self.state.initial_client_geom.inflate(xdelta, ydelta).size
 

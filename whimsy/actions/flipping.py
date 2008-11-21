@@ -67,10 +67,7 @@ class _flipper(object):
 
 class flipping_move(_transformers.start_move, _flipper):
     def client_adjust(self, warp_by, viewport_by, client_by):
-        self.state.client.moveresize_rel(
-            x=client_by[0],
-            y=client_by[1],
-        )
+        self.state.client.geom.move_ip(client_by)
 
     def motion(self, **kw):
         super(flipping_move, self).motion(**kw)
@@ -80,10 +77,7 @@ class flipping_resize(_transformers.start_resize, _flipper):
     def client_adjust(self, warp_by, viewport_by, client_by):
         self.state.initial_pointer_x -= viewport_by[0]
         self.state.initial_pointer_y -= viewport_by[1]
-        self.state.client.moveresize_rel(
-            width=client_by[0],
-            height=client_by[1],
-        )
+        self.state.client.geom.move_ip(client_by)
 
     def motion(self, **kw):
         super(flipping_resize, self).motion(**kw)

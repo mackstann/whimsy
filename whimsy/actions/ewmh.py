@@ -270,31 +270,28 @@ def confine_to_workarea(hub, wm, x, y, width, height, **kw):
         if c.props.get('_NET_WM_STRUT') or c.props.get('_NET_WM_STRUT_PARTIAL'):
             continue
 
-        newgeom = c.geom.copy()
-
         def fix_axis(begin, size, wm_size, work_begin, work_size):
-
             near_movable    = 0 <= c.geom[begin]
             near_needs_move = 0 <= c.geom[begin] < work_begin
             far_movable     =                        c.geom[begin]+c.geom[size] <= wm_size
             far_needs_move  = work_begin+work_size < c.geom[begin]+c.geom[size] <= wm_size
 
             if near_needs_move:
-                newgeom[begin] = work_begin
+                c.geom[begin] = work_begin
                 if far_movable:
-                    newgeom[size] = min(newgeom[size], work_size)
+                    c.geom[size] = min(c.geom[size], work_size)
             elif far_needs_move:
-                newgeom[begin] -= (newgeom[begin]+newgeom[size]) - (work_begin+work_size)
+                c.geom[begin] -= (c.geom[begin]+c.geom[size]) - (work_begin+work_size)
                 if near_movable:
-                    near_overlap = work_begin - newgeom[begin]
+                    near_overlap = work_begin - c.geom[begin]
                     if near_overlap > 0:
-                        newgeom[begin] += near_overlap
-                        newgeom[size] -= near_overlap
+                        c.geom[begin] += near_overlap
+                        c.geom[size] -= near_overlap
 
-        fix_axis('x', 'width', wm.root_geometry.width, x, width)
-        fix_axis('y', 'height', wm.root_geometry.height, y, height)
+        fix_axis(0, 2, wm.root_geometry.width, x, width)
+        fix_axis(1, 3, wm.root_geometry.height, y, height)
 
-        c.moveresize(**newgeom)
+        c.moveresize()
 
 
 # 'send_event': True,

@@ -3,6 +3,8 @@
 from Xlib import X, Xutil
 from Xlib import error as Xerror
 
+from pygame import Rect
+
 from whimsy import util
 from whimsy.x11 import props, size_hints
 
@@ -22,13 +24,8 @@ class managed_client(object):
 
         self.win.change_attributes(event_mask=self.mask)
 
-        geom = self.win.get_geometry()
-        self.geom = dict(
-            x = geom.x,
-            y = geom.y,
-            width = geom.width,
-            height = geom.height,
-        )
+        getgeom = self.win.get_geometry()
+        self.geom = Rect(getgeom.x, getgeom.y, getgeom.width, getgeom.height)
 
         self.sizehints = size_hints.size_hints(win=self.win)
 
@@ -61,37 +58,33 @@ class managed_client(object):
         self.win.set_wm_state(state=Xutil.NormalState, icon=X.NONE)
 
     def moveresize(self, **kw):
-        self.geom.update(kw)
+        for k, v in kw.items():
+            setattr(self.geom, k, v)
         self.apply_constraints()
-        self.win.configure(**self.geom)
-
-    def moveresize_rel(self, **kw):
-        self.moveresize(**dict(
-            (key, val + self.geom[key]) for key, val in kw.items()
-        ))
+        self.win.configure(
+            x=self.geom[0],
+            y=self.geom[1],
+            width=self.geom[2],
+            height=self.geom[3],
+        )
 
     def apply_constraints(self):
         sh = self.sizehints
-        w, h = self.geom['width'], self.geom['height']
+        w, h = self.geom.size
         w, h = sh.fix_min(w, h)
         w, h = sh.fix_max(w, h)
         w, h = sh.fix_increments(w, h)
         w, h = sh.fix_aspect(w, h)
-        self.geom['width'], self.geom['height'] = w, h
+        self.geom.size = w, h
 
     def out_of_viewport(self, wm):
-        return (
-            self.geom['x'] >= wm.root_geometry.width or
-            self.geom['y'] >= wm.root_geometry.height or
-            self.geom['x']+self.geom['width'] <= 0 or
-            self.geom['y']+self.geom['height'] <= 0
-        )
+        return not self.geom.colliderect(wm.root_geometry)
 
     def configure(self, **changes):
         self.win.configure(**changes)
         for k in "x", "y", "width", "height":
             if k in changes:
-                self.geom[k] = changes[k]
+                setattr(self.geom, k, changes[k])
 
     def focus(self):
         self.dpy.set_input_focus(self.win, X.RevertToPointerRoot, X.CurrentTime)

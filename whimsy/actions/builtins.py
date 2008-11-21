@@ -91,7 +91,8 @@ class viewport_absolute_move(object):
         wins = props.get_prop(wm.dpy, wm.root, '_NET_CLIENT_LIST_STACKING')
         for win in wins:
             c = wm.find_client(win)
-            c.moveresize_rel(x=xdelta, y=ydelta)
+            c.geom.move_ip(xdelta, ydelta)
+            c.moveresize()
             #c.dpy.sync() # necessary?  maybe not
             #wish list: discard enternotifies
 
