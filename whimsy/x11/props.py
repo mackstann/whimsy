@@ -64,6 +64,7 @@ all_props = {
     # client
 
     "WM_PROTOCOLS":              prop_definition("ATOM", "array"),
+    "WM_NAME":                   prop_definition("STRING"),
 
     "_NET_WM_NAME":              prop_definition("UTF8_STRING"),
     "_NET_WM_VISIBLE_NAME":      prop_definition("UTF8_STRING"),
