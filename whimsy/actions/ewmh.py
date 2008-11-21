@@ -4,6 +4,7 @@
 # <http://www.freedesktop.org/wiki/Specifications/wm-spec>, so if the location
 # of this file changes within the repository, be sure to update that page
 
+import inspect
 from Xlib import X
 
 from whimsy import util
@@ -37,14 +38,17 @@ class startup_and_shutdown_with_wm(ewmh_prop):
 class net_supported(startup_and_shutdown_with_wm):
     def startup(self, wm, **kw):
         supported = []
-        for attr in globals().keys():
-            if isinstance(attr, ewmh_prop):
-                supported.append(wm.dpy.get_atom('_' + attr.upper()))
+        for name, attr in globals().items():
+            if not name.startswith('net_'):
+                continue
+
+            if ewmh_prop in inspect.getmro(attr):
+                supported.append(wm.dpy.get_atom('_' + name.upper()))
                 supported += [
                     wm.dpy.get_atom(a) for a in attr.also_implements
                 ]
 
-        self.set(supported)
+        self.set(supported + [wm.dpy.get_atom('_NET_SHOWING_DESKTOP')]) # XXX hack
 
     def shutdown(self, **kw):
         self.delete()
@@ -316,10 +320,12 @@ def message_type(ev):
         return ev.client_type
 
 def handle_client_message(wm, ev, **kw):
-    _NET_ACTIVE_WINDOW = 269
+    #_NET_ACTIVE_WINDOW = 269
     type = message_type(ev)
     if type == wm.dpy.get_atom('_NET_ACTIVE_WINDOW'):
         handle_net_active_window_message(wm=wm, ev=ev, **kw)
+    elif type == wm.dpy.get_atom('_NET_SHOWING_DESKTOP'):
+        handle_net_showing_desktop_message(wm=wm, ev=ev, **kw)
 
 def handle_net_active_window_message(wm, ev, **kw):
     win = ev.window
@@ -328,6 +334,22 @@ def handle_net_active_window_message(wm, ev, **kw):
         return
     c.focus()
     c.stack_top()
+
+def handle_net_showing_desktop_message(wm, ev, **kw):
+    if ev.data[1][0]:
+        print "iconifying everything"
+    else:
+        print "de-iconifying everything"
+    props.change_prop(wm.dpy, wm.root, '_NET_SHOWING_DESKTOP', ev.data[1][0])
+    for c in wm.clients:
+        if ev.data[1][0]:
+            if wm.dpy.get_atom('_NET_WM_WINDOW_TYPE_DOCK') not in c.fetch_prop('_NET_WM_WINDOW_TYPE'):
+                c.iconify()
+        else:
+            print "maybe map client"
+            if wm.dpy.get_atom('_NET_WM_WINDOW_TYPE_DOCK') not in c.fetch_prop('_NET_WM_WINDOW_TYPE'):
+                print "really map"
+                c.map_normal()
 
 # _NET_WM_ICON_GEOMETRY
 # _NET_WM_ICON

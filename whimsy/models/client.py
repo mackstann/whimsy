@@ -57,6 +57,10 @@ class managed_client(object):
         self.win.map()
         self.win.set_wm_state(state=Xutil.NormalState, icon=X.NONE)
 
+    def iconify(self):
+        self.win.unmap()
+        self.win.set_wm_state(state=Xutil.IconicState, icon=X.NONE)
+
     def moveresize(self, **kw):
         for k, v in kw.items():
             setattr(self.geom, k, v)
