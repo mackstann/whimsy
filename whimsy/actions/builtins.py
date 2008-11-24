@@ -3,6 +3,7 @@
 import os, subprocess, logging
 
 from whimsy.x11 import props
+from whimsy.filters import if_sticky
 
 class delete_client(object):
     """this is when we tell the client to go away"""
@@ -91,8 +92,9 @@ class viewport_absolute_move(object):
         wins = props.get_prop(wm.dpy, wm.root, '_NET_CLIENT_LIST_STACKING')
         for win in wins:
             c = wm.find_client(win)
-            c.geom.move_ip(xdelta, ydelta)
-            c.moveresize()
+            if not if_sticky(wm=wm, win=c.win):
+                c.geom.move_ip(xdelta, ydelta)
+                c.moveresize()
             #c.dpy.sync() # necessary?  maybe not
             #wish list: discard enternotifies
 

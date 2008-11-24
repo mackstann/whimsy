@@ -262,14 +262,20 @@ class net_wm_strut_partial(ewmh_prop):
         hub.emit('workarea_changed',
             **dict(zip(('x', 'y', 'width', 'height'), workarea)))
 
-def confine_to_workarea(hub, wm, x, y, width, height, **kw):
+def confine_to_workarea(hub, wm, **kw):
     # this should go somewhere else
-
-    # need to differentiate between encroaching and retreating/disappearing
+    try:
+        x, y, width, height = props.get_prop(wm.dpy, wm.root, '_NET_WORKAREA')
+    except Exception, e:
+        print "net workarea value invalid?"
+        print e
+        print repr(e)
+        try: print vars(e)
+        except: pass
+        return
 
     clients = [ c for c in wm.clients if not c.out_of_viewport(wm) ]
 
-    #left edge
     for c in clients:
         if c.props.get('_NET_WM_STRUT') or c.props.get('_NET_WM_STRUT_PARTIAL'):
             continue
@@ -292,10 +298,13 @@ def confine_to_workarea(hub, wm, x, y, width, height, **kw):
                         c.geom[begin] += near_overlap
                         c.geom[size] -= near_overlap
 
-        fix_axis(0, 2, wm.root_geometry.width, x, width)
-        fix_axis(1, 3, wm.root_geometry.height, y, height)
+            return near_needs_move or far_needs_move
 
-        c.moveresize()
+        moved =  fix_axis(0, 2, wm.root_geometry.width, x, width)
+        moved |= fix_axis(1, 3, wm.root_geometry.height, y, height)
+
+        if moved:
+            c.moveresize()
 
 
 # 'send_event': True,

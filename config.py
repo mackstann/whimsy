@@ -45,17 +45,17 @@ chains = [
     (if_key("v", M4), mpd("pause")),
     (if_key("b", M4), mpd("next")),
 
-    (if_key('w', C+A), if_client, delete_client()),
-    (if_button(1,  A), if_client, flipping_move()),
-    (if_button(3,  A), if_client, flipping_resize()),
-    (if_button(4,  A), if_client, client_method('stack_bottom')),
-    (if_button(5,  A), if_client, client_method('stack_top')),
+    (if_key('w', C+A), if_manipulable, delete_client()),
+    (if_button(1,  A), if_manipulable, flipping_move()),
+    (if_button(3,  A), if_manipulable, flipping_resize()),
+    (if_button(4,  A), if_manipulable, client_method('stack_bottom')),
+    (if_button(5,  A), if_manipulable, client_method('stack_top')),
 
     # maximizations: full screen, left half, right half
 
-    (if_key("f", M4), if_client, client_method('moveresize', x=0,   y=0, width=W,   height=H)),
-    (if_key("h", M4), if_client, client_method('moveresize', x=0,   y=0, width=W/2, height=H)),
-    (if_key("l", M4), if_client, client_method('moveresize', x=W/2, y=0, width=W/2, height=H)),
+    (if_key("f", M4), if_manipulable, client_method('moveresize', x=0,   y=0, width=W,   height=H)),
+    (if_key("h", M4), if_manipulable, client_method('moveresize', x=0,   y=0, width=W/2, height=H)),
+    (if_key("l", M4), if_manipulable, client_method('moveresize', x=W/2, y=0, width=W/2, height=H)),
 ]
 
 # the recursiveness of grabbing on root is also causing global keybindings to

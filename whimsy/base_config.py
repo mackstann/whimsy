@@ -86,7 +86,9 @@ chains = [
     ('client_init_after', client_method('configure', border_width=0)),
     ('client_init_after', client_method('map_normal')),
 
-    ('workarea_changed', ewmh.confine_to_workarea),
+    ('workarea_changed',    ewmh.confine_to_workarea),
+    ('after_viewport_move', ewmh.confine_to_workarea),
+
     ('client_message', ewmh.handle_client_message),
 ]
 
