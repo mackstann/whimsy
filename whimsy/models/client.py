@@ -27,8 +27,6 @@ class managed_client(object):
         getgeom = self.win.get_geometry()
         self.geom = Rect(getgeom.x, getgeom.y, getgeom.width, getgeom.height)
 
-        self.sizehints = size_hints.size_hints(win=self.win)
-
         self.props = {}
 
         #self.grab_all()
@@ -64,22 +62,13 @@ class managed_client(object):
     def moveresize(self, **kw):
         for k, v in kw.items():
             setattr(self.geom, k, v)
-        self.apply_constraints()
+        self.hub.emit('before_moveresize_client', client=self)
         self.win.configure(
             x=self.geom[0],
             y=self.geom[1],
             width=self.geom[2],
             height=self.geom[3],
         )
-
-    def apply_constraints(self):
-        sh = self.sizehints
-        w, h = self.geom.size
-        w, h = sh.fix_min(w, h)
-        w, h = sh.fix_max(w, h)
-        w, h = sh.fix_increments(w, h)
-        w, h = sh.fix_aspect(w, h)
-        self.geom.size = w, h
 
     def out_of_viewport(self, wm):
         return not self.geom.colliderect(wm.root_geometry)

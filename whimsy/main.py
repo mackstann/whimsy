@@ -7,6 +7,7 @@ from Xlib.support.connect import get_display
 
 from whimsy.signals import publisher
 from whimsy.models.window_manager import window_manager
+from whimsy.models.layout import layout
 from whimsy.controllers.x_event_controller import x_event_controller
 from whimsy.controllers.tick_controller import tick_controller
 
@@ -23,6 +24,7 @@ class main(object):
         self.dpy    = display.Display()
         self.hub    = publisher()
         self.wm     = window_manager(self.hub, self.dpy)
+        self.layout = layout(self.hub, self.wm)
         self.xec    = x_event_controller(self.hub, self.dpy)
         self.ticker = tick_controller(self.hub)
 
