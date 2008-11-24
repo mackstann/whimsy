@@ -53,9 +53,9 @@ chains = [
 
     # maximizations: full screen, left half, right half
 
-    (if_key("f", M4), if_manipulable, client_method('moveresize', x=0,   y=0, width=W,   height=H)),
-    (if_key("h", M4), if_manipulable, client_method('moveresize', x=0,   y=0, width=W/2, height=H)),
-    (if_key("l", M4), if_manipulable, client_method('moveresize', x=W/2, y=0, width=W/2, height=H)),
+    (if_key("f", M4), if_manipulable, ewmh.tile(0,  0, 100, 100)),
+    (if_key("h", M4), if_manipulable, ewmh.tile(0,  0, 50,  100)),
+    (if_key("l", M4), if_manipulable, ewmh.tile(50, 0, 50,  100)),
 ]
 
 # the recursiveness of grabbing on root is also causing global keybindings to

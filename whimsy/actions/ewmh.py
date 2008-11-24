@@ -306,6 +306,18 @@ def confine_to_workarea(hub, wm, **kw):
         if moved:
             c.moveresize()
 
+def tile(left_percent, top_percent, width_percent, height_percent):
+    def closure(wm, win, **kw):
+        client = wm.find_client(win)
+        x, y, width, height = props.get_prop(wm.dpy, wm.root, '_NET_WORKAREA')
+        client.moveresize(
+            x=x+int(width*left_percent/100.0),
+            y=y+int(height*top_percent/100.0),
+            width=int(width*width_percent/100.0),
+            height=int(height*height_percent/100.0),
+        )
+    return closure
+
 
 # 'send_event': True,
 # 'type': 33,
