@@ -121,26 +121,10 @@ class size_hints(object):
     def change_to_aspect(self, aspect, width, height):
         """
         aspect is a float, e.g. 1.3... for 4:3 (4/3), 1.7... for 16:9 (16/9)
-
-        take a non-aspect-ratio-conforming width and height, and return a new
-        width and height that conforms (as close as possible) to the respective
-        aspect ratio while maintaining (as close as possible) the same amount
-        of area
-
-        width = height x aspect, so:
-        area = height x height x aspect
-
-        new_height x new_height x aspect = orig_width x orig_height
-        new_height**2 x aspect = orig_width x orig_height
-        new_height**2 = (orig_width x orig_height) / aspect
-        new_height = sqrt((orig_width x orig_height) / aspect)
-
-        so: 4096 x 75
-        becomes: 480 x (4/3.0) x 480
-        which is: 640 x 480
-        4096 x 75 = 640 x 480 = 307200
         """
-        new_height = int(round(math.sqrt((width * height) / aspect)))
-        new_width = int(round(new_height * aspect))
-        return new_width, new_height
+        if aspect > 1:
+            return width, int(round(width / aspect))
+        if aspect < 1:
+            return int(round(height / aspect)), height
+        return (min(width, height),)*2
 
