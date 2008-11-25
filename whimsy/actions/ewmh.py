@@ -264,47 +264,44 @@ class net_wm_strut_partial(ewmh_prop):
 
 def confine_to_workarea(hub, wm, **kw):
     # this should go somewhere else
-    try:
-        x, y, width, height = props.get_prop(wm.dpy, wm.root, '_NET_WORKAREA')
-    except Exception, e:
-        print "net workarea value invalid?"
-        print e
-        print repr(e)
-        try: print vars(e)
-        except: pass
-        return
-
     clients = [ c for c in wm.clients if not c.out_of_viewport(wm) ]
 
     for c in clients:
         if c.props.get('_NET_WM_STRUT') or c.props.get('_NET_WM_STRUT_PARTIAL'):
             continue
 
-        def fix_axis(begin, size, wm_size, work_begin, work_size):
-            near_movable    = 0 <= c.geom[begin]
-            near_needs_move = 0 <= c.geom[begin] < work_begin
-            far_movable     =                        c.geom[begin]+c.geom[size] <= wm_size
-            far_needs_move  = work_begin+work_size < c.geom[begin]+c.geom[size] <= wm_size
+        confine_window_to_workarea(hub, wm, c, **kw)
 
-            if near_needs_move:
-                c.geom[begin] = work_begin
-                if far_movable:
-                    c.geom[size] = min(c.geom[size], work_size)
-            elif far_needs_move:
-                c.geom[begin] -= (c.geom[begin]+c.geom[size]) - (work_begin+work_size)
-                if near_movable:
-                    near_overlap = work_begin - c.geom[begin]
-                    if near_overlap > 0:
-                        c.geom[begin] += near_overlap
-                        c.geom[size] -= near_overlap
+def confine_window_to_workarea(hub, wm, client, **kw):
+    x, y, width, height = props.get_prop(wm.dpy, wm.root, '_NET_WORKAREA')
+    c = client
+    def fix_axis(begin, size, wm_size, work_begin, work_size):
+        near_movable    = 0 <= c.geom[begin]
+        near_needs_move = 0 <= c.geom[begin] < work_begin
+        far_movable     =                        c.geom[begin]+c.geom[size] <= wm_size
+        far_needs_move  = work_begin+work_size < c.geom[begin]+c.geom[size] <= wm_size
 
-            return near_needs_move or far_needs_move
+        if near_needs_move:
+            c.geom[begin] = work_begin
+            if far_movable:
+                c.geom[size] = min(c.geom[size], work_size)
+        elif far_needs_move:
+            c.geom[begin] -= (c.geom[begin]+c.geom[size]) - (work_begin+work_size)
+            if near_movable:
+                near_overlap = work_begin - c.geom[begin]
+                if near_overlap > 0:
+                    c.geom[begin] += near_overlap
+                    c.geom[size] -= near_overlap
 
-        moved =  fix_axis(0, 2, wm.root_geometry.width, x, width)
-        moved |= fix_axis(1, 3, wm.root_geometry.height, y, height)
+        return near_needs_move or far_needs_move
 
-        if moved:
-            c.moveresize()
+    moved =  fix_axis(0, 2, wm.root_geometry.width, x, width)
+    moved |= fix_axis(1, 3, wm.root_geometry.height, y, height)
+
+    if moved:
+        c.moveresize()
+
+
 
 def tile(left_percent, top_percent, width_percent, height_percent):
     def closure(wm, win, **kw):

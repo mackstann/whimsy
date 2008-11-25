@@ -84,6 +84,7 @@ chains = [
     ('configure_request', configure_request_handler()), # rename this function
 
     ('client_init_after', client_method('configure', border_width=0)),
+    ('client_init_after', ewmh.confine_window_to_workarea),
     ('client_init_after', client_method('map_normal')),
 
     ('workarea_changed',    ewmh.confine_to_workarea),

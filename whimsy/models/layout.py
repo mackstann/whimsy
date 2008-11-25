@@ -8,7 +8,7 @@ class layout(object):
         self.hub = hub
         self.wm = wm
         self.sizehints = {}
-        hub.attach('after_manage_window', self.add_client)
+        hub.attach('client_init_before', self.add_client)
         hub.attach('after_unmanage_window', self.remove_client)
         hub.attach('before_moveresize_client', self.constrain_moveresize)
 
