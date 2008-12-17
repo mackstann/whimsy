@@ -273,7 +273,10 @@ def confine_to_workarea(hub, wm, **kw):
         confine_window_to_workarea(hub, wm, c, **kw)
 
 def confine_window_to_workarea(hub, wm, client, **kw):
-    x, y, width, height = props.get_prop(wm.dpy, wm.root, '_NET_WORKAREA')
+    try:
+        x, y, width, height = props.get_prop(wm.dpy, wm.root, '_NET_WORKAREA')
+    except ValueError:
+        return
     c = client
     def fix_axis(begin, size, wm_size, work_begin, work_size):
         near_movable    = 0 <= c.geom[begin]
