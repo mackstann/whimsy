@@ -12,7 +12,7 @@ class x_event_controller(object):
         self.dpy = dpy
 
     def select_and_emit_all(self, **kw):
-        lenient_select([self.dpy], [], [], 1.0/100)
+        lenient_select([self.dpy], [], [], 10)
         self.emit_all_pending_events()
 
     def emit_all_pending_events(self):
