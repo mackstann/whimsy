@@ -4,18 +4,9 @@ from whimsy.base_config import *
 
 import socket
 
-class mpd(object):
-    'control music player daemon (http://musicpd.org)'
-    def __init__(self, cmd):
-        self.cmd = cmd
-    def __call__(self, **kw):
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect(('localhost', 6600))
-            s.send("%s\n" % self.cmd)
-            s.close()
-        except socket.error:
-            pass
+def corn(cmd):
+    return 'dbus-send --session --type=method_call --dest=org.mpris.corn '\
+            '/Player org.freedesktop.MediaPlayer.%s' % cmd
 
 wm.vwidth = W * 3
 wm.vheight = H * 3
@@ -39,11 +30,11 @@ chains = [
     (if_key("x", C+A), execute("urxvt")),
     (if_key("s", C+A), execute("sleep 1; xset s activate")),
 
-    (if_key("z", M4), mpd("previous")),
-    (if_key("x", M4), mpd("stop")),
-    (if_key("c", M4), mpd("play")),
-    (if_key("v", M4), mpd("pause")),
-    (if_key("b", M4), mpd("next")),
+    (if_key("z", M4), execute(corn("Prev"))),
+    (if_key("x", M4), execute(corn("Stop"))),
+    (if_key("c", M4), execute(corn("Play"))),
+    (if_key("v", M4), execute(corn("Pause"))),
+    (if_key("b", M4), execute(corn("Next"))),
 
     (if_key('w', C+A), if_manipulable, delete_client()),
     (if_button(1,  A), if_manipulable, flipping_move()),
